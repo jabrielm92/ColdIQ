@@ -308,6 +308,7 @@ class ColdIQAPITester:
             self.test_email_analysis()
             self.test_insights_endpoint()
             self.test_billing_endpoints()
+            self.test_tier_specific_features()  # Add tier testing
         else:
             print("❌ Signup failed - skipping authenticated tests")
         
