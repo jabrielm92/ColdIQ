@@ -5,7 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth, API } from "@/App";
 import axios from "axios";
 import { 
-  Mail, Check, Zap, ArrowRight, ArrowLeft, Sparkles
+  Mail, Check, ArrowRight, ArrowLeft, Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -137,33 +137,38 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 overflow-hidden">
+    <div className="min-h-screen bg-[#050505] text-zinc-100 overflow-hidden">
+      {/* Noise Texture */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
+      }} />
+
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 glass">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <Mail className="w-4 h-4 text-white" />
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#050505]/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-5 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-[#d4af37] flex items-center justify-center">
+              <Mail className="w-4 h-4 text-black" />
             </div>
-            <span className="text-xl font-bold tracking-tighter" style={{ fontFamily: 'Manrope' }}>ColdIQ</span>
+            <span className="text-lg font-semibold tracking-tight font-sans">ColdIQ</span>
           </Link>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             {user ? (
               <Link to="/dashboard">
-                <Button variant="ghost" className="text-zinc-400 hover:text-white">
+                <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-transparent text-sm font-medium tracking-wide uppercase rounded-none">
                   Dashboard
                 </Button>
               </Link>
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" className="text-zinc-400 hover:text-white">
+                  <Button variant="ghost" className="text-zinc-400 hover:text-white hover:bg-transparent text-sm font-medium tracking-wide uppercase rounded-none">
                     Log in
                   </Button>
                 </Link>
                 <Link to="/signup">
-                  <Button className="bg-gradient-to-r from-indigo-600 to-violet-600">
+                  <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-6 py-3 h-auto">
                     Get Started
                   </Button>
                 </Link>
@@ -174,33 +179,34 @@ const Pricing = () => {
       </nav>
 
       {/* Header */}
-      <section className="pt-32 pb-12 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <Link to="/" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8">
+      <section className="pt-36 pb-16 px-6 lg:px-12">
+        <div className="max-w-4xl mx-auto">
+          <Link to="/" className="inline-flex items-center gap-2 text-zinc-500 hover:text-white transition-colors mb-12 text-sm font-mono tracking-wide uppercase">
             <ArrowLeft className="w-4 h-4" />
-            Back to home
+            Back
           </Link>
           
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4" style={{ fontFamily: 'Manrope' }}>
-            Simple, Transparent Pricing
+          <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-4">Pricing</p>
+          <h1 className="font-serif text-5xl sm:text-6xl tracking-tight mb-6">
+            Simple, transparent pricing
           </h1>
-          <p className="text-lg text-zinc-400 max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-zinc-400 max-w-xl mb-12">
             Choose the plan that's right for you. Upgrade or downgrade at any time.
           </p>
           
           {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-4">
-            <span className={`text-sm ${!isAnnual ? 'text-white' : 'text-zinc-500'}`}>Monthly</span>
+          <div className="flex items-center gap-6">
+            <span className={`text-sm font-mono tracking-wide ${!isAnnual ? 'text-white' : 'text-zinc-600'}`}>Monthly</span>
             <Switch
               checked={isAnnual}
               onCheckedChange={setIsAnnual}
-              className="data-[state=checked]:bg-indigo-600"
+              className="data-[state=checked]:bg-[#d4af37]"
               data-testid="billing-toggle"
             />
-            <span className={`text-sm ${isAnnual ? 'text-white' : 'text-zinc-500'}`}>
+            <span className={`text-sm font-mono tracking-wide ${isAnnual ? 'text-white' : 'text-zinc-600'}`}>
               Annual
-              <span className="ml-2 px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded-full">
-                Save 20%
+              <span className="ml-3 px-2 py-1 bg-[#a3e635]/10 text-[#a3e635] text-xs font-mono">
+                SAVE 20%
               </span>
             </span>
           </div>
@@ -208,9 +214,9 @@ const Pricing = () => {
       </section>
 
       {/* Pricing Cards */}
-      <section className="pb-20 px-6" data-testid="pricing-section">
+      <section className="pb-24 px-6 lg:px-12" data-testid="pricing-section">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-800/30">
             {plans.map((plan, i) => {
               const price = formatPrice(plan.monthlyPrice, plan.annualPrice, plan.annualMonthly);
               
@@ -220,40 +226,43 @@ const Pricing = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className={`relative bg-zinc-900/50 border rounded-xl p-6 ${
+                  className={`relative bg-[#050505] p-8 ${
                     plan.popular 
-                      ? 'border-indigo-500 ring-1 ring-indigo-500/50' 
-                      : 'border-zinc-800'
+                      ? 'border border-[#d4af37]/50' 
+                      : ''
                   }`}
                   data-testid={`pricing-card-${plan.id}`}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-indigo-500 rounded-full text-xs font-medium flex items-center gap-1">
+                    <div className="absolute -top-px left-0 right-0 h-px bg-[#d4af37]" />
+                  )}
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-6 px-3 py-1 bg-[#d4af37] text-black text-xs font-bold uppercase tracking-wider flex items-center gap-1">
                       <Sparkles className="w-3 h-3" />
-                      Most Popular
+                      Popular
                     </div>
                   )}
                   
-                  <div className="mb-6">
-                    <h3 className="text-xl font-bold mb-2" style={{ fontFamily: 'Manrope' }}>{plan.name}</h3>
+                  <div className="mb-8">
+                    <h3 className="text-xl font-sans font-semibold mb-3">{plan.name}</h3>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold" style={{ fontFamily: 'JetBrains Mono' }}>{price.display}</span>
-                      <span className="text-zinc-500">{price.period}</span>
+                      <span className="text-5xl font-mono font-bold tracking-tight">{price.display}</span>
+                      <span className="text-zinc-600 font-mono text-sm">{price.period}</span>
                     </div>
                     {price.total && (
-                      <p className="text-xs text-zinc-500 mt-1">Billed as {price.total}</p>
+                      <p className="text-xs text-zinc-600 mt-2 font-mono">Billed as {price.total}</p>
                     )}
                     {price.savings && (
-                      <p className="text-xs text-emerald-400 mt-1">{price.savings}</p>
+                      <p className="text-xs text-[#a3e635] mt-1 font-mono">{price.savings}</p>
                     )}
-                    <p className="text-zinc-400 text-sm mt-3">{plan.description}</p>
+                    <p className="text-zinc-500 text-sm mt-4">{plan.description}</p>
                   </div>
                   
-                  <ul className="space-y-3 mb-6">
+                  <ul className="space-y-3 mb-8">
                     {plan.features.map((feature, j) => (
-                      <li key={j} className="flex items-start gap-2 text-sm">
-                        <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                        <span className="text-zinc-300">{feature}</span>
+                      <li key={j} className="flex items-start gap-3 text-sm">
+                        <Check className="w-4 h-4 text-[#a3e635] flex-shrink-0 mt-0.5" />
+                        <span className="text-zinc-400">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -261,17 +270,17 @@ const Pricing = () => {
                   <Button 
                     onClick={() => handleUpgrade(plan.id)}
                     disabled={loading === plan.id || (user?.subscription_tier === plan.id)}
-                    className={`w-full ${
+                    className={`w-full rounded-none font-bold uppercase tracking-wider text-xs px-6 py-4 h-auto transition-all ${
                       plan.popular
-                        ? 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 glow-primary'
+                        ? 'bg-[#d4af37] text-black hover:bg-[#b5952f] hover:shadow-[0_0_20px_rgba(212,175,55,0.2)]'
                         : plan.id === 'free'
-                          ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
-                          : 'bg-zinc-800 hover:bg-zinc-700'
+                          ? 'bg-zinc-900 text-zinc-500 hover:bg-zinc-800 border border-zinc-800'
+                          : 'bg-zinc-900 text-zinc-300 hover:bg-zinc-800 border border-zinc-800'
                     }`}
                     data-testid={`select-plan-${plan.id}`}
                   >
                     {loading === plan.id ? (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
                     ) : user?.subscription_tier === plan.id ? (
                       "Current Plan"
                     ) : (
@@ -289,19 +298,19 @@ const Pricing = () => {
       </section>
 
       {/* Trust Banner */}
-      <section className="py-12 px-6 border-y border-zinc-800 bg-zinc-900/30">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex flex-wrap justify-center gap-8 text-zinc-500">
+      <section className="py-12 px-6 lg:px-12 border-y border-zinc-900">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-12 text-zinc-600 text-sm font-mono">
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-emerald-400" />
+              <Check className="w-4 h-4 text-[#a3e635]" />
               <span>30-day money-back guarantee</span>
             </div>
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-emerald-400" />
+              <Check className="w-4 h-4 text-[#a3e635]" />
               <span>Cancel anytime</span>
             </div>
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-emerald-400" />
+              <Check className="w-4 h-4 text-[#a3e635]" />
               <span>Secure payment via Stripe</span>
             </div>
           </div>
@@ -309,13 +318,14 @@ const Pricing = () => {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 px-6">
+      <section className="py-24 px-6 lg:px-12">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: 'Manrope' }}>
-            Frequently Asked Questions
+          <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-4">FAQ</p>
+          <h2 className="font-serif text-4xl tracking-tight mb-12">
+            Frequently asked questions
           </h2>
           
-          <div className="space-y-4">
+          <div className="space-y-px bg-zinc-800/30">
             {[
               { q: "Can I change plans later?", a: "Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately and we'll prorate your billing." },
               { q: "What payment methods do you accept?", a: "We accept all major credit cards (Visa, Mastercard, Amex) through Stripe's secure payment platform." },
@@ -323,9 +333,9 @@ const Pricing = () => {
               { q: "What's the difference between monthly and annual?", a: "Annual billing saves you 20% compared to monthly. You pay upfront for the full year at a discounted rate." },
               { q: "Can I get a refund?", a: "Yes! We offer a 30-day money-back guarantee. If you're not satisfied, contact us for a full refund." }
             ].map((faq, i) => (
-              <div key={i} className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5">
-                <h4 className="font-medium mb-2">{faq.q}</h4>
-                <p className="text-zinc-400 text-sm">{faq.a}</p>
+              <div key={i} className="bg-[#050505] p-6 border-l-2 border-transparent hover:border-[#d4af37]/50 transition-colors">
+                <h4 className="font-sans font-medium mb-2">{faq.q}</h4>
+                <p className="text-zinc-500 text-sm">{faq.a}</p>
               </div>
             ))}
           </div>
@@ -333,15 +343,15 @@ const Pricing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t border-zinc-800">
+      <footer className="py-12 px-6 lg:px-12 border-t border-zinc-900">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <Mail className="w-3 h-3 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 bg-[#d4af37] flex items-center justify-center">
+              <Mail className="w-3 h-3 text-black" />
             </div>
-            <span className="font-bold tracking-tighter" style={{ fontFamily: 'Manrope' }}>ColdIQ</span>
+            <span className="font-semibold tracking-tight font-sans">ColdIQ</span>
           </div>
-          <p className="text-zinc-500 text-sm">© 2025 ColdIQ. All rights reserved.</p>
+          <p className="text-zinc-600 text-sm font-mono">© 2025 ColdIQ. All rights reserved.</p>
         </div>
       </footer>
     </div>
