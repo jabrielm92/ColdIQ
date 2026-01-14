@@ -332,6 +332,36 @@ def require_tier(min_tier: str):
         return user
     return check_tier
 
+def generate_verification_token() -> str:
+    return secrets.token_urlsafe(32)
+
+def create_verification_token(user_id: str, token_type: str, expires_hours: int = 24) -> dict:
+    return {
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "token": generate_verification_token(),
+        "type": token_type,  # "email_verification" or "password_reset"
+        "expires_at": (datetime.now(timezone.utc) + timedelta(hours=expires_hours)).isoformat(),
+        "used": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+
+async def send_email_notification(to_email: str, subject: str, body: str):
+    """Mock email sender - in production, integrate with SendGrid/Resend"""
+    logger.info(f"EMAIL TO: {to_email}")
+    logger.info(f"SUBJECT: {subject}")
+    logger.info(f"BODY: {body}")
+    # Store in db for demo purposes
+    await db.email_logs.insert_one({
+        "id": str(uuid.uuid4()),
+        "to": to_email,
+        "subject": subject,
+        "body": body,
+        "sent_at": datetime.now(timezone.utc).isoformat(),
+        "status": "sent"  # In production: pending -> sent/failed
+    })
+    return True
+
 # ================= AUTH ROUTES =================
 
 @api_router.post("/auth/signup")
