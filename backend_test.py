@@ -241,6 +241,57 @@ class ColdIQAPITester:
         
         return bool(response)
 
+    def test_tier_specific_features(self):
+        """Test tier-specific feature restrictions"""
+        print("\n🎯 Testing Tier-Specific Features...")
+        
+        if not self.token:
+            self.log_test("Tier Features", False, "No auth token available")
+            return False
+        
+        # Test GET /api/user/features
+        features_response = self.run_test("Get User Features", "GET", "user/features", 200)
+        if features_response:
+            # Verify it has expected structure for free tier
+            expected_keys = ["analyses_limit", "history_limit", "insights_dashboard", "export_csv", "templates", "api_access"]
+            has_all_keys = all(key in features_response for key in expected_keys)
+            self.log_test("Features Response Structure", has_all_keys, 
+                         "Missing keys" if not has_all_keys else "All expected keys present")
+        
+        # Test auth/me includes features
+        me_response = self.run_test("Auth Me Includes Features", "GET", "auth/me", 200)
+        if me_response:
+            has_features = "features" in me_response
+            self.log_test("Auth Me Has Features Object", has_features,
+                         "Features object missing" if not has_features else "Features object present")
+        
+        # Test insights dashboard (free tier should get available: false)
+        insights_response = self.run_test("Insights Dashboard Access", "GET", "insights/dashboard", 200)
+        if insights_response:
+            # For free tier, should return available: false
+            is_blocked = insights_response.get("available") == False
+            self.log_test("Free Tier Insights Blocked", is_blocked,
+                         "Free tier should be blocked from insights" if not is_blocked else "Correctly blocked")
+        
+        # Test CSV export (should be 403 for free tier)
+        self.run_test("CSV Export Blocked for Free", "GET", "analysis/export/csv", 403)
+        
+        # Test templates (should return available: false for free tier)
+        templates_response = self.run_test("Templates Access", "GET", "templates", 200)
+        if templates_response:
+            is_blocked = templates_response.get("available") == False
+            self.log_test("Free Tier Templates Blocked", is_blocked,
+                         "Free tier should be blocked from templates" if not is_blocked else "Correctly blocked")
+        
+        # Test API keys (should be 403 for free tier)
+        self.run_test("API Keys Blocked for Free", "GET", "api-keys", 403)
+        self.run_test("API Key Creation Blocked for Free", "POST", "api-keys", 403)
+        
+        # Test team management (should be 403 for free tier)
+        self.run_test("Team Management Blocked for Free", "GET", "team", 403)
+        
+        return True
+
     def run_all_tests(self):
         """Run all API tests"""
         print("🚀 Starting ColdIQ API Tests...")
