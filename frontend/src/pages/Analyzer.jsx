@@ -152,7 +152,7 @@ const Analyzer = () => {
                   <Button 
                     type="submit"
                     disabled={loading || !subject.trim() || !body.trim()}
-                    className="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 glow-primary h-11"
+                    className="flex-1 bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs h-12 transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.2)]"
                     data-testid="analyze-btn"
                   >
                     {loading ? (
@@ -173,7 +173,7 @@ const Analyzer = () => {
                       type="button"
                       variant="outline"
                       onClick={resetForm}
-                      className="border-zinc-700 hover:bg-zinc-800"
+                      className="border-zinc-800 hover:bg-zinc-800 rounded-none"
                       data-testid="reset-btn"
                     >
                       <RefreshCw className="w-4 h-4" />
@@ -192,11 +192,11 @@ const Analyzer = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-8 flex flex-col items-center justify-center min-h-[400px]"
+                    className="bg-[#0a0a0a] border border-zinc-900 p-8 flex flex-col items-center justify-center min-h-[400px]"
                   >
-                    <div className="w-16 h-16 rounded-full border-4 border-indigo-500/30 border-t-indigo-500 animate-spin mb-4" />
+                    <div className="w-16 h-16 border-4 border-[#d4af37]/30 border-t-[#d4af37] animate-spin mb-4" />
                     <p className="text-zinc-400 text-center">Analyzing your email with AI...</p>
-                    <p className="text-zinc-500 text-sm mt-2">This may take a few seconds</p>
+                    <p className="text-zinc-600 text-sm mt-2 font-mono">This may take a few seconds</p>
                   </motion.div>
                 ) : analysis ? (
                   <motion.div
@@ -207,20 +207,20 @@ const Analyzer = () => {
                     data-testid="analysis-results"
                   >
                     {/* Score Card */}
-                    <div className={`bg-gradient-to-br ${getScoreBgColor(analysis.analysis_score)} border border-zinc-800 rounded-xl p-6`}>
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-semibold text-lg" style={{ fontFamily: 'Manrope' }}>Overall Score</h3>
+                    <div className={`${getScoreBgColor(analysis.analysis_score)} border p-8`}>
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xs font-mono tracking-widest uppercase text-zinc-500">Overall Score</h3>
                         <div className="flex gap-2">
                           <button 
                             onClick={() => submitFeedback('helpful')}
-                            className="p-2 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-emerald-400 transition-colors"
+                            className="p-2 hover:bg-white/5 text-zinc-500 hover:text-[#a3e635] transition-colors"
                             data-testid="feedback-helpful-btn"
                           >
                             <ThumbsUp className="w-4 h-4" />
                           </button>
                           <button 
                             onClick={() => submitFeedback('not_helpful')}
-                            className="p-2 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-red-400 transition-colors"
+                            className="p-2 hover:bg-white/5 text-zinc-500 hover:text-red-500 transition-colors"
                             data-testid="feedback-not-helpful-btn"
                           >
                             <ThumbsDown className="w-4 h-4" />
