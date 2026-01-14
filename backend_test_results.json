@@ -1,94 +1,166 @@
 {
   "summary": {
-    "tests_run": 14,
-    "tests_passed": 14,
+    "tests_run": 26,
+    "tests_passed": 26,
     "success_rate": 100.0,
-    "timestamp": "2026-01-14T16:21:24.592130"
+    "timestamp": "2026-01-14T19:33:05.784949"
   },
   "results": [
     {
       "test": "API Root",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:04.597298"
+      "timestamp": "2026-01-14T19:32:45.081895"
     },
     {
       "test": "Health Check",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:04.678978"
+      "timestamp": "2026-01-14T19:32:45.123285"
     },
     {
       "test": "User Signup",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:04.956030"
+      "timestamp": "2026-01-14T19:32:45.390366"
     },
     {
       "test": "User Login",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:05.218034"
+      "timestamp": "2026-01-14T19:32:45.658758"
     },
     {
       "test": "Get Current User",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:05.257143"
+      "timestamp": "2026-01-14T19:32:45.699355"
     },
     {
       "test": "Complete Onboarding",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:05.304985"
+      "timestamp": "2026-01-14T19:32:45.746384"
     },
     {
       "test": "Get User Usage",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:05.349280"
+      "timestamp": "2026-01-14T19:32:45.789722"
     },
     {
       "test": "Update Profile",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:05.393110"
+      "timestamp": "2026-01-14T19:32:45.866946"
     },
     {
       "test": "Analyze Email",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:23.849124"
+      "timestamp": "2026-01-14T19:33:04.722489"
     },
     {
       "test": "Get Analysis History",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:23.919219"
+      "timestamp": "2026-01-14T19:33:04.781818"
     },
     {
       "test": "Get Specific Analysis",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:23.960170"
+      "timestamp": "2026-01-14T19:33:04.818976"
     },
     {
       "test": "Submit Feedback",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:23.997601"
+      "timestamp": "2026-01-14T19:33:04.858678"
     },
     {
       "test": "Get Insights Dashboard",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:24.040094"
+      "timestamp": "2026-01-14T19:33:04.897446"
     },
     {
       "test": "Create Checkout Session",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:21:24.591213"
+      "timestamp": "2026-01-14T19:33:05.445056"
+    },
+    {
+      "test": "Get User Features",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:33:05.482303"
+    },
+    {
+      "test": "Features Response Structure",
+      "success": true,
+      "details": "All expected keys present",
+      "timestamp": "2026-01-14T19:33:05.482937"
+    },
+    {
+      "test": "Auth Me Includes Features",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:33:05.517934"
+    },
+    {
+      "test": "Auth Me Has Features Object",
+      "success": true,
+      "details": "Features object present",
+      "timestamp": "2026-01-14T19:33:05.518574"
+    },
+    {
+      "test": "Insights Dashboard Access",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:33:05.554948"
+    },
+    {
+      "test": "Free Tier Insights Blocked",
+      "success": true,
+      "details": "Correctly blocked",
+      "timestamp": "2026-01-14T19:33:05.555600"
+    },
+    {
+      "test": "CSV Export Blocked for Free",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:33:05.594242"
+    },
+    {
+      "test": "Templates Access",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:33:05.630009"
+    },
+    {
+      "test": "Free Tier Templates Blocked",
+      "success": true,
+      "details": "Correctly blocked",
+      "timestamp": "2026-01-14T19:33:05.630688"
+    },
+    {
+      "test": "API Keys Blocked for Free",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:33:05.666887"
+    },
+    {
+      "test": "API Key Creation Blocked for Free",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:33:05.746286"
+    },
+    {
+      "test": "Team Management Blocked for Free",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:33:05.784013"
     }
   ]
 }
