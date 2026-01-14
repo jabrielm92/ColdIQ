@@ -1,82 +1,59 @@
 # ColdIQ - Product Requirements Document
 
-## Original Problem Statement
-AI-powered cold email analyzer & optimizer SaaS platform that analyzes cold emails, provides actionable feedback, rewrites emails for optimal performance, and tracks user performance over time with personalized insights.
+## Overview
+AI-powered cold email analyzer & optimizer SaaS with tier-specific features.
 
-## Architecture
-- **Frontend**: React with Tailwind CSS, Framer Motion, Shadcn UI components
-- **Backend**: FastAPI (Python) with JWT authentication
-- **Database**: MongoDB
-- **AI**: Claude Sonnet 4.5 via Emergent LLM integration
-- **Payments**: Stripe via emergentintegrations library
+## Subscription Tiers Implemented
 
-## User Personas
-1. **Sales Professionals** - Send 50-500+ cold emails/month, need better response rates
-2. **Founders/CEOs** - Limited time, need quick optimization
-3. **Recruiters** - High volume outreach, need consistency
-4. **Marketers** - Cold outreach campaigns, need data-driven insights
+| Feature | Free | Starter ($29) | Pro ($79) | Agency ($199) |
+|---------|------|---------------|-----------|---------------|
+| Analyses/month | 3 | 50 | Unlimited | Unlimited |
+| History access | Last 3 | Full | Full | Full |
+| Insights dashboard | ❌ | Basic | Advanced | Advanced |
+| AI Recommendations | ❌ | ❌ | ✅ | ✅ |
+| CSV Export | ❌ | ❌ | ✅ | ✅ |
+| Email Templates | ❌ | ❌ | ✅ | ✅ |
+| Team Seats | 0 | 0 | 0 | 5 |
+| API Access | ❌ | ❌ | ❌ | ✅ |
+| Priority Support | ❌ | ❌ | ✅ | ✅ |
 
-## Core Requirements (Implemented)
-- [x] User authentication (signup/login with JWT)
-- [x] 3-step onboarding flow (role, industry, volume)
-- [x] Email analyzer with AI-powered scoring (0-100)
-- [x] Detailed analysis (strengths, weaknesses, improvements)
-- [x] AI-rewritten optimized email versions
-- [x] Sub-scores (personalization, value prop, CTA)
-- [x] Analysis history with pagination
-- [x] Insights dashboard (trends, patterns, recommendations)
-- [x] 4-tier subscription model (Free, Starter, Pro, Agency)
-- [x] Stripe payment integration
-- [x] User settings/profile management
-- [x] Monthly usage tracking and limits
+## Features Implemented (January 2025)
 
-## What's Implemented (January 2025)
-### Backend APIs
-- `/api/auth/signup`, `/api/auth/login`, `/api/auth/me`
-- `/api/auth/onboarding`
-- `/api/analysis/analyze`, `/api/analysis/history`, `/api/analysis/{id}`
-- `/api/insights/dashboard`
-- `/api/user/profile`, `/api/user/usage`
-- `/api/billing/create-checkout-session`, `/api/billing/checkout-status/{id}`
-- `/api/webhook/stripe`
+### Authentication
+- JWT-based signup/login
+- 3-step onboarding (role, industry, volume)
+- Session persistence
 
-### Frontend Pages
-- Landing page with hero, features, stats
-- Login/Signup pages with validation
-- 3-step onboarding flow
-- Dashboard with stats, usage, recent analyses
-- Email analyzer with live results
-- History page with table and modal details
-- Insights dashboard with charts
-- Settings page (profile, billing)
-- Pricing page with 4 tiers
+### Email Analysis
+- AI analysis via Claude Sonnet 4.5
+- Score (0-100), response/open rates
+- Strengths, weaknesses, improvements
+- AI-rewritten optimized emails
+- Sub-scores (personalization, CTA, value prop)
 
-## Prioritized Backlog
-### P0 (Critical)
-- [x] Core email analysis functionality
-- [x] User authentication
-- [x] Basic subscription tiers
+### Tier-Specific Features
+- **Free**: 3 analyses, 3 history, no insights
+- **Starter**: 50 analyses, full history, basic insights
+- **Pro**: Unlimited + advanced insights + CSV export + templates
+- **Agency**: Everything + team management (5 seats) + API keys
 
-### P1 (High Priority)
-- [ ] Email verification flow
-- [ ] Password reset functionality
-- [ ] Export analyses to CSV
+### API Endpoints
+- Auth: signup, login, me, onboarding
+- Analysis: analyze, history, export/csv
+- Insights: dashboard (tier-gated)
+- Templates: CRUD (Pro+)
+- Team: management, invites, analytics (Agency)
+- API Keys: create, list, delete (Agency)
+- Billing: Stripe checkout, webhooks
 
-### P2 (Medium Priority)
-- [ ] Chrome extension for Gmail
-- [ ] Email templates library
-- [ ] A/B test suggestions
-- [ ] Team collaboration (Agency tier)
-
-### P3 (Future)
-- [ ] CRM integrations (Salesforce, HubSpot)
-- [ ] Mobile app
-- [ ] API access for developers
-- [ ] ML model trained on user data
+## Tech Stack
+- Frontend: React + Tailwind + Framer Motion
+- Backend: FastAPI + MongoDB
+- AI: Claude via Emergent LLM
+- Payments: Stripe via emergentintegrations
 
 ## Next Tasks
-1. Add email verification for signups
-2. Implement password reset flow
-3. Add CSV export for analyses
-4. Create onboarding email sequence
-5. Add feedback submission to improve AI
+1. Email verification flow
+2. Password reset
+3. More email templates
+4. Chrome extension
