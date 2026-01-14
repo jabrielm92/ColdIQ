@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth, API } from "@/App";
 import axios from "axios";
 import { 
-  Search, Filter, Trash2, ChevronLeft, ChevronRight, 
-  Copy, Check, X, Mail, Calendar, Target
+  Search, Trash2, ChevronLeft, ChevronRight, 
+  Copy, Check, Mail, Download, Lock, ArrowRight
 } from "lucide-react";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
   Dialog,
@@ -23,11 +23,16 @@ const History = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [tierLimit, setTierLimit] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [exporting, setExporting] = useState(false);
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
+
+  const isPro = user?.subscription_tier === "pro" || user?.subscription_tier === "agency";
 
   useEffect(() => {
     fetchAnalyses();
@@ -49,6 +54,8 @@ const History = () => {
       const res = await axios.get(`${API}/analysis/history?page=${page}&limit=10`);
       setAnalyses(res.data.analyses);
       setTotalPages(res.data.total_pages);
+      setTotal(res.data.total);
+      setTierLimit(res.data.tier_limit);
     } catch (err) {
       toast.error("Failed to load history");
     } finally {
@@ -64,6 +71,35 @@ const History = () => {
       setSelectedAnalysis(null);
     } catch (err) {
       toast.error("Failed to delete");
+    }
+  };
+
+  const exportToCSV = async () => {
+    if (!isPro) {
+      toast.error("CSV export requires Pro or Agency plan");
+      return;
+    }
+    
+    setExporting(true);
+    try {
+      const response = await axios.get(`${API}/analysis/export/csv`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `coldiq_analyses_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success("Export downloaded!");
+    } catch (err) {
+      toast.error("Failed to export");
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -101,20 +137,71 @@ const History = () => {
               <h1 className="text-2xl lg:text-3xl font-bold mb-2" style={{ fontFamily: 'Manrope' }}>
                 Analysis History
               </h1>
-              <p className="text-zinc-400">View and manage your past email analyses</p>
+              <p className="text-zinc-400">
+                {tierLimit ? `Showing last ${tierLimit} analyses (upgrade for full history)` : `${total} total analyses`}
+              </p>
             </div>
             
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-              <Input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search analyses..."
-                className="pl-10 bg-zinc-900/50 border-zinc-800 w-full md:w-64"
-                data-testid="search-input"
-              />
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search analyses..."
+                  className="pl-10 bg-zinc-900/50 border-zinc-800 w-full md:w-64"
+                  data-testid="search-input"
+                />
+              </div>
+              
+              {isPro ? (
+                <Button
+                  variant="outline"
+                  onClick={exportToCSV}
+                  disabled={exporting || analyses.length === 0}
+                  className="border-zinc-700"
+                  data-testid="export-csv-btn"
+                >
+                  {exporting ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      Export CSV
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="border-zinc-700 text-zinc-500"
+                  onClick={() => toast.info("Upgrade to Pro for CSV export")}
+                  data-testid="export-csv-locked-btn"
+                >
+                  <Lock className="w-4 h-4 mr-2" />
+                  Export CSV
+                </Button>
+              )}
             </div>
           </div>
+          
+          {/* Tier Limit Banner */}
+          {tierLimit && (
+            <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Lock className="w-5 h-5 text-amber-400" />
+                <p className="text-amber-200">
+                  Free tier shows last {tierLimit} analyses only. Upgrade for full history access.
+                </p>
+              </div>
+              <Link to="/pricing">
+                <Button size="sm" className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400">
+                  Upgrade
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          )}
           
           {/* Table */}
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
