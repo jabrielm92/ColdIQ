@@ -1,166 +1,274 @@
 {
   "summary": {
-    "tests_run": 26,
-    "tests_passed": 26,
-    "success_rate": 100.0,
-    "timestamp": "2026-01-14T19:33:05.784949"
+    "tests_run": 44,
+    "tests_passed": 42,
+    "success_rate": 95.45454545454545,
+    "timestamp": "2026-01-14T19:48:28.312608"
   },
   "results": [
     {
       "test": "API Root",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:32:45.081895"
+      "timestamp": "2026-01-14T19:48:09.006491"
     },
     {
       "test": "Health Check",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:32:45.123285"
+      "timestamp": "2026-01-14T19:48:09.047036"
+    },
+    {
+      "test": "Forgot Password - Valid Email",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:48:09.091035"
+    },
+    {
+      "test": "Forgot Password Message Check",
+      "success": true,
+      "details": "Correct security message returned",
+      "timestamp": "2026-01-14T19:48:09.091685"
+    },
+    {
+      "test": "Forgot Password - Invalid Email",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:48:09.132263"
+    },
+    {
+      "test": "Get Billing Prices",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T19:48:09.166666"
+    },
+    {
+      "test": "Plan starter exists",
+      "success": true,
+      "details": "Plan found in response",
+      "timestamp": "2026-01-14T19:48:09.167276"
+    },
+    {
+      "test": "Plan pro exists",
+      "success": true,
+      "details": "Plan found in response",
+      "timestamp": "2026-01-14T19:48:09.167296"
+    },
+    {
+      "test": "Plan agency exists",
+      "success": true,
+      "details": "Plan found in response",
+      "timestamp": "2026-01-14T19:48:09.167301"
+    },
+    {
+      "test": "starter Annual Pricing",
+      "success": true,
+      "details": "20% discount applied correctly: $278.4",
+      "timestamp": "2026-01-14T19:48:09.167313"
+    },
+    {
+      "test": "starter Discount Percentage",
+      "success": true,
+      "details": "20% discount shown",
+      "timestamp": "2026-01-14T19:48:09.167317"
+    },
+    {
+      "test": "starter Annual Monthly Equivalent",
+      "success": true,
+      "details": "Correct monthly equivalent: $23.2",
+      "timestamp": "2026-01-14T19:48:09.167321"
+    },
+    {
+      "test": "pro Annual Pricing",
+      "success": true,
+      "details": "20% discount applied correctly: $758.4",
+      "timestamp": "2026-01-14T19:48:09.167325"
+    },
+    {
+      "test": "pro Discount Percentage",
+      "success": true,
+      "details": "20% discount shown",
+      "timestamp": "2026-01-14T19:48:09.167328"
+    },
+    {
+      "test": "pro Annual Monthly Equivalent",
+      "success": true,
+      "details": "Correct monthly equivalent: $63.2",
+      "timestamp": "2026-01-14T19:48:09.167331"
+    },
+    {
+      "test": "agency Annual Pricing",
+      "success": true,
+      "details": "20% discount applied correctly: $1910.4",
+      "timestamp": "2026-01-14T19:48:09.167335"
+    },
+    {
+      "test": "agency Discount Percentage",
+      "success": true,
+      "details": "20% discount shown",
+      "timestamp": "2026-01-14T19:48:09.167337"
+    },
+    {
+      "test": "agency Annual Monthly Equivalent",
+      "success": true,
+      "details": "Correct monthly equivalent: $159.2",
+      "timestamp": "2026-01-14T19:48:09.167341"
+    },
+    {
+      "test": "Templates Access - Free User",
+      "success": false,
+      "details": "Expected 200, got 403 - Not authenticated",
+      "timestamp": "2026-01-14T19:48:09.203673"
+    },
+    {
+      "test": "System Templates Seeding",
+      "success": true,
+      "details": "Access control verified (Pro account needed for full template test)",
+      "timestamp": "2026-01-14T19:48:09.204270"
     },
     {
       "test": "User Signup",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:32:45.390366"
+      "timestamp": "2026-01-14T19:48:09.552669"
     },
     {
       "test": "User Login",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:32:45.658758"
+      "timestamp": "2026-01-14T19:48:09.812995"
     },
     {
       "test": "Get Current User",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:32:45.699355"
+      "timestamp": "2026-01-14T19:48:09.853898"
     },
     {
       "test": "Complete Onboarding",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:32:45.746384"
+      "timestamp": "2026-01-14T19:48:09.891093"
     },
     {
       "test": "Get User Usage",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:32:45.789722"
+      "timestamp": "2026-01-14T19:48:09.937043"
     },
     {
       "test": "Update Profile",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:32:45.866946"
+      "timestamp": "2026-01-14T19:48:09.978890"
     },
     {
       "test": "Analyze Email",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:04.722489"
+      "timestamp": "2026-01-14T19:48:27.766077"
     },
     {
       "test": "Get Analysis History",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:04.781818"
+      "timestamp": "2026-01-14T19:48:27.837899"
     },
     {
       "test": "Get Specific Analysis",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:04.818976"
+      "timestamp": "2026-01-14T19:48:27.880087"
     },
     {
       "test": "Submit Feedback",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:04.858678"
+      "timestamp": "2026-01-14T19:48:27.926974"
     },
     {
       "test": "Get Insights Dashboard",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:04.897446"
+      "timestamp": "2026-01-14T19:48:27.970871"
     },
     {
       "test": "Create Checkout Session",
-      "success": true,
-      "details": "",
-      "timestamp": "2026-01-14T19:33:05.445056"
+      "success": false,
+      "details": "Expected 200, got 400 - Invalid plan tier",
+      "timestamp": "2026-01-14T19:48:28.012589"
     },
     {
       "test": "Get User Features",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:05.482303"
+      "timestamp": "2026-01-14T19:48:28.055831"
     },
     {
       "test": "Features Response Structure",
       "success": true,
       "details": "All expected keys present",
-      "timestamp": "2026-01-14T19:33:05.482937"
+      "timestamp": "2026-01-14T19:48:28.056450"
     },
     {
       "test": "Auth Me Includes Features",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:05.517934"
+      "timestamp": "2026-01-14T19:48:28.090684"
     },
     {
       "test": "Auth Me Has Features Object",
       "success": true,
       "details": "Features object present",
-      "timestamp": "2026-01-14T19:33:05.518574"
+      "timestamp": "2026-01-14T19:48:28.091297"
     },
     {
       "test": "Insights Dashboard Access",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:05.554948"
+      "timestamp": "2026-01-14T19:48:28.129328"
     },
     {
       "test": "Free Tier Insights Blocked",
       "success": true,
       "details": "Correctly blocked",
-      "timestamp": "2026-01-14T19:33:05.555600"
+      "timestamp": "2026-01-14T19:48:28.129986"
     },
     {
       "test": "CSV Export Blocked for Free",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:05.594242"
+      "timestamp": "2026-01-14T19:48:28.166587"
     },
     {
       "test": "Templates Access",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:05.630009"
+      "timestamp": "2026-01-14T19:48:28.201910"
     },
     {
       "test": "Free Tier Templates Blocked",
       "success": true,
       "details": "Correctly blocked",
-      "timestamp": "2026-01-14T19:33:05.630688"
+      "timestamp": "2026-01-14T19:48:28.202548"
     },
     {
       "test": "API Keys Blocked for Free",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:05.666887"
+      "timestamp": "2026-01-14T19:48:28.238980"
     },
     {
       "test": "API Key Creation Blocked for Free",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:05.746286"
+      "timestamp": "2026-01-14T19:48:28.276342"
     },
     {
       "test": "Team Management Blocked for Free",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T19:33:05.784013"
+      "timestamp": "2026-01-14T19:48:28.311702"
     }
   ]
 }
