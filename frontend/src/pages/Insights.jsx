@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth, API } from "@/App";
 import axios from "axios";
 import { 
-  BarChart3, TrendingUp, Target, Lightbulb, Lock, ArrowRight
+  BarChart3, TrendingUp, Target, Lightbulb, Lock, ArrowRight, ArrowUp, ArrowDown
 } from "lucide-react";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -43,6 +43,7 @@ const Insights = () => {
     );
   }
 
+  // Free tier - locked
   if (!insights?.available) {
     return (
       <DashboardLayout>
@@ -54,9 +55,25 @@ const Insights = () => {
             <h1 className="text-2xl font-bold mb-3" style={{ fontFamily: 'Manrope' }}>
               Unlock Personalized Insights
             </h1>
-            <p className="text-zinc-400 mb-8 max-w-md mx-auto">
-              Upgrade to Starter or Pro to access detailed performance analytics, trend charts, and personalized recommendations.
+            <p className="text-zinc-400 mb-4 max-w-md mx-auto">
+              Upgrade to {insights?.required_tier === "starter" ? "Starter" : "Pro"} or higher to access detailed performance analytics and personalized recommendations.
             </p>
+            
+            {/* Feature preview */}
+            <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-8 text-left">
+              {[
+                "Performance Trends",
+                "Score Analytics",
+                "Word Count Insights",
+                "AI Recommendations"
+              ].map((feature, i) => (
+                <div key={i} className="flex items-center gap-2 text-sm text-zinc-500">
+                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                  {feature}
+                </div>
+              ))}
+            </div>
+            
             <Link to="/pricing">
               <Button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 glow-primary">
                 View Plans
@@ -69,6 +86,7 @@ const Insights = () => {
     );
   }
 
+  // No data yet
   if (!insights?.has_data) {
     return (
       <DashboardLayout>
@@ -95,19 +113,26 @@ const Insights = () => {
     );
   }
 
-  const { summary, word_count_insights, trend_data, recommendations } = insights;
-
+  const { summary, word_count_insights, trend_data, recommendations, ab_suggestions, improvement_trend } = insights;
   const chartColors = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b'];
+  const isPro = insights.tier === "pro" || insights.tier === "agency";
 
   return (
     <DashboardLayout>
       <div className="p-6 lg:p-8 space-y-8" data-testid="insights-page">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold mb-2" style={{ fontFamily: 'Manrope' }}>
-            Your Insights
-          </h1>
-          <p className="text-zinc-400">Personalized analytics based on your email performance</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold mb-2" style={{ fontFamily: 'Manrope' }}>
+              Your Insights
+            </h1>
+            <p className="text-zinc-400">Personalized analytics based on your email performance</p>
+          </div>
+          <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+            isPro ? "bg-indigo-500/20 text-indigo-400" : "bg-emerald-500/20 text-emerald-400"
+          }`}>
+            {insights.tier === "agency" ? "Agency" : insights.tier === "pro" ? "Pro" : "Starter"}
+          </div>
         </div>
         
         {/* Summary Stats */}
@@ -133,13 +158,40 @@ const Insights = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Improvement Trend (Pro+) */}
+        {improvement_trend && (
+          <div className={`bg-gradient-to-br ${improvement_trend.improvement >= 0 ? "from-emerald-500/10 to-cyan-500/10 border-emerald-500/20" : "from-red-500/10 to-orange-500/10 border-red-500/20"} border rounded-xl p-6`}>
+            <div className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${improvement_trend.improvement >= 0 ? "bg-emerald-500/20" : "bg-red-500/20"}`}>
+                {improvement_trend.improvement >= 0 ? (
+                  <ArrowUp className="w-6 h-6 text-emerald-400" />
+                ) : (
+                  <ArrowDown className="w-6 h-6 text-red-400" />
+                )}
+              </div>
+              <div>
+                <h3 className="font-semibold" style={{ fontFamily: 'Manrope' }}>
+                  {improvement_trend.improvement >= 0 ? "You're Improving!" : "Room for Growth"}
+                </h3>
+                <p className="text-zinc-400 text-sm">
+                  Your last 5 emails scored <span className="font-semibold">{improvement_trend.last_5_avg}</span> on average,
+                  {improvement_trend.improvement >= 0 ? " up " : " down "}
+                  <span className={`font-semibold ${improvement_trend.improvement >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                    {Math.abs(improvement_trend.improvement)} points
+                  </span> from your first 5.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         
-        {/* Charts Row */}
+        {/* Charts Row (Pro+ gets full charts, Starter gets basic) */}
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Trend Chart */}
-          {trend_data && trend_data.length > 0 && (
+          {trend_data && trend_data.length > 0 ? (
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="font-semibold mb-4" style={{ fontFamily: 'Manrope' }}>Score Trend</h3>
+              <h3 className="font-semibold mb-4" style={{ fontFamily: 'Manrope' }}>Score Trend (Last 30 Days)</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={trend_data}>
@@ -169,10 +221,18 @@ const Insights = () => {
                 </ResponsiveContainer>
               </div>
             </div>
+          ) : (
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 flex items-center justify-center min-h-[300px]">
+              <div className="text-center">
+                <Lock className="w-8 h-8 text-zinc-600 mx-auto mb-3" />
+                <p className="text-zinc-500">Trend charts available with Pro plan</p>
+                <Link to="/pricing" className="text-indigo-400 text-sm hover:text-indigo-300">Upgrade →</Link>
+              </div>
+            </div>
           )}
           
           {/* Word Count Insights */}
-          {word_count_insights && word_count_insights.length > 0 && (
+          {word_count_insights && word_count_insights.length > 0 ? (
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
               <h3 className="font-semibold mb-4" style={{ fontFamily: 'Manrope' }}>Score by Email Length</h3>
               <div className="h-64">
@@ -197,6 +257,14 @@ const Insights = () => {
                 </ResponsiveContainer>
               </div>
             </div>
+          ) : (
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 flex items-center justify-center min-h-[300px]">
+              <div className="text-center">
+                <Lock className="w-8 h-8 text-zinc-600 mx-auto mb-3" />
+                <p className="text-zinc-500">Advanced analytics available with Pro plan</p>
+                <Link to="/pricing" className="text-indigo-400 text-sm hover:text-indigo-300">Upgrade →</Link>
+              </div>
+            </div>
           )}
         </div>
         
@@ -217,8 +285,8 @@ const Insights = () => {
           </div>
         </div>
         
-        {/* Recommendations */}
-        {recommendations && recommendations.length > 0 && (
+        {/* Recommendations (Pro+ only) */}
+        {recommendations && recommendations.length > 0 ? (
           <div className="bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center">
@@ -236,6 +304,41 @@ const Insights = () => {
                 </li>
               ))}
             </ul>
+          </div>
+        ) : !isPro && (
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center">
+                <Lock className="w-5 h-5 text-zinc-500" />
+              </div>
+              <div>
+                <h3 className="font-semibold" style={{ fontFamily: 'Manrope' }}>Personalized Recommendations</h3>
+                <p className="text-sm text-zinc-500">Upgrade to Pro for AI-powered suggestions</p>
+              </div>
+            </div>
+            <Link to="/pricing">
+              <Button variant="outline" className="border-zinc-700">
+                Upgrade to Pro
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        )}
+        
+        {/* A/B Test Suggestions (Pro+ only) */}
+        {ab_suggestions && ab_suggestions.length > 0 && (
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+            <h3 className="font-semibold mb-4" style={{ fontFamily: 'Manrope' }}>A/B Test Suggestions</h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              {ab_suggestions.map((suggestion, i) => (
+                <div key={i} className="p-4 bg-zinc-800/50 rounded-lg">
+                  <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mb-3">
+                    {i + 1}
+                  </div>
+                  <p className="text-sm text-zinc-300">{suggestion}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
