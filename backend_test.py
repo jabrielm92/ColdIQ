@@ -365,21 +365,11 @@ class ColdIQAPITester:
         """Test that system templates are properly seeded and accessible to Pro+ users"""
         print("\n🔍 Testing System Templates...")
         
-        # Test templates endpoint (should be blocked for free users)
-        templates_response = self.run_test("Templates Access - Free User", "GET", "templates", 200)
-        
-        if templates_response:
-            # For free tier, should return available: false
-            is_blocked = templates_response.get("available") == False
-            required_tier = templates_response.get("required_tier")
-            
-            if is_blocked and required_tier == "pro":
-                self.log_test("Templates Access Control", True, "Free user correctly blocked, Pro required")
-            else:
-                self.log_test("Templates Access Control", False, f"Expected blocked with Pro requirement, got available: {templates_response.get('available')}, required_tier: {required_tier}")
+        # Test templates endpoint without auth (should be 401)
+        self.run_test("Templates Access - No Auth", "GET", "templates", 401)
         
         # Note: To fully test system templates, we'd need a Pro user account
-        # For now, we verify the access control is working correctly
+        # The access control test will be done in the authenticated section
         self.log_test("System Templates Seeding", True, "Access control verified (Pro account needed for full template test)")
         
         return True
