@@ -1,52 +1,176 @@
-import { useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
+import { Toaster } from "@/components/ui/sonner";
+
+// Pages
+import Landing from "@/pages/Landing";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
+import Onboarding from "@/pages/Onboarding";
+import Dashboard from "@/pages/Dashboard";
+import Analyzer from "@/pages/Analyzer";
+import History from "@/pages/History";
+import Insights from "@/pages/Insights";
+import Settings from "@/pages/Settings";
+import Pricing from "@/pages/Pricing";
+import BillingSuccess from "@/pages/BillingSuccess";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+export const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+// Auth Context
+const AuthContext = createContext(null);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return context;
+};
+
+// Axios interceptor for auth
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("coldiq_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Auth Provider Component
+const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    helloWorldApi();
+    const initAuth = async () => {
+      const token = localStorage.getItem("coldiq_token");
+      if (token) {
+        try {
+          const res = await axios.get(`${API}/auth/me`);
+          setUser(res.data);
+        } catch (err) {
+          localStorage.removeItem("coldiq_token");
+        }
+      }
+      setLoading(false);
+    };
+    initAuth();
   }, []);
 
+  const login = async (email, password) => {
+    const res = await axios.post(`${API}/auth/login`, { email, password });
+    localStorage.setItem("coldiq_token", res.data.token);
+    setUser(res.data.user);
+    return res.data.user;
+  };
+
+  const signup = async (email, password, full_name) => {
+    const res = await axios.post(`${API}/auth/signup`, { email, password, full_name });
+    localStorage.setItem("coldiq_token", res.data.token);
+    setUser(res.data.user);
+    return res.data.user;
+  };
+
+  const logout = () => {
+    localStorage.removeItem("coldiq_token");
+    setUser(null);
+  };
+
+  const updateUser = (userData) => {
+    setUser(userData);
+  };
+
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout, updateUser }}>
+      {children}
+    </AuthContext.Provider>
   );
+};
+
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+};
+
+// Onboarding Check Route
+const OnboardingRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (!user.onboarding_completed) {
+    return <Navigate to="/onboarding" replace />;
+  }
+  
+  return children;
 };
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+    <div className="App min-h-screen bg-[#09090b]">
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/pricing" element={<Pricing />} />
+            
+            {/* Protected Routes */}
+            <Route path="/onboarding" element={
+              <ProtectedRoute><Onboarding /></ProtectedRoute>
+            } />
+            <Route path="/dashboard" element={
+              <OnboardingRoute><Dashboard /></OnboardingRoute>
+            } />
+            <Route path="/analyze" element={
+              <OnboardingRoute><Analyzer /></OnboardingRoute>
+            } />
+            <Route path="/history" element={
+              <OnboardingRoute><History /></OnboardingRoute>
+            } />
+            <Route path="/insights" element={
+              <OnboardingRoute><Insights /></OnboardingRoute>
+            } />
+            <Route path="/settings" element={
+              <OnboardingRoute><Settings /></OnboardingRoute>
+            } />
+            <Route path="/billing/success" element={
+              <OnboardingRoute><BillingSuccess /></OnboardingRoute>
+            } />
+          </Routes>
+        </BrowserRouter>
+        <Toaster position="top-right" theme="dark" />
+      </AuthProvider>
     </div>
   );
 }
