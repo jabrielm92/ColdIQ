@@ -30,7 +30,13 @@ const Login = () => {
         navigate("/onboarding");
       }
     } catch (err) {
-      const message = err.response?.data?.detail || "Invalid credentials";
+      let message = "Invalid credentials";
+      const detail = err.response?.data?.detail;
+      if (typeof detail === "string") {
+        message = detail;
+      } else if (Array.isArray(detail)) {
+        message = detail[0]?.msg || "Validation error";
+      }
       toast.error(message);
     } finally {
       setLoading(false);

@@ -37,7 +37,13 @@ const Signup = () => {
       toast.success("Account created successfully!");
       navigate("/onboarding");
     } catch (err) {
-      const message = err.response?.data?.detail || "Failed to create account";
+      let message = "Failed to create account";
+      const detail = err.response?.data?.detail;
+      if (typeof detail === "string") {
+        message = detail;
+      } else if (Array.isArray(detail)) {
+        message = detail[0]?.msg || "Validation error";
+      }
       toast.error(message);
     } finally {
       setLoading(false);
