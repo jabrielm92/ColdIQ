@@ -174,6 +174,9 @@ function App() {
             <Route path="/billing/success" element={
               <OnboardingRoute><BillingSuccess /></OnboardingRoute>
             } />
+            <Route path="/templates" element={
+              <OnboardingRoute><Templates /></OnboardingRoute>
+            } />
           </Routes>
         </BrowserRouter>
         <Toaster position="top-right" theme="dark" />
