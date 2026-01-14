@@ -1,19 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/App";
 import {
   Mail, LayoutDashboard, History, BarChart3, Settings, LogOut,
-  Plus, CreditCard, Menu, X, ChevronDown, FileText
+  Plus, Menu, X, FileText
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useState } from "react";
 
 const DashboardLayout = ({ children }) => {
   const { user, logout } = useAuth();
@@ -37,24 +29,26 @@ const DashboardLayout = ({ children }) => {
 
   const isActive = (path) => location.pathname === path;
 
-  const tierColors = {
-    free: "bg-zinc-700 text-zinc-300",
-    starter: "bg-emerald-500/20 text-emerald-400",
-    pro: "bg-indigo-500/20 text-indigo-400",
-    agency: "bg-violet-500/20 text-violet-400"
+  const tierConfig = {
+    free: { label: "Free", bg: "bg-zinc-800", text: "text-zinc-400" },
+    starter: { label: "Starter", bg: "bg-[#a3e635]/10", text: "text-[#a3e635]" },
+    pro: { label: "Pro", bg: "bg-[#d4af37]/10", text: "text-[#d4af37]" },
+    agency: { label: "Agency", bg: "bg-[#d4af37]/20", text: "text-[#d4af37]" }
   };
 
+  const tier = tierConfig[user?.subscription_tier] || tierConfig.free;
+
   return (
-    <div className="min-h-screen bg-[#09090b] flex">
+    <div className="min-h-screen bg-[#050505] flex">
       {/* Sidebar - Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 border-r border-zinc-800 bg-zinc-900/30">
+      <aside className="hidden lg:flex flex-col w-64 border-r border-zinc-900 bg-[#0a0a0a]">
         {/* Logo */}
-        <div className="p-6 border-b border-zinc-800">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <Mail className="w-4 h-4 text-white" />
+        <div className="p-6 border-b border-zinc-900">
+          <Link to="/dashboard" className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-[#d4af37] flex items-center justify-center">
+              <Mail className="w-4 h-4 text-black" />
             </div>
-            <span className="text-xl font-bold tracking-tighter" style={{ fontFamily: 'Manrope' }}>ColdIQ</span>
+            <span className="text-lg font-semibold tracking-tight font-sans">ColdIQ</span>
           </Link>
         </div>
         
@@ -64,36 +58,36 @@ const DashboardLayout = ({ children }) => {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+              className={`flex items-center gap-3 px-4 py-3 transition-all font-medium text-sm ${
                 isActive(item.path) 
-                  ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' 
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                  ? 'bg-[#d4af37]/10 text-[#d4af37] border-l-2 border-[#d4af37]' 
+                  : 'text-zinc-500 hover:text-zinc-200 hover:bg-zinc-900/50 border-l-2 border-transparent'
               }`}
               data-testid={`nav-${item.label.toLowerCase()}`}
             >
               {item.icon}
-              <span className="font-medium">{item.label}</span>
+              <span>{item.label}</span>
             </Link>
           ))}
         </nav>
         
         {/* User Section */}
-        <div className="p-4 border-t border-zinc-800">
-          <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-sm font-bold">
+        <div className="p-4 border-t border-zinc-900">
+          <div className="flex items-center gap-3 px-3 py-3 mb-2">
+            <div className="w-10 h-10 bg-zinc-800 flex items-center justify-center text-sm font-bold text-zinc-400">
               {user?.full_name?.charAt(0) || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate">{user?.full_name || 'User'}</p>
-              <p className={`text-xs px-2 py-0.5 rounded-full inline-block ${tierColors[user?.subscription_tier || 'free']}`}>
-                {user?.subscription_tier?.charAt(0).toUpperCase() + user?.subscription_tier?.slice(1) || 'Free'}
+              <p className="font-medium text-sm truncate text-zinc-200">{user?.full_name || 'User'}</p>
+              <p className={`text-xs px-2 py-0.5 inline-block ${tier.bg} ${tier.text}`}>
+                {tier.label}
               </p>
             </div>
           </div>
           
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-zinc-400 hover:text-white mt-2"
+            className="w-full justify-start text-zinc-500 hover:text-white hover:bg-zinc-900 rounded-none"
             onClick={handleLogout}
             data-testid="logout-btn"
           >
@@ -104,13 +98,13 @@ const DashboardLayout = ({ children }) => {
       </aside>
       
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-zinc-900/95 backdrop-blur border-b border-zinc-800">
-        <div className="flex items-center justify-between px-4 py-3">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <Mail className="w-4 h-4 text-white" />
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a] border-b border-zinc-900">
+        <div className="flex items-center justify-between px-4 py-4">
+          <Link to="/dashboard" className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-[#d4af37] flex items-center justify-center">
+              <Mail className="w-4 h-4 text-black" />
             </div>
-            <span className="text-lg font-bold tracking-tighter" style={{ fontFamily: 'Manrope' }}>ColdIQ</span>
+            <span className="text-lg font-semibold tracking-tight font-sans">ColdIQ</span>
           </Link>
           
           <button 
@@ -123,16 +117,16 @@ const DashboardLayout = ({ children }) => {
         
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="p-4 space-y-2 border-t border-zinc-800">
+          <div className="p-4 space-y-1 border-t border-zinc-900 bg-[#0a0a0a]">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                className={`flex items-center gap-3 px-4 py-3 transition-all ${
                   isActive(item.path) 
-                    ? 'bg-indigo-500/10 text-indigo-400' 
-                    : 'text-zinc-400'
+                    ? 'bg-[#d4af37]/10 text-[#d4af37]' 
+                    : 'text-zinc-500 hover:text-white'
                 }`}
               >
                 {item.icon}
@@ -141,7 +135,7 @@ const DashboardLayout = ({ children }) => {
             ))}
             <Button 
               variant="ghost" 
-              className="w-full justify-start text-zinc-400 mt-4"
+              className="w-full justify-start text-zinc-500 hover:text-white mt-4 rounded-none"
               onClick={handleLogout}
             >
               <LogOut className="w-4 h-4 mr-3" />
@@ -152,7 +146,7 @@ const DashboardLayout = ({ children }) => {
       </div>
       
       {/* Main Content */}
-      <main className="flex-1 overflow-auto lg:mt-0 mt-14">
+      <main className="flex-1 overflow-auto lg:mt-0 mt-16">
         {children}
       </main>
     </div>

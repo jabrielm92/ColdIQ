@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAuth } from "@/App";
 import { Mail, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
@@ -44,98 +42,109 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-6 relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[128px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-[128px]" />
+    <div className="min-h-screen bg-[#050505] flex">
+      {/* Left Side - Form */}
+      <div className="flex-1 flex items-center justify-center px-6 lg:px-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          <div className="mb-10">
+            <Link to="/" className="inline-flex items-center gap-2 text-zinc-500 hover:text-white transition-colors mb-10 text-sm font-mono tracking-wide uppercase">
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Link>
+            
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 bg-[#d4af37] flex items-center justify-center">
+                <Mail className="w-5 h-5 text-black" />
+              </div>
+              <span className="text-xl font-semibold tracking-tight font-sans">ColdIQ</span>
+            </div>
+            
+            <h1 className="font-serif text-4xl tracking-tight mb-3">Welcome back</h1>
+            <p className="text-zinc-500">Sign in to continue analyzing your cold emails</p>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-xs font-mono tracking-widest uppercase text-zinc-500">Email</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                required
+                className="w-full bg-transparent border-b border-zinc-800 focus:border-[#d4af37] text-white px-0 py-4 outline-none transition-colors placeholder:text-zinc-700 font-mono text-sm"
+                data-testid="login-email-input"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-xs font-mono tracking-widest uppercase text-zinc-500">Password</label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full bg-transparent border-b border-zinc-800 focus:border-[#d4af37] text-white px-0 py-4 pr-10 outline-none transition-colors placeholder:text-zinc-700 font-mono text-sm"
+                  data-testid="login-password-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className="w-full bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-5 h-auto transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] mt-8"
+              data-testid="login-submit-btn"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+              ) : (
+                "Sign in"
+              )}
+            </Button>
+          </form>
+          
+          <p className="mt-8 text-zinc-500 text-sm">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-[#d4af37] hover:text-[#b5952f] font-medium transition-colors" data-testid="login-signup-link">
+              Sign up
+            </Link>
+          </p>
+          <p className="mt-3">
+            <Link to="/forgot-password" className="text-zinc-600 hover:text-zinc-400 text-sm transition-colors" data-testid="forgot-password-link">
+              Forgot your password?
+            </Link>
+          </p>
+        </motion.div>
       </div>
       
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md relative z-10"
-      >
-        <div className="mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-8">
-            <ArrowLeft className="w-4 h-4" />
-            Back to home
-          </Link>
-          
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <Mail className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold tracking-tighter" style={{ fontFamily: 'Manrope' }}>ColdIQ</span>
-          </div>
-          
-          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Manrope' }}>Welcome back</h1>
-          <p className="text-zinc-400">Sign in to continue analyzing your cold emails</p>
+      {/* Right Side - Visual */}
+      <div className="hidden lg:flex flex-1 bg-[#0a0a0a] items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/5 to-transparent" />
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 border border-zinc-800/50" />
+        <div className="absolute bottom-1/4 left-1/4 w-64 h-64 border border-[#d4af37]/20" />
+        <div className="relative z-10 text-center px-12">
+          <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-6">The Precision Advantage</p>
+          <p className="font-serif text-3xl text-zinc-400 leading-relaxed">
+            "Every word in your cold email either <span className="text-white">opens doors</span> or <span className="text-zinc-600">closes them</span>."
+          </p>
         </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-5" data-testid="login-form">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-zinc-300">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
-              required
-              className="bg-zinc-900/50 border-zinc-800 focus:border-indigo-500 h-11"
-              data-testid="login-email-input"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-zinc-300">Password</Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="bg-zinc-900/50 border-zinc-800 focus:border-indigo-500 h-11 pr-10"
-                data-testid="login-password-input"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-          
-          <Button 
-            type="submit" 
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 h-11 glow-primary"
-            data-testid="login-submit-btn"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              "Sign in"
-            )}
-          </Button>
-        </form>
-        
-        <p className="mt-6 text-center text-zinc-400">
-          Don't have an account?{" "}
-          <Link to="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium" data-testid="login-signup-link">
-            Sign up
-          </Link>
-        </p>
-        <p className="mt-2 text-center">
-          <Link to="/forgot-password" className="text-zinc-500 hover:text-zinc-400 text-sm" data-testid="forgot-password-link">
-            Forgot your password?
-          </Link>
-        </p>
-      </motion.div>
+      </div>
     </div>
   );
 };
