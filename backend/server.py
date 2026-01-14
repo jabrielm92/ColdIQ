@@ -353,21 +353,62 @@ def create_verification_token(user_id: str, token_type: str, expires_hours: int 
         "created_at": datetime.now(timezone.utc).isoformat()
     }
 
-async def send_email_notification(to_email: str, subject: str, body: str):
-    """Mock email sender - in production, integrate with SendGrid/Resend"""
-    logger.info(f"EMAIL TO: {to_email}")
-    logger.info(f"SUBJECT: {subject}")
-    logger.info(f"BODY: {body}")
-    # Store in db for demo purposes
-    await db.email_logs.insert_one({
-        "id": str(uuid.uuid4()),
-        "to": to_email,
+async def send_email_notification(to_email: str, subject: str, body: str, html_body: str = None):
+    """Send email using Resend"""
+    logger.info(f"Sending email to: {to_email}, subject: {subject}")
+    
+    # Convert plain text to simple HTML if no HTML provided
+    if not html_body:
+        html_body = f"""
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #6366f1; margin: 0;">ColdIQ</h1>
+                <p style="color: #71717a; font-size: 14px;">AI-Powered Cold Email Analyzer</p>
+            </div>
+            <div style="background: #18181b; border-radius: 12px; padding: 30px; color: #fafafa;">
+                {body.replace(chr(10), '<br/>')}
+            </div>
+            <div style="text-align: center; margin-top: 30px; color: #71717a; font-size: 12px;">
+                <p>© 2025 ColdIQ. All rights reserved.</p>
+            </div>
+        </div>
+        """
+    
+    params = {
+        "from": SENDER_EMAIL,
+        "to": [to_email],
         "subject": subject,
-        "body": body,
-        "sent_at": datetime.now(timezone.utc).isoformat(),
-        "status": "sent"  # In production: pending -> sent/failed
-    })
-    return True
+        "html": html_body
+    }
+    
+    try:
+        # Run sync SDK in thread to keep FastAPI non-blocking
+        email_result = await asyncio.to_thread(resend.Emails.send, params)
+        
+        # Log to database
+        await db.email_logs.insert_one({
+            "id": str(uuid.uuid4()),
+            "resend_id": email_result.get("id") if isinstance(email_result, dict) else str(email_result),
+            "to": to_email,
+            "subject": subject,
+            "sent_at": datetime.now(timezone.utc).isoformat(),
+            "status": "sent"
+        })
+        
+        logger.info(f"Email sent successfully to {to_email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send email to {to_email}: {str(e)}")
+        # Log failed attempt
+        await db.email_logs.insert_one({
+            "id": str(uuid.uuid4()),
+            "to": to_email,
+            "subject": subject,
+            "sent_at": datetime.now(timezone.utc).isoformat(),
+            "status": "failed",
+            "error": str(e)
+        })
+        return False
 
 # ================= AUTH ROUTES =================
 
