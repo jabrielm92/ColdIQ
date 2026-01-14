@@ -5,7 +5,7 @@ from datetime import datetime
 import uuid
 
 class ColdIQAPITester:
-    def __init__(self, base_url="https://email-analyzer-1.preview.emergentagent.com"):
+    def __init__(self, base_url="https://cold-email-pro-6.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
@@ -233,7 +233,7 @@ class ColdIQAPITester:
         # Test create checkout session (this should work even with test keys)
         checkout_data = {
             "plan_tier": "starter",
-            "origin_url": "https://email-analyzer-1.preview.emergentagent.com"
+            "origin_url": "https://cold-email-pro-6.preview.emergentagent.com"
         }
         
         # Note: This might fail if Stripe is not properly configured, but we'll test it
