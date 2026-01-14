@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/App";
 import {
   Mail, LayoutDashboard, History, BarChart3, Settings, LogOut,
-  Plus, CreditCard, Menu, X, ChevronDown
+  Plus, CreditCard, Menu, X, ChevronDown, FileText
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,6 +30,7 @@ const DashboardLayout = ({ children }) => {
     { path: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { path: "/analyze", label: "Analyze", icon: <Plus className="w-5 h-5" /> },
     { path: "/history", label: "History", icon: <History className="w-5 h-5" /> },
+    { path: "/templates", label: "Templates", icon: <FileText className="w-5 h-5" /> },
     { path: "/insights", label: "Insights", icon: <BarChart3 className="w-5 h-5" /> },
     { path: "/settings", label: "Settings", icon: <Settings className="w-5 h-5" /> }
   ];
