@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -13,6 +14,9 @@ from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
 import json
+import csv
+import io
+import secrets
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from emergentintegrations.payments.stripe.checkout import (
     StripeCheckout, 
@@ -49,6 +53,68 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# ================= TIER CONFIGURATION =================
+
+TIER_FEATURES = {
+    "free": {
+        "analyses_limit": 3,
+        "history_limit": 3,
+        "insights_dashboard": False,
+        "advanced_insights": False,
+        "recommendations": False,
+        "export_csv": False,
+        "templates": False,
+        "team_seats": 0,
+        "api_access": False,
+        "priority_support": False
+    },
+    "starter": {
+        "analyses_limit": 50,
+        "history_limit": 999999,
+        "insights_dashboard": True,
+        "advanced_insights": False,
+        "recommendations": False,
+        "export_csv": False,
+        "templates": False,
+        "team_seats": 0,
+        "api_access": False,
+        "priority_support": False
+    },
+    "pro": {
+        "analyses_limit": 999999,
+        "history_limit": 999999,
+        "insights_dashboard": True,
+        "advanced_insights": True,
+        "recommendations": True,
+        "export_csv": True,
+        "templates": True,
+        "team_seats": 0,
+        "api_access": False,
+        "priority_support": True
+    },
+    "agency": {
+        "analyses_limit": 999999,
+        "history_limit": 999999,
+        "insights_dashboard": True,
+        "advanced_insights": True,
+        "recommendations": True,
+        "export_csv": True,
+        "templates": True,
+        "team_seats": 5,
+        "api_access": True,
+        "priority_support": True
+    }
+}
+
+SUBSCRIPTION_PRICES = {
+    "starter": 29.00,
+    "pro": 79.00,
+    "agency": 199.00
+}
+
+def get_tier_features(tier: str) -> dict:
+    return TIER_FEATURES.get(tier, TIER_FEATURES["free"])
+
 # ================= MODELS =================
 
 class UserSignup(BaseModel):
@@ -73,6 +139,7 @@ class UserResponse(BaseModel):
     analyses_used_this_month: int = 0
     total_analyses: int = 0
     created_at: str
+    team_id: Optional[str] = None
 
 class OnboardingData(BaseModel):
     role: str
@@ -108,10 +175,10 @@ class AnalysisResponse(BaseModel):
     created_at: str
 
 class FeedbackRequest(BaseModel):
-    feedback: str  # "helpful" or "not_helpful"
+    feedback: str
 
 class CheckoutRequest(BaseModel):
-    plan_tier: str  # "starter", "pro", "agency"
+    plan_tier: str
     origin_url: str
 
 class ProfileUpdate(BaseModel):
@@ -119,6 +186,17 @@ class ProfileUpdate(BaseModel):
     role: Optional[str] = None
     target_industry: Optional[str] = None
     monthly_email_volume: Optional[str] = None
+
+class TemplateCreate(BaseModel):
+    name: str
+    subject: str
+    body: str
+    category: str
+    is_shared: bool = False
+
+class TeamMemberInvite(BaseModel):
+    email: EmailStr
+    role: str = "member"  # "admin" or "member"
 
 # ================= AUTH HELPERS =================
 
@@ -154,26 +232,45 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="User not found")
     return user
 
-# ================= SUBSCRIPTION LIMITS =================
+async def verify_api_key(x_api_key: str = Header(None)):
+    if not x_api_key:
+        raise HTTPException(status_code=401, detail="API key required")
+    
+    api_key_doc = await db.api_keys.find_one({"key": x_api_key, "is_active": True}, {"_id": 0})
+    if not api_key_doc:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    
+    user = await db.users.find_one({"id": api_key_doc["user_id"]}, {"_id": 0})
+    if not user or user.get("subscription_tier") != "agency":
+        raise HTTPException(status_code=403, detail="API access requires Agency plan")
+    
+    # Update last used
+    await db.api_keys.update_one(
+        {"key": x_api_key},
+        {"$set": {"last_used": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return user
 
-SUBSCRIPTION_LIMITS = {
-    "free": 3,
-    "starter": 50,
-    "pro": 999999,  # unlimited
-    "agency": 999999  # unlimited
-}
-
-SUBSCRIPTION_PRICES = {
-    "starter": 29.00,
-    "pro": 79.00,
-    "agency": 199.00
-}
+def require_tier(min_tier: str):
+    tier_order = ["free", "starter", "pro", "agency"]
+    min_index = tier_order.index(min_tier)
+    
+    async def check_tier(user: dict = Depends(get_current_user)):
+        user_tier = user.get("subscription_tier", "free")
+        user_index = tier_order.index(user_tier) if user_tier in tier_order else 0
+        if user_index < min_index:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"This feature requires {min_tier.title()} plan or higher"
+            )
+        return user
+    return check_tier
 
 # ================= AUTH ROUTES =================
 
 @api_router.post("/auth/signup")
 async def signup(data: UserSignup):
-    # Check if user exists
     existing = await db.users.find_one({"email": data.email})
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -195,14 +292,14 @@ async def signup(data: UserSignup):
         "analyses_used_this_month": 0,
         "total_analyses": 0,
         "created_at": now,
-        "onboarding_completed": False
+        "onboarding_completed": False,
+        "team_id": None
     }
     
     await db.users.insert_one(user_doc)
     
     token = create_jwt_token(user_id, data.email)
     
-    # Remove password and _id from response
     del user_doc["password_hash"]
     if "_id" in user_doc:
         del user_doc["_id"]
@@ -219,15 +316,14 @@ async def login(data: UserLogin):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     token = create_jwt_token(user["id"], user["email"])
-    
-    # Remove sensitive data
     user_response = {k: v for k, v in user.items() if k not in ["password_hash", "_id"]}
     
     return {"token": token, "user": user_response}
 
-@api_router.get("/auth/me", response_model=UserResponse)
+@api_router.get("/auth/me")
 async def get_me(user: dict = Depends(get_current_user)):
-    return user
+    features = get_tier_features(user.get("subscription_tier", "free"))
+    return {**user, "features": features}
 
 @api_router.post("/auth/onboarding")
 async def complete_onboarding(data: OnboardingData, user: dict = Depends(get_current_user)):
@@ -242,26 +338,25 @@ async def complete_onboarding(data: OnboardingData, user: dict = Depends(get_cur
     )
     
     updated_user = await db.users.find_one({"id": user["id"]}, {"_id": 0, "password_hash": 0})
-    return {"message": "Onboarding completed", "user": updated_user}
+    features = get_tier_features(updated_user.get("subscription_tier", "free"))
+    return {"message": "Onboarding completed", "user": {**updated_user, "features": features}}
 
 # ================= EMAIL ANALYSIS ROUTES =================
 
 @api_router.post("/analysis/analyze", response_model=AnalysisResponse)
 async def analyze_email(data: EmailAnalysisRequest, user: dict = Depends(get_current_user)):
-    # Check subscription limits
-    limit = SUBSCRIPTION_LIMITS.get(user["subscription_tier"], 3)
-    if user["analyses_used_this_month"] >= limit:
+    features = get_tier_features(user.get("subscription_tier", "free"))
+    
+    if user["analyses_used_this_month"] >= features["analyses_limit"]:
         raise HTTPException(
             status_code=403, 
-            detail=f"Monthly analysis limit reached ({limit}). Please upgrade your plan."
+            detail=f"Monthly analysis limit reached ({features['analyses_limit']}). Please upgrade your plan."
         )
     
-    # Get LLM key
     api_key = os.environ.get('EMERGENT_LLM_KEY')
     if not api_key:
         raise HTTPException(status_code=500, detail="AI service not configured")
     
-    # Prepare context
     user_role = data.target_role or user.get("role", "sales professional")
     industry = data.target_industry or user.get("target_industry", "B2B")
     
@@ -301,7 +396,6 @@ Be specific, actionable, and focus on what makes cold emails convert."""
         user_message = UserMessage(text=prompt)
         response = await chat.send_message(user_message)
         
-        # Parse JSON from response
         response_text = response.strip()
         if response_text.startswith("```"):
             response_text = response_text.split("```")[1]
@@ -317,7 +411,6 @@ Be specific, actionable, and focus on what makes cold emails convert."""
         logger.error(f"Analysis error: {e}")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
     
-    # Create analysis record
     analysis_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     word_count = len(data.body.split())
@@ -325,6 +418,7 @@ Be specific, actionable, and focus on what makes cold emails convert."""
     analysis_doc = {
         "id": analysis_id,
         "user_id": user["id"],
+        "team_id": user.get("team_id"),
         "original_subject": data.subject,
         "original_body": data.body,
         "analysis_score": analysis_data.get("overallScore", 0),
@@ -346,7 +440,6 @@ Be specific, actionable, and focus on what makes cold emails convert."""
     
     await db.analyses.insert_one(analysis_doc)
     
-    # Update user stats
     await db.users.update_one(
         {"id": user["id"]},
         {"$inc": {"analyses_used_this_month": 1, "total_analyses": 1}}
@@ -360,26 +453,31 @@ async def get_analysis_history(
     limit: int = 10,
     user: dict = Depends(get_current_user)
 ):
+    features = get_tier_features(user.get("subscription_tier", "free"))
     skip = (page - 1) * limit
     
-    # Free users can only see last 3
-    if user["subscription_tier"] == "free":
-        limit = min(limit, 3)
+    # Apply history limit for free tier
+    effective_limit = min(limit, features["history_limit"])
     
     cursor = db.analyses.find(
         {"user_id": user["id"]},
         {"_id": 0}
-    ).sort("created_at", -1).skip(skip).limit(limit)
+    ).sort("created_at", -1).skip(skip).limit(effective_limit)
     
-    analyses = await cursor.to_list(length=limit)
+    analyses = await cursor.to_list(length=effective_limit)
     total = await db.analyses.count_documents({"user_id": user["id"]})
+    
+    # For free tier, cap the total shown
+    if features["history_limit"] < 999999:
+        total = min(total, features["history_limit"])
     
     return {
         "analyses": analyses,
         "total": total,
         "page": page,
-        "limit": limit,
-        "total_pages": (total + limit - 1) // limit
+        "limit": effective_limit,
+        "total_pages": max(1, (total + effective_limit - 1) // effective_limit),
+        "tier_limit": features["history_limit"] if features["history_limit"] < 999999 else None
     }
 
 @api_router.get("/analysis/{analysis_id}", response_model=AnalysisResponse)
@@ -409,24 +507,67 @@ async def submit_feedback(analysis_id: str, data: FeedbackRequest, user: dict = 
         raise HTTPException(status_code=404, detail="Analysis not found")
     return {"message": "Feedback submitted"}
 
+# ================= EXPORT (Pro+) =================
+
+@api_router.get("/analysis/export/csv")
+async def export_analyses_csv(user: dict = Depends(require_tier("pro"))):
+    analyses = await db.analyses.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(10000)
+    
+    if not analyses:
+        raise HTTPException(status_code=404, detail="No analyses to export")
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow([
+        "Date", "Subject", "Score", "Response Rate", "Open Rate",
+        "Personalization", "CTA Score", "Value Prop", "Word Count",
+        "Key Insight", "Optimized Subject", "Feedback"
+    ])
+    
+    for a in analyses:
+        writer.writerow([
+            a.get("created_at", "")[:10],
+            a.get("original_subject", ""),
+            a.get("analysis_score", 0),
+            a.get("estimated_response_rate", 0),
+            a.get("estimated_open_rate", 0),
+            a.get("personalization_score", 0),
+            a.get("cta_score", 0),
+            a.get("value_proposition_clarity", 0),
+            a.get("email_word_count", 0),
+            a.get("key_insight", ""),
+            a.get("rewritten_subject", ""),
+            a.get("user_feedback", "")
+        ])
+    
+    output.seek(0)
+    
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=coldiq_analyses_{datetime.now().strftime('%Y%m%d')}.csv"}
+    )
+
 # ================= INSIGHTS ROUTES =================
 
 @api_router.get("/insights/dashboard")
 async def get_insights_dashboard(user: dict = Depends(get_current_user)):
-    # Check subscription
-    if user["subscription_tier"] == "free":
+    features = get_tier_features(user.get("subscription_tier", "free"))
+    
+    if not features["insights_dashboard"]:
         return {
             "available": False,
-            "message": "Upgrade to Starter or Pro to access insights"
+            "required_tier": "starter",
+            "message": "Upgrade to Starter or higher to access insights dashboard"
         }
     
     user_id = user["id"]
-    
-    # Get all analyses for the user
-    analyses = await db.analyses.find(
-        {"user_id": user_id},
-        {"_id": 0}
-    ).to_list(1000)
+    analyses = await db.analyses.find({"user_id": user_id}, {"_id": 0}).to_list(1000)
     
     if not analyses:
         return {
@@ -435,64 +576,22 @@ async def get_insights_dashboard(user: dict = Depends(get_current_user)):
             "message": "Complete your first analysis to see insights"
         }
     
-    # Calculate metrics
     total_analyses = len(analyses)
     avg_score = sum(a.get("analysis_score", 0) for a in analyses) / total_analyses
     best_score = max(a.get("analysis_score", 0) for a in analyses)
     avg_response_rate = sum(a.get("estimated_response_rate", 0) for a in analyses) / total_analyses
     
-    # Word count analysis
     word_counts = [a.get("email_word_count", 0) for a in analyses]
     avg_word_count = sum(word_counts) / len(word_counts)
     
-    # Score by word count buckets
-    short_emails = [a for a in analyses if a.get("email_word_count", 0) < 50]
-    medium_emails = [a for a in analyses if 50 <= a.get("email_word_count", 0) < 100]
-    long_emails = [a for a in analyses if a.get("email_word_count", 0) >= 100]
-    
-    word_count_insights = []
-    if short_emails:
-        avg_short = sum(a.get("analysis_score", 0) for a in short_emails) / len(short_emails)
-        word_count_insights.append({"category": "Short (0-50)", "avg_score": round(avg_short, 1), "count": len(short_emails)})
-    if medium_emails:
-        avg_med = sum(a.get("analysis_score", 0) for a in medium_emails) / len(medium_emails)
-        word_count_insights.append({"category": "Medium (50-100)", "avg_score": round(avg_med, 1), "count": len(medium_emails)})
-    if long_emails:
-        avg_long = sum(a.get("analysis_score", 0) for a in long_emails) / len(long_emails)
-        word_count_insights.append({"category": "Long (100+)", "avg_score": round(avg_long, 1), "count": len(long_emails)})
-    
-    # Recent trends (last 30 days)
-    thirty_days_ago = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
-    recent = [a for a in analyses if a.get("created_at", "") >= thirty_days_ago]
-    
-    # Build trend data
-    trend_data = []
-    for a in sorted(recent, key=lambda x: x.get("created_at", "")):
-        trend_data.append({
-            "date": a.get("created_at", "")[:10],
-            "score": a.get("analysis_score", 0)
-        })
-    
-    # Recommendations based on patterns
-    recommendations = []
-    if avg_score < 60:
-        recommendations.append("Focus on improving your value proposition clarity")
-    if avg_word_count > 120:
-        recommendations.append("Try shorter emails - aim for 60-100 words")
-    if avg_word_count < 40:
-        recommendations.append("Add more context to your emails - aim for 60-100 words")
-    
     avg_personalization = sum(a.get("personalization_score", 0) for a in analyses) / total_analyses
-    if avg_personalization < 5:
-        recommendations.append("Include more personalized elements in your emails")
-    
     avg_cta = sum(a.get("cta_score", 0) for a in analyses) / total_analyses
-    if avg_cta < 5:
-        recommendations.append("Strengthen your call-to-action with specific next steps")
     
-    return {
+    # Basic insights for Starter
+    response = {
         "available": True,
         "has_data": True,
+        "tier": user.get("subscription_tier"),
         "summary": {
             "total_analyses": total_analyses,
             "average_score": round(avg_score, 1),
@@ -501,11 +600,324 @@ async def get_insights_dashboard(user: dict = Depends(get_current_user)):
             "average_word_count": round(avg_word_count),
             "avg_personalization_score": round(avg_personalization, 1),
             "avg_cta_score": round(avg_cta, 1)
-        },
-        "word_count_insights": word_count_insights,
-        "trend_data": trend_data[-30:],  # Last 30 data points
-        "recommendations": recommendations[:5]
+        }
     }
+    
+    # Advanced insights for Pro+
+    if features["advanced_insights"]:
+        # Word count analysis
+        short_emails = [a for a in analyses if a.get("email_word_count", 0) < 50]
+        medium_emails = [a for a in analyses if 50 <= a.get("email_word_count", 0) < 100]
+        long_emails = [a for a in analyses if a.get("email_word_count", 0) >= 100]
+        
+        word_count_insights = []
+        if short_emails:
+            avg_short = sum(a.get("analysis_score", 0) for a in short_emails) / len(short_emails)
+            word_count_insights.append({"category": "Short (0-50)", "avg_score": round(avg_short, 1), "count": len(short_emails)})
+        if medium_emails:
+            avg_med = sum(a.get("analysis_score", 0) for a in medium_emails) / len(medium_emails)
+            word_count_insights.append({"category": "Medium (50-100)", "avg_score": round(avg_med, 1), "count": len(medium_emails)})
+        if long_emails:
+            avg_long = sum(a.get("analysis_score", 0) for a in long_emails) / len(long_emails)
+            word_count_insights.append({"category": "Long (100+)", "avg_score": round(avg_long, 1), "count": len(long_emails)})
+        
+        response["word_count_insights"] = word_count_insights
+        
+        # Trend data
+        thirty_days_ago = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+        recent = [a for a in analyses if a.get("created_at", "") >= thirty_days_ago]
+        
+        trend_data = []
+        for a in sorted(recent, key=lambda x: x.get("created_at", "")):
+            trend_data.append({
+                "date": a.get("created_at", "")[:10],
+                "score": a.get("analysis_score", 0)
+            })
+        response["trend_data"] = trend_data[-30:]
+        
+        # Score improvement over time
+        if len(analyses) >= 5:
+            first_5_avg = sum(a.get("analysis_score", 0) for a in analyses[-5:]) / 5
+            last_5_avg = sum(a.get("analysis_score", 0) for a in analyses[:5]) / 5
+            improvement = round(last_5_avg - first_5_avg, 1)
+            response["improvement_trend"] = {
+                "first_5_avg": round(first_5_avg, 1),
+                "last_5_avg": round(last_5_avg, 1),
+                "improvement": improvement
+            }
+    
+    # Personalized recommendations for Pro+
+    if features["recommendations"]:
+        recommendations = []
+        if avg_score < 60:
+            recommendations.append("Focus on improving your value proposition clarity - your emails would benefit from clearer benefits")
+        if avg_word_count > 120:
+            recommendations.append("Your emails average over 120 words - try shorter emails (60-100 words) for better engagement")
+        if avg_word_count < 40:
+            recommendations.append("Your emails are quite short - add more context to build credibility")
+        if avg_personalization < 5:
+            recommendations.append("Include more personalized elements - reference specific company news or achievements")
+        if avg_cta < 5:
+            recommendations.append("Strengthen your CTAs - use specific times like 'Tuesday at 2pm' instead of 'sometime'")
+        
+        # A/B test suggestions
+        ab_suggestions = []
+        if avg_score < 70:
+            ab_suggestions.append("Try testing question-based subject lines vs. statement-based ones")
+        if avg_response_rate < 5:
+            ab_suggestions.append("Test shorter emails (under 75 words) vs. your current length")
+        ab_suggestions.append("A/B test your CTA: 'quick call' vs. specific time slots")
+        
+        response["recommendations"] = recommendations[:5]
+        response["ab_suggestions"] = ab_suggestions[:3]
+    
+    return response
+
+# ================= TEMPLATES (Pro+) =================
+
+@api_router.get("/templates")
+async def get_templates(user: dict = Depends(get_current_user)):
+    features = get_tier_features(user.get("subscription_tier", "free"))
+    
+    if not features["templates"]:
+        return {
+            "available": False,
+            "required_tier": "pro",
+            "message": "Upgrade to Pro or higher to access email templates"
+        }
+    
+    # Get user's templates and shared team templates
+    query = {"$or": [{"user_id": user["id"]}]}
+    
+    if user.get("team_id"):
+        query["$or"].append({"team_id": user["team_id"], "is_shared": True})
+    
+    # Also get system templates
+    query["$or"].append({"is_system": True})
+    
+    templates = await db.templates.find(query, {"_id": 0}).to_list(100)
+    
+    return {"available": True, "templates": templates}
+
+@api_router.post("/templates")
+async def create_template(data: TemplateCreate, user: dict = Depends(require_tier("pro"))):
+    template_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    template_doc = {
+        "id": template_id,
+        "user_id": user["id"],
+        "team_id": user.get("team_id") if data.is_shared else None,
+        "name": data.name,
+        "subject": data.subject,
+        "body": data.body,
+        "category": data.category,
+        "is_shared": data.is_shared,
+        "is_system": False,
+        "created_at": now
+    }
+    
+    await db.templates.insert_one(template_doc)
+    return template_doc
+
+@api_router.delete("/templates/{template_id}")
+async def delete_template(template_id: str, user: dict = Depends(require_tier("pro"))):
+    result = await db.templates.delete_one({"id": template_id, "user_id": user["id"], "is_system": False})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Template not found or cannot be deleted")
+    return {"message": "Template deleted"}
+
+# ================= TEAM MANAGEMENT (Agency) =================
+
+@api_router.get("/team")
+async def get_team(user: dict = Depends(require_tier("agency"))):
+    if not user.get("team_id"):
+        # Create team for user
+        team_id = str(uuid.uuid4())
+        await db.teams.insert_one({
+            "id": team_id,
+            "owner_id": user["id"],
+            "name": f"{user['full_name']}'s Team",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        await db.users.update_one({"id": user["id"]}, {"$set": {"team_id": team_id, "team_role": "owner"}})
+        user["team_id"] = team_id
+    
+    team = await db.teams.find_one({"id": user["team_id"]}, {"_id": 0})
+    members = await db.users.find(
+        {"team_id": user["team_id"]},
+        {"_id": 0, "password_hash": 0}
+    ).to_list(10)
+    
+    return {
+        "team": team,
+        "members": members,
+        "seats_used": len(members),
+        "seats_total": 5
+    }
+
+@api_router.post("/team/invite")
+async def invite_team_member(data: TeamMemberInvite, user: dict = Depends(require_tier("agency"))):
+    if not user.get("team_id"):
+        raise HTTPException(status_code=400, detail="No team found")
+    
+    # Check seat limit
+    member_count = await db.users.count_documents({"team_id": user["team_id"]})
+    if member_count >= 5:
+        raise HTTPException(status_code=403, detail="Team seat limit reached (5 members)")
+    
+    # Check if user exists
+    existing_user = await db.users.find_one({"email": data.email})
+    
+    if existing_user:
+        if existing_user.get("team_id"):
+            raise HTTPException(status_code=400, detail="User is already in a team")
+        
+        # Add to team
+        await db.users.update_one(
+            {"id": existing_user["id"]},
+            {"$set": {
+                "team_id": user["team_id"],
+                "team_role": data.role,
+                "subscription_tier": "agency"  # Inherit agency tier
+            }}
+        )
+        return {"message": f"User {data.email} added to team", "status": "added"}
+    else:
+        # Create invitation
+        invite_id = str(uuid.uuid4())
+        await db.team_invites.insert_one({
+            "id": invite_id,
+            "team_id": user["team_id"],
+            "email": data.email,
+            "role": data.role,
+            "invited_by": user["id"],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "status": "pending"
+        })
+        return {"message": f"Invitation sent to {data.email}", "status": "invited", "invite_id": invite_id}
+
+@api_router.delete("/team/members/{member_id}")
+async def remove_team_member(member_id: str, user: dict = Depends(require_tier("agency"))):
+    if member_id == user["id"]:
+        raise HTTPException(status_code=400, detail="Cannot remove yourself from team")
+    
+    member = await db.users.find_one({"id": member_id, "team_id": user["team_id"]})
+    if not member:
+        raise HTTPException(status_code=404, detail="Team member not found")
+    
+    await db.users.update_one(
+        {"id": member_id},
+        {"$set": {"team_id": None, "team_role": None, "subscription_tier": "free"}}
+    )
+    
+    return {"message": "Team member removed"}
+
+@api_router.get("/team/analytics")
+async def get_team_analytics(user: dict = Depends(require_tier("agency"))):
+    if not user.get("team_id"):
+        return {"available": False, "message": "No team found"}
+    
+    # Get all team members' analyses
+    team_members = await db.users.find({"team_id": user["team_id"]}, {"id": 1}).to_list(10)
+    member_ids = [m["id"] for m in team_members]
+    
+    analyses = await db.analyses.find(
+        {"user_id": {"$in": member_ids}},
+        {"_id": 0}
+    ).to_list(10000)
+    
+    if not analyses:
+        return {"available": True, "has_data": False}
+    
+    # Aggregate by user
+    user_stats = {}
+    for a in analyses:
+        uid = a["user_id"]
+        if uid not in user_stats:
+            user_stats[uid] = {"count": 0, "total_score": 0}
+        user_stats[uid]["count"] += 1
+        user_stats[uid]["total_score"] += a.get("analysis_score", 0)
+    
+    # Get user names
+    members_data = []
+    for uid, stats in user_stats.items():
+        member = await db.users.find_one({"id": uid}, {"full_name": 1, "email": 1})
+        members_data.append({
+            "user_id": uid,
+            "name": member.get("full_name", "Unknown") if member else "Unknown",
+            "email": member.get("email", "") if member else "",
+            "analyses_count": stats["count"],
+            "avg_score": round(stats["total_score"] / stats["count"], 1) if stats["count"] > 0 else 0
+        })
+    
+    total_analyses = len(analyses)
+    avg_team_score = sum(a.get("analysis_score", 0) for a in analyses) / total_analyses if total_analyses > 0 else 0
+    
+    return {
+        "available": True,
+        "has_data": True,
+        "team_summary": {
+            "total_analyses": total_analyses,
+            "avg_score": round(avg_team_score, 1),
+            "member_count": len(member_ids)
+        },
+        "member_stats": sorted(members_data, key=lambda x: x["analyses_count"], reverse=True)
+    }
+
+# ================= API KEYS (Agency) =================
+
+@api_router.get("/api-keys")
+async def get_api_keys(user: dict = Depends(require_tier("agency"))):
+    keys = await db.api_keys.find(
+        {"user_id": user["id"]},
+        {"_id": 0, "key": 0}  # Don't return full key
+    ).to_list(10)
+    
+    # Mask keys
+    for key in keys:
+        key["key_preview"] = key.get("key_prefix", "coldiq_") + "..." + key.get("key_suffix", "****")
+    
+    return {"api_keys": keys}
+
+@api_router.post("/api-keys")
+async def create_api_key(user: dict = Depends(require_tier("agency"))):
+    # Check limit (max 3 keys)
+    count = await db.api_keys.count_documents({"user_id": user["id"]})
+    if count >= 3:
+        raise HTTPException(status_code=400, detail="Maximum 3 API keys allowed")
+    
+    key = f"coldiq_{secrets.token_urlsafe(32)}"
+    key_id = str(uuid.uuid4())
+    
+    await db.api_keys.insert_one({
+        "id": key_id,
+        "user_id": user["id"],
+        "key": key,
+        "key_prefix": key[:10],
+        "key_suffix": key[-4:],
+        "name": f"API Key {count + 1}",
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "last_used": None
+    })
+    
+    # Return full key only on creation
+    return {"id": key_id, "key": key, "message": "Save this key - it won't be shown again"}
+
+@api_router.delete("/api-keys/{key_id}")
+async def delete_api_key(key_id: str, user: dict = Depends(require_tier("agency"))):
+    result = await db.api_keys.delete_one({"id": key_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="API key not found")
+    return {"message": "API key deleted"}
+
+# ================= PUBLIC API (Agency) =================
+
+@api_router.post("/v1/analyze")
+async def api_analyze_email(data: EmailAnalysisRequest, user: dict = Depends(verify_api_key)):
+    """Public API endpoint for email analysis (requires API key)"""
+    return await analyze_email(data, user)
 
 # ================= USER ROUTES =================
 
@@ -520,13 +932,18 @@ async def update_profile(data: ProfileUpdate, user: dict = Depends(get_current_u
 
 @api_router.get("/user/usage")
 async def get_usage(user: dict = Depends(get_current_user)):
-    limit = SUBSCRIPTION_LIMITS.get(user["subscription_tier"], 3)
+    features = get_tier_features(user.get("subscription_tier", "free"))
     return {
         "used": user["analyses_used_this_month"],
-        "limit": limit,
-        "remaining": max(0, limit - user["analyses_used_this_month"]),
-        "tier": user["subscription_tier"]
+        "limit": features["analyses_limit"],
+        "remaining": max(0, features["analyses_limit"] - user["analyses_used_this_month"]),
+        "tier": user["subscription_tier"],
+        "features": features
     }
+
+@api_router.get("/user/features")
+async def get_user_features(user: dict = Depends(get_current_user)):
+    return get_tier_features(user.get("subscription_tier", "free"))
 
 # ================= BILLING ROUTES =================
 
@@ -562,7 +979,6 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
     
     session = await stripe_checkout.create_checkout_session(checkout_request)
     
-    # Create payment transaction record
     await db.payment_transactions.insert_one({
         "id": str(uuid.uuid4()),
         "session_id": session.session_id,
@@ -582,30 +998,36 @@ async def get_checkout_status(session_id: str, user: dict = Depends(get_current_
     if not api_key:
         raise HTTPException(status_code=500, detail="Stripe not configured")
     
-    webhook_url = ""  # Not needed for status check
-    stripe_checkout = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
-    
+    stripe_checkout = StripeCheckout(api_key=api_key, webhook_url="")
     status = await stripe_checkout.get_checkout_status(session_id)
     
-    # Update transaction status
     transaction = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
     
     if transaction and status.payment_status == "paid" and transaction.get("payment_status") != "paid":
-        # Update transaction
         await db.payment_transactions.update_one(
             {"session_id": session_id},
             {"$set": {"payment_status": "paid", "updated_at": datetime.now(timezone.utc).isoformat()}}
         )
         
-        # Update user subscription
         plan_tier = transaction.get("plan_tier", "starter")
-        await db.users.update_one(
-            {"id": user["id"]},
-            {"$set": {
-                "subscription_tier": plan_tier,
-                "subscription_status": "active"
-            }}
-        )
+        update_data = {
+            "subscription_tier": plan_tier,
+            "subscription_status": "active"
+        }
+        
+        # For agency, create team if not exists
+        if plan_tier == "agency" and not user.get("team_id"):
+            team_id = str(uuid.uuid4())
+            await db.teams.insert_one({
+                "id": team_id,
+                "owner_id": user["id"],
+                "name": f"{user['full_name']}'s Team",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            })
+            update_data["team_id"] = team_id
+            update_data["team_role"] = "owner"
+        
+        await db.users.update_one({"id": user["id"]}, {"$set": update_data})
     
     return {
         "status": status.status,
@@ -631,24 +1053,34 @@ async def stripe_webhook(request: Request):
             session_id = webhook_response.session_id
             metadata = webhook_response.metadata
             
-            # Update transaction
             await db.payment_transactions.update_one(
                 {"session_id": session_id},
                 {"$set": {"payment_status": "paid", "updated_at": datetime.now(timezone.utc).isoformat()}}
             )
             
-            # Update user subscription
             user_id = metadata.get("user_id")
             plan_tier = metadata.get("plan_tier", "starter")
             
             if user_id:
-                await db.users.update_one(
-                    {"id": user_id},
-                    {"$set": {
-                        "subscription_tier": plan_tier,
-                        "subscription_status": "active"
-                    }}
-                )
+                update_data = {
+                    "subscription_tier": plan_tier,
+                    "subscription_status": "active"
+                }
+                
+                if plan_tier == "agency":
+                    user = await db.users.find_one({"id": user_id})
+                    if user and not user.get("team_id"):
+                        team_id = str(uuid.uuid4())
+                        await db.teams.insert_one({
+                            "id": team_id,
+                            "owner_id": user_id,
+                            "name": f"{user.get('full_name', 'User')}'s Team",
+                            "created_at": datetime.now(timezone.utc).isoformat()
+                        })
+                        update_data["team_id"] = team_id
+                        update_data["team_role"] = "owner"
+                
+                await db.users.update_one({"id": user_id}, {"$set": update_data})
         
         return {"status": "success"}
     except Exception as e:
@@ -665,7 +1097,7 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
-# Include the router in the main app
+# Include the router
 app.include_router(api_router)
 
 app.add_middleware(
