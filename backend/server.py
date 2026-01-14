@@ -1407,6 +1407,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def startup_event():
+    """Seed system templates on startup"""
+    # Check if system templates already exist
+    existing_count = await db.templates.count_documents({"is_system": True})
+    if existing_count == 0:
+        logger.info("Seeding system templates...")
+        for template in SYSTEM_TEMPLATES:
+            await db.templates.insert_one({
+                "id": str(uuid.uuid4()),
+                "user_id": None,
+                "team_id": None,
+                "name": template["name"],
+                "subject": template["subject"],
+                "body": template["body"],
+                "category": template["category"],
+                "avg_score": template.get("avg_score"),
+                "is_shared": False,
+                "is_system": True,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            })
+        logger.info(f"Seeded {len(SYSTEM_TEMPLATES)} system templates")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
