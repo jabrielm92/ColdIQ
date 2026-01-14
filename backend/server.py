@@ -388,10 +388,23 @@ async def signup(data: UserSignup):
         "total_analyses": 0,
         "created_at": now,
         "onboarding_completed": False,
-        "team_id": None
+        "team_id": None,
+        "email_verified": False
     }
     
     await db.users.insert_one(user_doc)
+    
+    # Create email verification token
+    verification_token = create_verification_token(user_id, "email_verification")
+    await db.verification_tokens.insert_one(verification_token)
+    
+    # Send verification email
+    verify_url = f"{{FRONTEND_URL}}/verify-email?token={verification_token['token']}"
+    await send_email_notification(
+        data.email,
+        "Verify your ColdIQ account",
+        f"Hi {data.full_name},\n\nWelcome to ColdIQ! Please verify your email by clicking the link below:\n\n{verify_url}\n\nThis link expires in 24 hours.\n\nBest,\nThe ColdIQ Team"
+    )
     
     token = create_jwt_token(user_id, data.email)
     
@@ -399,7 +412,7 @@ async def signup(data: UserSignup):
     if "_id" in user_doc:
         del user_doc["_id"]
     
-    return {"token": token, "user": user_doc}
+    return {"token": token, "user": user_doc, "verification_sent": True}
 
 @api_router.post("/auth/login")
 async def login(data: UserLogin):
