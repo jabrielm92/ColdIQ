@@ -1222,6 +1222,11 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
     stripe_checkout = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
     
     amount = SUBSCRIPTION_PRICES[data.plan_tier]
+    
+    # Determine actual tier from price key
+    actual_tier = PRICE_TO_TIER.get(data.plan_tier, data.plan_tier.replace("_monthly", "").replace("_annual", ""))
+    is_annual = "_annual" in data.plan_tier
+    
     success_url = f"{host_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{host_url}/pricing"
     
@@ -1232,7 +1237,8 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
         cancel_url=cancel_url,
         metadata={
             "user_id": user["id"],
-            "plan_tier": data.plan_tier,
+            "plan_tier": actual_tier,
+            "billing_period": "annual" if is_annual else "monthly",
             "user_email": user["email"]
         }
     )
@@ -1245,12 +1251,45 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
         "user_id": user["id"],
         "amount": amount,
         "currency": "usd",
-        "plan_tier": data.plan_tier,
+        "plan_tier": actual_tier,
+        "billing_period": "annual" if is_annual else "monthly",
         "payment_status": "pending",
         "created_at": datetime.now(timezone.utc).isoformat()
     })
     
     return {"url": session.url, "session_id": session.session_id}
+
+@api_router.get("/billing/prices")
+async def get_prices():
+    """Get all available prices with annual discount info"""
+    return {
+        "plans": [
+            {
+                "tier": "starter",
+                "name": "Starter",
+                "monthly_price": 29,
+                "annual_price": 278.40,
+                "annual_monthly_equivalent": 23.20,
+                "discount_percent": 20
+            },
+            {
+                "tier": "pro",
+                "name": "Pro",
+                "monthly_price": 79,
+                "annual_price": 758.40,
+                "annual_monthly_equivalent": 63.20,
+                "discount_percent": 20
+            },
+            {
+                "tier": "agency",
+                "name": "Agency",
+                "monthly_price": 199,
+                "annual_price": 1910.40,
+                "annual_monthly_equivalent": 159.20,
+                "discount_percent": 20
+            }
+        ]
+    }
 
 @api_router.get("/billing/checkout-status/{session_id}")
 async def get_checkout_status(session_id: str, user: dict = Depends(get_current_user)):
