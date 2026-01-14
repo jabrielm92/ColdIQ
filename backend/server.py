@@ -447,7 +447,7 @@ async def signup(data: UserSignup):
     await db.verification_tokens.insert_one(verification_token)
     
     # Send verification email
-    verify_url = f"{$FRONTEND_URL}/verify-email?token={verification_token['token']}"
+    verify_url = f"{FRONTEND_URL}/verify-email?token={verification_token['token']}"
     await send_email_notification(
         data.email,
         "Verify your ColdIQ account",
@@ -547,7 +547,7 @@ async def resend_verification(data: ResendVerificationRequest):
     verification_token = create_verification_token(user["id"], "email_verification")
     await db.verification_tokens.insert_one(verification_token)
     
-    verify_url = f"{$FRONTEND_URL}/verify-email?token={verification_token['token']}"
+    verify_url = f"{FRONTEND_URL}/verify-email?token={verification_token['token']}"
     await send_email_notification(
         data.email,
         "Verify your ColdIQ account",
@@ -574,7 +574,7 @@ async def forgot_password(data: PasswordResetRequest):
     reset_token = create_verification_token(user["id"], "password_reset", expires_hours=1)
     await db.verification_tokens.insert_one(reset_token)
     
-    reset_url = f"{$FRONTEND_URL}/reset-password?token={reset_token['token']}"
+    reset_url = f"{FRONTEND_URL}/reset-password?token={reset_token['token']}"
     await send_email_notification(
         data.email,
         "Reset your ColdIQ password",
@@ -1074,7 +1074,7 @@ async def invite_team_member(data: TeamMemberInvite, user: dict = Depends(requir
         await send_email_notification(
             data.email,
             f"You've been added to {team_name} on ColdIQ",
-            f"Hi {existing_user['full_name']},\n\n{user['full_name']} has added you to {team_name} on ColdIQ.\n\nYou now have access to Agency-level features including:\n- Unlimited email analyses\n- Advanced insights & recommendations\n- CSV export\n- Email templates\n- Team analytics\n\nLog in now to get started: {$FRONTEND_URL}/login\n\nBest,\nThe ColdIQ Team"
+            f"Hi {existing_user['full_name']},\n\n{user['full_name']} has added you to {team_name} on ColdIQ.\n\nYou now have access to Agency-level features including:\n- Unlimited email analyses\n- Advanced insights & recommendations\n- CSV export\n- Email templates\n- Team analytics\n\nLog in now to get started: {FRONTEND_URL}/login\n\nBest,\nThe ColdIQ Team"
         )
         
         return {"message": f"User {data.email} added to team", "status": "added"}
@@ -1096,7 +1096,7 @@ async def invite_team_member(data: TeamMemberInvite, user: dict = Depends(requir
         })
         
         # Send invitation email
-        invite_url = f"{$FRONTEND_URL}/join-team?token={invite_token}"
+        invite_url = f"{FRONTEND_URL}/join-team?token={invite_token}"
         await send_email_notification(
             data.email,
             f"{user['full_name']} invited you to join {team_name} on ColdIQ",
