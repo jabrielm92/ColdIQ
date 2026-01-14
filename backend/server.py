@@ -449,6 +449,134 @@ async def complete_onboarding(data: OnboardingData, user: dict = Depends(get_cur
     features = get_tier_features(updated_user.get("subscription_tier", "free"))
     return {"message": "Onboarding completed", "user": {**updated_user, "features": features}}
 
+@api_router.post("/auth/verify-email")
+async def verify_email(data: EmailVerificationRequest):
+    token_doc = await db.verification_tokens.find_one({
+        "token": data.token,
+        "type": "email_verification",
+        "used": False
+    })
+    
+    if not token_doc:
+        raise HTTPException(status_code=400, detail="Invalid or expired verification token")
+    
+    # Check expiration
+    expires_at = datetime.fromisoformat(token_doc["expires_at"].replace("Z", "+00:00"))
+    if datetime.now(timezone.utc) > expires_at:
+        raise HTTPException(status_code=400, detail="Verification token has expired")
+    
+    # Mark token as used
+    await db.verification_tokens.update_one(
+        {"token": data.token},
+        {"$set": {"used": True}}
+    )
+    
+    # Update user
+    await db.users.update_one(
+        {"id": token_doc["user_id"]},
+        {"$set": {"email_verified": True}}
+    )
+    
+    return {"message": "Email verified successfully"}
+
+@api_router.post("/auth/resend-verification")
+async def resend_verification(data: ResendVerificationRequest):
+    user = await db.users.find_one({"email": data.email})
+    if not user:
+        # Don't reveal if user exists
+        return {"message": "If an account exists, a verification email has been sent"}
+    
+    if user.get("email_verified"):
+        return {"message": "Email is already verified"}
+    
+    # Invalidate old tokens
+    await db.verification_tokens.update_many(
+        {"user_id": user["id"], "type": "email_verification"},
+        {"$set": {"used": True}}
+    )
+    
+    # Create new token
+    verification_token = create_verification_token(user["id"], "email_verification")
+    await db.verification_tokens.insert_one(verification_token)
+    
+    verify_url = f"{{FRONTEND_URL}}/verify-email?token={verification_token['token']}"
+    await send_email_notification(
+        data.email,
+        "Verify your ColdIQ account",
+        f"Hi {user['full_name']},\n\nPlease verify your email by clicking the link below:\n\n{verify_url}\n\nThis link expires in 24 hours.\n\nBest,\nThe ColdIQ Team"
+    )
+    
+    return {"message": "Verification email sent"}
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(data: PasswordResetRequest):
+    user = await db.users.find_one({"email": data.email})
+    
+    # Always return success to prevent email enumeration
+    if not user:
+        return {"message": "If an account exists with this email, a reset link has been sent"}
+    
+    # Invalidate old reset tokens
+    await db.verification_tokens.update_many(
+        {"user_id": user["id"], "type": "password_reset"},
+        {"$set": {"used": True}}
+    )
+    
+    # Create reset token (expires in 1 hour)
+    reset_token = create_verification_token(user["id"], "password_reset", expires_hours=1)
+    await db.verification_tokens.insert_one(reset_token)
+    
+    reset_url = f"{{FRONTEND_URL}}/reset-password?token={reset_token['token']}"
+    await send_email_notification(
+        data.email,
+        "Reset your ColdIQ password",
+        f"Hi {user['full_name']},\n\nYou requested to reset your password. Click the link below:\n\n{reset_url}\n\nThis link expires in 1 hour. If you didn't request this, please ignore this email.\n\nBest,\nThe ColdIQ Team"
+    )
+    
+    return {"message": "If an account exists with this email, a reset link has been sent"}
+
+@api_router.post("/auth/reset-password")
+async def reset_password(data: PasswordResetConfirm):
+    token_doc = await db.verification_tokens.find_one({
+        "token": data.token,
+        "type": "password_reset",
+        "used": False
+    })
+    
+    if not token_doc:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+    
+    # Check expiration
+    expires_at = datetime.fromisoformat(token_doc["expires_at"].replace("Z", "+00:00"))
+    if datetime.now(timezone.utc) > expires_at:
+        raise HTTPException(status_code=400, detail="Reset token has expired")
+    
+    if len(data.new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+    
+    # Mark token as used
+    await db.verification_tokens.update_one(
+        {"token": data.token},
+        {"$set": {"used": True}}
+    )
+    
+    # Update password
+    await db.users.update_one(
+        {"id": token_doc["user_id"]},
+        {"$set": {"password_hash": hash_password(data.new_password)}}
+    )
+    
+    # Send confirmation email
+    user = await db.users.find_one({"id": token_doc["user_id"]})
+    if user:
+        await send_email_notification(
+            user["email"],
+            "Your ColdIQ password has been reset",
+            f"Hi {user['full_name']},\n\nYour password has been successfully reset. If you didn't make this change, please contact support immediately.\n\nBest,\nThe ColdIQ Team"
+        )
+    
+    return {"message": "Password reset successfully"}
+
 # ================= EMAIL ANALYSIS ROUTES =================
 
 @api_router.post("/analysis/analyze", response_model=AnalysisResponse)
