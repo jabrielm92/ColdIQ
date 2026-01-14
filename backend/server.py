@@ -1002,6 +1002,9 @@ async def invite_team_member(data: TeamMemberInvite, user: dict = Depends(requir
     if member_count >= 5:
         raise HTTPException(status_code=403, detail="Team seat limit reached (5 members)")
     
+    team = await db.teams.find_one({"id": user["team_id"]})
+    team_name = team.get("name", "the team") if team else "the team"
+    
     # Check if user exists
     existing_user = await db.users.find_one({"email": data.email})
     
@@ -1018,19 +1021,40 @@ async def invite_team_member(data: TeamMemberInvite, user: dict = Depends(requir
                 "subscription_tier": "agency"  # Inherit agency tier
             }}
         )
+        
+        # Send notification email
+        await send_email_notification(
+            data.email,
+            f"You've been added to {team_name} on ColdIQ",
+            f"Hi {existing_user['full_name']},\n\n{user['full_name']} has added you to {team_name} on ColdIQ.\n\nYou now have access to Agency-level features including:\n- Unlimited email analyses\n- Advanced insights & recommendations\n- CSV export\n- Email templates\n- Team analytics\n\nLog in now to get started: {{FRONTEND_URL}}/login\n\nBest,\nThe ColdIQ Team"
+        )
+        
         return {"message": f"User {data.email} added to team", "status": "added"}
     else:
         # Create invitation
         invite_id = str(uuid.uuid4())
+        invite_token = generate_verification_token()
+        
         await db.team_invites.insert_one({
             "id": invite_id,
             "team_id": user["team_id"],
             "email": data.email,
             "role": data.role,
             "invited_by": user["id"],
+            "token": invite_token,
             "created_at": datetime.now(timezone.utc).isoformat(),
+            "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
             "status": "pending"
         })
+        
+        # Send invitation email
+        invite_url = f"{{FRONTEND_URL}}/join-team?token={invite_token}"
+        await send_email_notification(
+            data.email,
+            f"{user['full_name']} invited you to join {team_name} on ColdIQ",
+            f"Hi there,\n\n{user['full_name']} has invited you to join {team_name} on ColdIQ - the AI-powered cold email analyzer.\n\nAs a team member, you'll get Agency-level access including:\n- Unlimited email analyses\n- AI-powered recommendations\n- Advanced analytics\n- Team collaboration features\n\nClick here to accept the invitation:\n{invite_url}\n\nThis invitation expires in 7 days.\n\nBest,\nThe ColdIQ Team"
+        )
+        
         return {"message": f"Invitation sent to {data.email}", "status": "invited", "invite_id": invite_id}
 
 @api_router.delete("/team/members/{member_id}")
