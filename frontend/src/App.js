@@ -101,8 +101,8 @@ const ProtectedRoute = ({ children }) => {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -120,8 +120,8 @@ const OnboardingRoute = ({ children }) => {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -139,7 +139,7 @@ const OnboardingRoute = ({ children }) => {
 
 function App() {
   return (
-    <div className="App min-h-screen bg-[#09090b]">
+    <div className="App min-h-screen bg-[#050505]">
       <AuthProvider>
         <BrowserRouter>
           <Routes>
