@@ -13,6 +13,7 @@ class ColdIQAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.test_results = []
+        self.failed_tests = []
 
     def log_test(self, name, success, details=""):
         """Log test result"""
