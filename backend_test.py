@@ -392,6 +392,11 @@ class ColdIQAPITester:
         # Test in order of dependency
         self.test_health_endpoints()
         
+        # Test new features first (don't require auth)
+        self.test_forgot_password_flow()
+        self.test_billing_prices_endpoint()
+        self.test_templates_system_seeded()
+        
         if self.test_auth_signup():
             self.test_auth_login()
             self.test_auth_me()
