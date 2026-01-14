@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,30 +6,26 @@
 
 @layer base {
     :root {
-        --background: 240 6% 4%;
-        --foreground: 240 5% 96%;
-        --card: 240 6% 10%;
-        --card-foreground: 240 5% 96%;
-        --popover: 240 6% 10%;
-        --popover-foreground: 240 5% 96%;
-        --primary: 239 84% 67%;
-        --primary-foreground: 0 0% 100%;
-        --secondary: 240 4% 16%;
-        --secondary-foreground: 240 5% 96%;
-        --muted: 240 4% 16%;
-        --muted-foreground: 240 5% 65%;
-        --accent: 239 84% 67%;
-        --accent-foreground: 0 0% 100%;
+        --background: 0 0% 2%;
+        --foreground: 0 0% 90%;
+        --card: 0 0% 4%;
+        --card-foreground: 0 0% 90%;
+        --popover: 0 0% 4%;
+        --popover-foreground: 0 0% 90%;
+        --primary: 43 74% 52%;
+        --primary-foreground: 0 0% 0%;
+        --secondary: 0 0% 15%;
+        --secondary-foreground: 0 0% 100%;
+        --muted: 0 0% 15%;
+        --muted-foreground: 0 0% 64%;
+        --accent: 82 85% 55%;
+        --accent-foreground: 0 0% 0%;
         --destructive: 0 84% 60%;
         --destructive-foreground: 0 0% 100%;
-        --border: 240 4% 16%;
-        --input: 240 4% 16%;
-        --ring: 239 84% 67%;
-        --chart-1: 239 84% 67%;
-        --chart-2: 187 85% 43%;
-        --chart-3: 160 84% 39%;
-        --chart-4: 38 92% 50%;
-        --radius: 0.5rem;
+        --border: 0 0% 15%;
+        --input: 0 0% 15%;
+        --ring: 43 74% 52%;
+        --radius: 0rem;
     }
 }
 
@@ -39,37 +35,69 @@
     }
     
     body {
-        @apply bg-[#09090b] text-zinc-100 antialiased;
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        @apply bg-[#050505] text-zinc-200 antialiased;
+        font-family: 'Manrope', sans-serif;
     }
     
     h1, h2, h3, h4, h5, h6 {
-        font-family: 'Manrope', sans-serif;
-        letter-spacing: -0.02em;
+        font-family: 'Playfair Display', serif;
     }
     
-    code, .mono {
+    .font-serif {
+        font-family: 'Playfair Display', serif;
+    }
+    
+    .font-sans {
+        font-family: 'Manrope', sans-serif;
+    }
+    
+    code, .mono, .font-mono {
         font-family: 'JetBrains Mono', monospace;
+    }
+
+    ::selection {
+        background: rgba(212, 175, 55, 0.3);
+        color: #fff;
     }
 }
 
 @layer utilities {
-    .text-gradient {
-        @apply bg-gradient-to-r from-white via-white to-zinc-500 bg-clip-text text-transparent;
+    .text-gold {
+        color: #d4af37;
     }
     
+    .bg-gold {
+        background-color: #d4af37;
+    }
+    
+    .border-gold {
+        border-color: #d4af37;
+    }
+    
+    .text-acid {
+        color: #a3e635;
+    }
+    
+    .bg-acid {
+        background-color: #a3e635;
+    }
+
+    .glow-gold {
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+    }
+
+    .glow-gold-sm {
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    }
+
     .glass {
-        @apply bg-zinc-900/60 backdrop-blur-xl border border-white/10;
+        @apply bg-black/40 backdrop-blur-xl border border-white/10;
     }
-    
-    .glow-primary {
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+
+    .glass-subtle {
+        @apply bg-black/20 backdrop-blur-md border border-white/5;
     }
-    
-    .glow-primary-lg {
-        box-shadow: 0 0 40px rgba(99, 102, 241, 0.4);
-    }
-    
+
     .noise {
         position: relative;
     }
@@ -83,61 +111,114 @@
         pointer-events: none;
         z-index: 1;
     }
-    
-    .score-red {
-        @apply text-red-400;
+
+    .hero-glow {
+        background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 60%);
     }
-    
-    .score-yellow {
-        @apply text-amber-400;
+
+    .border-subtle {
+        border-color: rgba(255, 255, 255, 0.08);
     }
-    
-    .score-green {
-        @apply text-emerald-400;
+
+    .text-gradient-gold {
+        background: linear-gradient(135deg, #d4af37 0%, #f4e4a6 50%, #d4af37 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .btn-primary {
+        @apply bg-[#d4af37] text-black font-sans font-bold uppercase tracking-wider text-xs px-8 py-4 rounded-none transition-colors duration-300 hover:bg-[#b5952f];
+    }
+
+    .btn-secondary {
+        @apply bg-transparent border border-zinc-800 text-zinc-300 hover:border-zinc-600 hover:text-white font-sans uppercase tracking-wider text-xs px-8 py-4 rounded-none transition-colors duration-300;
+    }
+
+    .input-minimal {
+        @apply bg-transparent border-b border-zinc-800 focus:border-[#d4af37] text-white px-0 py-4 rounded-none outline-none transition-colors placeholder:text-zinc-700 font-mono text-sm w-full;
+    }
+
+    .card-dark {
+        @apply bg-[#0a0a0a] border border-zinc-800/50 p-6 rounded-none relative overflow-hidden;
+    }
+
+    .score-excellent {
+        @apply text-[#a3e635];
+    }
+
+    .score-good {
+        @apply text-[#d4af37];
+    }
+
+    .score-poor {
+        @apply text-red-500;
     }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #18181b;
+    background: #050505;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #3f3f46;
-    border-radius: 4px;
+    background: #27272a;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #52525b;
+    background: #3f3f46;
 }
 
-/* Animation classes */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
-    50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.5); }
-}
-
-.animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
-.animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-}
-
-/* Override for data wrapper */
-@layer base {
-    [data-debug-wrapper="true"] {
-        display: contents !important;
+/* Animations */
+@keyframes fadeUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
     }
 }
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-gold {
+    0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+    50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.4); }
+}
+
+.animate-fade-up {
+    animation: fadeUp 0.6s ease-out forwards;
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(212,175,55,0.1) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+.animate-pulse-gold {
+    animation: pulse-gold 2s ease-in-out infinite;
+}
+
+/* Stagger children */
+.stagger-children > * {
+    opacity: 0;
+    animation: fadeUp 0.5s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
