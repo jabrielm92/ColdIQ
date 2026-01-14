@@ -130,6 +130,11 @@ const Login = () => {
             Sign up
           </Link>
         </p>
+        <p className="mt-2 text-center">
+          <Link to="/forgot-password" className="text-zinc-500 hover:text-zinc-400 text-sm" data-testid="forgot-password-link">
+            Forgot your password?
+          </Link>
+        </p>
       </motion.div>
     </div>
   );
