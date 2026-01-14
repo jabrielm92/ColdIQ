@@ -107,13 +107,65 @@ TIER_FEATURES = {
 }
 
 SUBSCRIPTION_PRICES = {
-    "starter": 29.00,
-    "pro": 79.00,
-    "agency": 199.00
+    "starter_monthly": 29.00,
+    "starter_annual": 278.40,  # 29 * 12 * 0.8 = 20% discount
+    "pro_monthly": 79.00,
+    "pro_annual": 758.40,  # 79 * 12 * 0.8
+    "agency_monthly": 199.00,
+    "agency_annual": 1910.40  # 199 * 12 * 0.8
+}
+
+# Map price IDs to tiers
+PRICE_TO_TIER = {
+    "starter_monthly": "starter",
+    "starter_annual": "starter",
+    "pro_monthly": "pro",
+    "pro_annual": "pro",
+    "agency_monthly": "agency",
+    "agency_annual": "agency"
 }
 
 def get_tier_features(tier: str) -> dict:
     return TIER_FEATURES.get(tier, TIER_FEATURES["free"])
+
+# Email templates seed data
+SYSTEM_TEMPLATES = [
+    {
+        "name": "The Personalized Opener",
+        "subject": "{{trigger_event}} at {{company}} - quick thought",
+        "body": "Hi {{first_name}},\n\nI noticed {{company}} just {{trigger_event}}. Congrats!\n\nWe've helped similar companies in {{industry}} achieve {{specific_result}} by {{value_prop}}.\n\nWould you be open to a quick 15-min call to explore if we could help {{company}} do the same?\n\nBest,\n{{your_name}}",
+        "category": "Outreach",
+        "avg_score": 78
+    },
+    {
+        "name": "The Problem-Agitate-Solve",
+        "subject": "{{pain_point}} costing {{company}} revenue?",
+        "body": "Hi {{first_name}},\n\nMost {{role}}s I talk to are struggling with {{pain_point}}. It's frustrating because {{agitate_problem}}.\n\nWe built {{product}} specifically to solve this - our clients typically see {{result}} within {{timeframe}}.\n\nCurious if this resonates with you?\n\nBest,\n{{your_name}}",
+        "category": "Pain Point",
+        "avg_score": 75
+    },
+    {
+        "name": "The Social Proof Hook",
+        "subject": "How {{similar_company}} achieved {{result}}",
+        "body": "Hi {{first_name}},\n\n{{similar_company}} was facing {{challenge}} just like {{company}} might be.\n\nAfter implementing our solution, they achieved {{specific_result}} in {{timeframe}}.\n\nI'd love to share how we did it and see if we could replicate similar results for you.\n\nFree for a quick call this week?\n\nBest,\n{{your_name}}",
+        "category": "Case Study",
+        "avg_score": 82
+    },
+    {
+        "name": "The Direct Ask",
+        "subject": "15 min - {{value_prop}} for {{company}}",
+        "body": "Hi {{first_name}},\n\nI help {{target_role}}s at {{industry}} companies {{achieve_outcome}}.\n\nWould you be the right person to speak with about this at {{company}}?\n\nIf so, are you free for 15 minutes this Thursday or Friday?\n\nBest,\n{{your_name}}",
+        "category": "Direct",
+        "avg_score": 71
+    },
+    {
+        "name": "The Permission-Based",
+        "subject": "Quick question, {{first_name}}",
+        "body": "Hi {{first_name}},\n\nI have an idea that could help {{company}} {{achieve_benefit}}.\n\nWould it be okay if I sent over a few bullet points on how?\n\nBest,\n{{your_name}}",
+        "category": "Soft Ask",
+        "avg_score": 68
+    }
+]
 
 # ================= MODELS =================
 
