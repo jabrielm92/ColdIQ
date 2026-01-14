@@ -1,0 +1,28 @@
+{
+  "summary": {
+    "tests_run": 3,
+    "tests_passed": 2,
+    "success_rate": 66.66666666666666,
+    "timestamp": "2026-01-14T16:20:54.960082"
+  },
+  "results": [
+    {
+      "test": "API Root",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:20:54.828010"
+    },
+    {
+      "test": "Health Check",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:20:54.875514"
+    },
+    {
+      "test": "User Signup",
+      "success": false,
+      "details": "Expected 200, got 422 - [{'type': 'value_error', 'loc': ['body', 'email'], 'msg': 'value is not a valid email address: The part after the @-sign is a special-use or reserved name that cannot be used with email.', 'input': 'test_user_162054@coldiq.test', 'ctx': {'reason': 'The part after the @-sign is a special-use or reserved name that cannot be used with email.'}}]",
+      "timestamp": "2026-01-14T16:20:54.959113"
+    }
+  ]
+}
