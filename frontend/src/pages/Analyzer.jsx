@@ -71,15 +71,15 @@ const Analyzer = () => {
   };
 
   const getScoreColor = (score) => {
-    if (score >= 71) return "text-emerald-400";
-    if (score >= 41) return "text-amber-400";
-    return "text-red-400";
+    if (score >= 71) return "text-[#a3e635]";
+    if (score >= 41) return "text-[#d4af37]";
+    return "text-red-500";
   };
 
   const getScoreBgColor = (score) => {
-    if (score >= 71) return "from-emerald-500/20 to-emerald-500/5";
-    if (score >= 41) return "from-amber-500/20 to-amber-500/5";
-    return "from-red-500/20 to-red-500/5";
+    if (score >= 71) return "bg-[#a3e635]/10 border-[#a3e635]/20";
+    if (score >= 41) return "bg-[#d4af37]/10 border-[#d4af37]/20";
+    return "bg-red-500/10 border-red-500/20";
   };
 
   const resetForm = () => {
@@ -93,11 +93,12 @@ const Analyzer = () => {
       <div className="p-6 lg:p-8" data-testid="analyzer-page">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl lg:text-3xl font-bold mb-2" style={{ fontFamily: 'Manrope' }}>
+          <div className="mb-10">
+            <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-3">Email Analysis</p>
+            <h1 className="font-serif text-4xl tracking-tight mb-2">
               Analyze Your Email
             </h1>
-            <p className="text-zinc-400">Paste your cold email to get AI-powered feedback and optimization</p>
+            <p className="text-zinc-500">Paste your cold email to get AI-powered feedback and optimization</p>
           </div>
           
           <div className="grid lg:grid-cols-2 gap-8">
@@ -111,7 +112,7 @@ const Analyzer = () => {
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     placeholder="Quick question about {{company}}'s growth..."
-                    className="bg-zinc-900/50 border-zinc-800 focus:border-indigo-500 h-11"
+                    className="bg-zinc-900/50 border-zinc-800 focus:border-[#d4af37] h-11 rounded-none"
                     disabled={loading}
                     data-testid="email-subject-input"
                   />
@@ -124,7 +125,7 @@ const Analyzer = () => {
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
                     placeholder="Hi {{first_name}},&#10;&#10;I noticed that..."
-                    className="bg-zinc-900/50 border-zinc-800 focus:border-indigo-500 min-h-[200px] resize-none"
+                    className="bg-zinc-900/50 border-zinc-800 focus:border-[#d4af37] min-h-[200px] resize-none rounded-none"
                     disabled={loading}
                     data-testid="email-body-input"
                   />
@@ -141,7 +142,7 @@ const Analyzer = () => {
                     value={targetIndustry}
                     onChange={(e) => setTargetIndustry(e.target.value)}
                     placeholder="e.g., SaaS, E-commerce, Healthcare"
-                    className="bg-zinc-900/50 border-zinc-800 focus:border-indigo-500 h-11"
+                    className="bg-zinc-900/50 border-zinc-800 focus:border-[#d4af37] h-11 rounded-none"
                     disabled={loading}
                     data-testid="email-industry-input"
                   />
