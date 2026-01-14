@@ -1,143 +1,164 @@
 {
   "brand_identity": {
     "name": "ColdIQ",
-    "mission": "Turn cold emails into warm conversations with surgical AI precision.",
-    "emotional_tone": "Surgical, High-Tech, Trustworthy, Efficient, 'Control Room' vibe.",
-    "visual_style": "Dark Mode, Neon Accents, Glassmorphism, Data-Dense.",
-    "archetype": "The Architect (Strategic, Masterful, Structured)"
+    "archetype": "The Midnight Architect",
+    "core_values": ["Precision", "Authority", "Exclusivity", "Impact"],
+    "emotional_tone": "A secret weapon for the top 1%. Cold, calculated, and undeniably effective.",
+    "visual_metaphor": "A precision instrument carved from obsidian and platinum."
   },
   "typography": {
-    "headings": {
-      "font_family": "Manrope, sans-serif",
-      "weights": ["600", "700", "800"],
-      "usage": "All section headers, hero titles, modal titles. Use tight tracking (-0.02em).",
-      "import_url": "https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap"
+    "font_family": {
+      "headings": "Playfair Display, serif",
+      "body": "Manrope, sans-serif",
+      "mono": "JetBrains Mono, monospace"
     },
-    "body": {
-      "font_family": "Plus Jakarta Sans, sans-serif",
-      "weights": ["400", "500", "600"],
-      "usage": "Paragraphs, UI labels, form inputs.",
-      "import_url": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    "weights": {
+      "headings": "400 (Regular) or 600 (SemiBold) - Avoid Black weight for elegance",
+      "body": "400 (Regular) and 500 (Medium)",
+      "bold": "700"
     },
-    "mono": {
-      "font_family": "JetBrains Mono, monospace",
-      "weights": ["400", "500"],
-      "usage": "Email content previews, code snippets, data metrics, analysis scores.",
-      "import_url": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
-    }
+    "usage_rules": {
+      "h1": "text-5xl md:text-7xl font-serif tracking-tight leading-[1.1] text-white",
+      "h2": "text-3xl md:text-5xl font-serif tracking-tight text-zinc-100",
+      "h3": "text-xl md:text-2xl font-sans font-light tracking-wide uppercase text-zinc-400",
+      "body": "text-base md:text-lg font-sans text-zinc-400 leading-relaxed",
+      "caption": "text-xs font-mono tracking-widest uppercase text-zinc-600"
+    },
+    "installation": "Import 'Playfair Display' from Google Fonts in index.css if not present."
   },
   "colors": {
-    "mode": "dark",
     "palette": {
       "background": {
-        "default": "#09090b",
-        "paper": "#18181b",
-        "subtle": "#27272a"
+        "default": "#050505",
+        "paper": "#0a0a0a",
+        "subtle": "#171717"
+      },
+      "foreground": {
+        "default": "#e5e5e5",
+        "muted": "#a1a1aa",
+        "dim": "#52525b"
       },
       "primary": {
-        "main": "#6366f1",
-        "light": "#818cf8",
-        "dark": "#4f46e5",
-        "glow": "0 0 20px rgba(99, 102, 241, 0.5)"
+        "DEFAULT": "#d4af37",
+        "foreground": "#000000",
+        "hover": "#b5952f",
+        "description": "Metallic Gold - Use sparingly for high-value actions (CTAs, Scores)"
       },
       "secondary": {
-        "main": "#ec4899",
-        "light": "#f472b6",
-        "dark": "#db2777"
+        "DEFAULT": "#27272a",
+        "foreground": "#ffffff"
       },
       "accent": {
-        "cyan": "#06b6d4",
-        "emerald": "#10b981",
-        "amber": "#f59e0b"
-      },
-      "text": {
-        "primary": "#f4f4f5",
-        "secondary": "#a1a1aa",
-        "muted": "#52525b"
+        "DEFAULT": "#a3e635",
+        "description": "Acid Green - Use for positive data trends and success states only"
       },
       "border": {
-        "default": "#27272a",
-        "active": "#3f3f46"
+        "DEFAULT": "#27272a",
+        "subtle": "#18181b"
       }
     },
     "gradients": {
-      "hero_text": "bg-gradient-to-r from-white via-white to-zinc-500",
-      "primary_button": "bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500",
-      "glass_surface": "bg-zinc-900/60 backdrop-blur-xl border border-white/10"
+      "hero_glow": "radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.15) 0%, transparent 70%)",
+      "glass_surface": "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)"
+    }
+  },
+  "visual_enhancers": {
+    "radius": {
+      "default": "0px",
+      "buttons": "0px",
+      "inputs": "0px",
+      "cards": "0px",
+      "description": "Strict sharp edges for a brutalist, precision feel."
+    },
+    "shadows": {
+      "glow": "0 0 20px rgba(212, 175, 55, 0.2)",
+      "glass": "0 8px 32px rgba(0, 0, 0, 0.2)"
+    },
+    "borders": {
+      "style": "1px solid",
+      "color": "rgba(255, 255, 255, 0.08)",
+      "active": "rgba(212, 175, 55, 0.5)"
+    },
+    "textures": {
+      "noise": "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")"
     }
   },
   "layout_strategies": {
-    "marketing": {
-      "grid_type": "Tetris Grid",
-      "container": "max-w-7xl mx-auto px-6",
-      "spacing": "gap-8 md:gap-12",
-      "rules": [
-        "Use asymmetry in feature sections.",
-        "Hero section must use 'Control Room' aesthetic (dashboard preview).",
-        "Use 'Bento' grid for features list."
-      ]
+    "landing_page": {
+      "grid": "Tetris Grid (Mode A)",
+      "spacing": "Generous (py-24, gap-12)",
+      "alignment": "Asymmetric - Offset text and images"
     },
     "dashboard": {
-      "grid_type": "Control Room Grid",
-      "structure": "Sidebar (fixed) + Topbar + Main Content Area",
-      "card_style": "Flat, 1px border (zinc-800), no shadow, sharp or sm rounded corners.",
-      "density": "High. Use compact tables and lists."
+      "grid": "Control Room Grid (Mode B)",
+      "spacing": "Tight (gap-4, p-6)",
+      "container": "Full width, max-w-[1920px]"
     }
   },
   "components": {
     "buttons": {
-      "primary": "h-10 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-all duration-300",
-      "secondary": "h-10 px-6 rounded-md border border-zinc-700 bg-transparent hover:bg-zinc-800 text-zinc-100 transition-all",
-      "ghost": "hover:bg-zinc-800/50 text-zinc-400 hover:text-white"
+      "primary": "bg-[#d4af37] text-black hover:bg-[#b5952f] font-sans font-bold uppercase tracking-wider text-xs px-8 py-4 rounded-none transition-all duration-300",
+      "secondary": "bg-transparent border border-zinc-800 text-zinc-300 hover:border-zinc-600 hover:text-white font-sans uppercase tracking-wider text-xs px-8 py-4 rounded-none"
     },
     "cards": {
-      "default": "bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 backdrop-blur-sm",
-      "interactive": "group hover:border-zinc-600 transition-colors duration-300 cursor-pointer",
-      "glass": "bg-black/40 border border-white/10 backdrop-blur-md rounded-xl"
+      "base": "bg-[#0a0a0a] border border-zinc-800 p-8 rounded-none relative overflow-hidden group hover:border-zinc-700 transition-colors",
+      "glass": "backdrop-blur-xl bg-black/40 border border-white/10 p-8 rounded-none"
     },
     "inputs": {
-      "default": "bg-zinc-950/50 border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-md h-10"
-    },
-    "charts": {
-      "library": "recharts",
-      "style": "Minimalist. Hide grid lines where possible. Use tooltips for details.",
-      "colors": ["#6366f1", "#06b6d4", "#10b981", "#f59e0b"]
+      "base": "bg-black border-b border-zinc-800 focus:border-[#d4af37] text-white px-0 py-4 rounded-none outline-none transition-colors placeholder:text-zinc-700 font-mono text-sm w-full"
     }
-  },
-  "visual_enhancers": {
-    "textures": "Use subtle noise overlay on the background (opacity 0.03).",
-    "glows": "Use radial gradients behind key elements (Hero image, CTA) to create depth.",
-    "borders": "Use 'Tracing Beam' effect for high-value cards (pricing, key features).",
-    "icons": "Lucide React (default). Use stroke-width={1.5} for a refined look."
   },
   "image_urls": {
-    "hero_background": "https://images.unsplash.com/photo-1762279389006-43963a0cee55?crop=entropy&cs=srgb&fm=jpg&q=85",
-    "abstract_data": "https://images.unsplash.com/photo-1762279388956-1c098163a2a8?crop=entropy&cs=srgb&fm=jpg&q=85",
-    "team_avatars": [
-      "https://images.unsplash.com/photo-1659353220597-71b8c6a56259?crop=entropy&cs=srgb&fm=jpg&q=85",
-      "https://images.unsplash.com/photo-1659353221237-6a1cfb73fd90?crop=entropy&cs=srgb&fm=jpg&q=85",
-      "https://images.unsplash.com/photo-1659353218140-7f8f9da943fc?crop=entropy&cs=srgb&fm=jpg&q=85"
-    ],
-    "placeholders": {
-      "logo": "Use text 'ColdIQ' with Manrope font, weight 800, tracking-tighter.",
-      "chart_placeholder": "Use a Recharts component with mock data instead of an image."
-    }
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1755515586940-8f2aaca215fc?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Abstract dark metallic texture",
+      "usage": "Hero section background with heavy overlay"
+    },
+    "feature_abstract": {
+      "url": "https://images.unsplash.com/photo-1766958205141-2d775ea560a1?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Dark textured wall",
+      "usage": "Feature section visual"
+    },
+    "office_vibe": {
+      "url": "https://images.unsplash.com/photo-1671722294182-ed01cbe66bd1?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Minimalist luxury office",
+      "usage": "About/Team section background"
+    },
+    "team_members": [
+      "https://images.unsplash.com/photo-1701463205870-6b6ec3dbed2b?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "https://images.unsplash.com/photo-1701463387028-3947648f1337?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "https://images.unsplash.com/photo-1595790753283-3c164baddb72?crop=entropy&cs=srgb&fm=jpg&q=85"
+    ]
   },
-  "instructions_to_main_agent": [
-    "CRITICAL: The project uses .jsx files. Do NOT create .tsx files.",
-    "CRITICAL: Use the 'Manrope' font for all headings. Import it in index.css.",
-    "CRITICAL: Implement the 'Dark Mode' class strategy in tailwind.config.js (already present, ensure it's used).",
-    "STEP 1: Update index.css with the new font imports and color variables defined in 'colors' section.",
-    "STEP 2: Create a 'Layout' component that handles the Sidebar/Topbar structure for the dashboard.",
-    "STEP 3: Build the 'Email Analyzer' core component using a split-screen layout (Input Left, Analysis Right).",
-    "STEP 4: Use 'framer-motion' for subtle entrance animations on the dashboard cards.",
-    "STEP 5: Ensure all interactive elements have 'data-testid' attributes."
-  ],
-  "universal_guidelines": [
-    "Do not use gradients for text unless it's a main hero title.",
-    "Avoid 'Inter' font for headings. Use Manrope.",
-    "Use 2-3x more spacing than typical designs (e.g., p-8 instead of p-4).",
-    "Never use pure black (#000000) for backgrounds. Use #09090b.",
-    "All toasts must use the 'sonner' library."
+  "instructions_to_main_agent": {
+    "general": "Implement the 'Midnight Architect' aesthetic. This is NOT a standard SaaS. It is a luxury tool. Prioritize atmosphere, negative space, and typography over density.",
+    "setup": [
+      "Install 'Playfair Display' font.",
+      "Update tailwind.config.js with the new color palette (Gold/Acid Green/Obsidian).",
+      "Set default border radius to 0px in tailwind config."
+    ],
+    "landing_page": "Build a 'Tetris' grid layout. Use the hero background image with a gradient overlay. Use Playfair Display for the main headline 'Cold Email. Perfected.'.",
+    "dashboard": "Create a 'Control Room' feel. Dark, dense, data-heavy but beautiful. Use the 'Acid Green' for success metrics (open rates, reply rates).",
+    "components": "Override Shadcn defaults. Remove rounded corners. Use borders instead of shadows for depth."
+  },
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Create new components that match the style and conventions of existing components when needed",
+    "Examine existing components to understand the project's component patterns before creating new ones",
+    "Components MUST use named exports (export const ComponentName = ...)",
+    "Pages MUST use default exports (export default function PageName() {...})",
+    "Use sonner for toasts"
   ]
 }
