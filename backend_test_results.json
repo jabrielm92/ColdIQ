@@ -1,28 +1,94 @@
 {
   "summary": {
-    "tests_run": 3,
-    "tests_passed": 2,
-    "success_rate": 66.66666666666666,
-    "timestamp": "2026-01-14T16:20:54.960082"
+    "tests_run": 14,
+    "tests_passed": 14,
+    "success_rate": 100.0,
+    "timestamp": "2026-01-14T16:21:24.592130"
   },
   "results": [
     {
       "test": "API Root",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:20:54.828010"
+      "timestamp": "2026-01-14T16:21:04.597298"
     },
     {
       "test": "Health Check",
       "success": true,
       "details": "",
-      "timestamp": "2026-01-14T16:20:54.875514"
+      "timestamp": "2026-01-14T16:21:04.678978"
     },
     {
       "test": "User Signup",
-      "success": false,
-      "details": "Expected 200, got 422 - [{'type': 'value_error', 'loc': ['body', 'email'], 'msg': 'value is not a valid email address: The part after the @-sign is a special-use or reserved name that cannot be used with email.', 'input': 'test_user_162054@coldiq.test', 'ctx': {'reason': 'The part after the @-sign is a special-use or reserved name that cannot be used with email.'}}]",
-      "timestamp": "2026-01-14T16:20:54.959113"
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:04.956030"
+    },
+    {
+      "test": "User Login",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:05.218034"
+    },
+    {
+      "test": "Get Current User",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:05.257143"
+    },
+    {
+      "test": "Complete Onboarding",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:05.304985"
+    },
+    {
+      "test": "Get User Usage",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:05.349280"
+    },
+    {
+      "test": "Update Profile",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:05.393110"
+    },
+    {
+      "test": "Analyze Email",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:23.849124"
+    },
+    {
+      "test": "Get Analysis History",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:23.919219"
+    },
+    {
+      "test": "Get Specific Analysis",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:23.960170"
+    },
+    {
+      "test": "Submit Feedback",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:23.997601"
+    },
+    {
+      "test": "Get Insights Dashboard",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:24.040094"
+    },
+    {
+      "test": "Create Checkout Session",
+      "success": true,
+      "details": "",
+      "timestamp": "2026-01-14T16:21:24.591213"
     }
   ]
 }
