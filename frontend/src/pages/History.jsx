@@ -340,7 +340,7 @@ const History = () => {
       
       {/* Analysis Detail Modal */}
       <Dialog open={!!selectedAnalysis} onOpenChange={() => setSelectedAnalysis(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-zinc-900 border-zinc-800">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-zinc-900 border-zinc-800">
           {selectedAnalysis && (
             <>
               <DialogHeader>
@@ -353,7 +353,7 @@ const History = () => {
               </DialogHeader>
               
               <div className="space-y-6 mt-4">
-                {/* Original */}
+                {/* Original Email */}
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-zinc-400">Original Email</h4>
                   <div className="bg-zinc-800/50 rounded-lg p-4">
@@ -366,14 +366,17 @@ const History = () => {
                 
                 {/* Key Insight */}
                 <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-4">
-                  <p className="text-sm font-medium text-indigo-400 mb-1">Key Insight</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Zap className="w-4 h-4 text-indigo-400" />
+                    <span className="text-sm font-medium text-indigo-400">Key Insight</span>
+                  </div>
                   <p className="text-zinc-200">{selectedAnalysis.key_insight}</p>
                 </div>
                 
-                {/* Metrics */}
-                <div className="grid grid-cols-3 gap-4">
+                {/* Core Metrics */}
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
                   <div className="bg-zinc-800/50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-zinc-500 mb-1">Response Rate</p>
+                    <p className="text-xs text-zinc-500 mb-1">Response</p>
                     <p className="font-semibold text-cyan-400" style={{ fontFamily: 'JetBrains Mono' }}>{selectedAnalysis.estimated_response_rate}%</p>
                   </div>
                   <div className="bg-zinc-800/50 rounded-lg p-3 text-center">
@@ -381,10 +384,311 @@ const History = () => {
                     <p className="font-semibold text-violet-400" style={{ fontFamily: 'JetBrains Mono' }}>{selectedAnalysis.estimated_open_rate}%</p>
                   </div>
                   <div className="bg-zinc-800/50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-zinc-500 mb-1">Word Count</p>
+                    <p className="text-xs text-zinc-500 mb-1">Words</p>
                     <p className="font-semibold" style={{ fontFamily: 'JetBrains Mono' }}>{selectedAnalysis.email_word_count}</p>
                   </div>
+                  <div className="bg-zinc-800/50 rounded-lg p-3 text-center">
+                    <p className="text-xs text-zinc-500 mb-1">Personal</p>
+                    <p className="font-semibold" style={{ fontFamily: 'JetBrains Mono' }}>{selectedAnalysis.personalization_score}/10</p>
+                  </div>
+                  <div className="bg-zinc-800/50 rounded-lg p-3 text-center">
+                    <p className="text-xs text-zinc-500 mb-1">Value Prop</p>
+                    <p className="font-semibold" style={{ fontFamily: 'JetBrains Mono' }}>{selectedAnalysis.value_proposition_clarity}/10</p>
+                  </div>
+                  <div className="bg-zinc-800/50 rounded-lg p-3 text-center">
+                    <p className="text-xs text-zinc-500 mb-1">CTA</p>
+                    <p className="font-semibold" style={{ fontFamily: 'JetBrains Mono' }}>{selectedAnalysis.cta_score}/10</p>
+                  </div>
                 </div>
+                
+                {/* Strengths & Weaknesses */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="bg-zinc-800/50 rounded-lg p-4">
+                    <h4 className="font-medium mb-3 flex items-center gap-2 text-emerald-400">
+                      <CheckCircle className="w-4 h-4" />
+                      Strengths
+                    </h4>
+                    <ul className="space-y-2">
+                      {selectedAnalysis.strengths?.map((s, i) => (
+                        <li key={i} className="text-sm text-zinc-300 flex items-start gap-2">
+                          <span className="text-emerald-400 mt-0.5">•</span>
+                          {s}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-zinc-800/50 rounded-lg p-4">
+                    <h4 className="font-medium mb-3 flex items-center gap-2 text-amber-400">
+                      <AlertTriangle className="w-4 h-4" />
+                      Weaknesses
+                    </h4>
+                    <ul className="space-y-2">
+                      {selectedAnalysis.weaknesses?.map((w, i) => (
+                        <li key={i} className="text-sm text-zinc-300 flex items-start gap-2">
+                          <span className="text-amber-400 mt-0.5">•</span>
+                          {w}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                
+                {/* Improvements */}
+                <div className="bg-zinc-800/50 rounded-lg p-4">
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Target className="w-4 h-4 text-cyan-400" />
+                    Specific Improvements
+                  </h4>
+                  <ul className="space-y-2">
+                    {selectedAnalysis.improvements?.map((imp, i) => (
+                      <li key={i} className="text-sm text-zinc-300 flex items-start gap-2">
+                        <span className="text-cyan-400 font-medium">{i + 1}.</span>
+                        {imp}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                {/* Starter+ Metrics */}
+                {isStarter && (
+                  <div className="border-t border-zinc-800 pt-6">
+                    <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-4">Starter+ Metrics</p>
+                    
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* Readability */}
+                      {selectedAnalysis.readability_score !== null && selectedAnalysis.readability_score !== undefined && (
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <BookOpen className="w-4 h-4 text-cyan-400" />
+                            <span className="text-sm font-medium">Readability</span>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="text-2xl font-mono font-bold" style={{ color: selectedAnalysis.readability_score >= 70 ? '#a3e635' : selectedAnalysis.readability_score >= 50 ? '#d4af37' : '#ef4444' }}>
+                              {selectedAnalysis.readability_score}
+                            </span>
+                            <span className={`px-2 py-0.5 text-xs font-bold rounded ${
+                              selectedAnalysis.readability_level === 'Easy' ? 'bg-emerald-500/20 text-emerald-400' :
+                              selectedAnalysis.readability_level === 'Medium' ? 'bg-amber-500/20 text-amber-400' :
+                              'bg-red-500/20 text-red-400'
+                            }`}>
+                              {selectedAnalysis.readability_level}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Spam Risk */}
+                      {selectedAnalysis.spam_risk_score !== null && selectedAnalysis.spam_risk_score !== undefined && (
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <AlertTriangle className="w-4 h-4 text-amber-400" />
+                            <span className="text-sm font-medium">Spam Risk</span>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="text-2xl font-mono font-bold" style={{ color: selectedAnalysis.spam_risk_score <= 30 ? '#a3e635' : selectedAnalysis.spam_risk_score <= 60 ? '#d4af37' : '#ef4444' }}>
+                              {selectedAnalysis.spam_risk_score}%
+                            </span>
+                            {selectedAnalysis.spam_keywords?.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {selectedAnalysis.spam_keywords.slice(0, 3).map((kw, i) => (
+                                  <span key={i} className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-xs font-mono rounded">
+                                    {kw}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Subject Line Analysis */}
+                      {selectedAnalysis.subject_line_analysis && (
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Mail className="w-4 h-4 text-violet-400" />
+                            <span className="text-sm font-medium">Subject Line</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div><span className="text-zinc-500">Length:</span> <span className="font-mono">{selectedAnalysis.subject_line_analysis.length} chars</span></div>
+                            <div><span className="text-zinc-500">Effectiveness:</span> <span className="font-mono">{selectedAnalysis.subject_line_analysis.effectiveness}/10</span></div>
+                            <div className="flex items-center gap-1">
+                              <span className={selectedAnalysis.subject_line_analysis.hasPersonalization ? 'text-emerald-400' : 'text-zinc-600'}>
+                                {selectedAnalysis.subject_line_analysis.hasPersonalization ? '✓' : '✗'}
+                              </span>
+                              <span className="text-zinc-400">Personalized</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className={selectedAnalysis.subject_line_analysis.hasCuriosity ? 'text-emerald-400' : 'text-zinc-600'}>
+                                {selectedAnalysis.subject_line_analysis.hasCuriosity ? '✓' : '✗'}
+                              </span>
+                              <span className="text-zinc-400">Curiosity</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* CTA Analysis */}
+                      {selectedAnalysis.cta_analysis && (
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <MousePointer className="w-4 h-4 text-emerald-400" />
+                            <span className="text-sm font-medium">CTA Analysis</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div><span className="text-zinc-500">Present:</span> <span className={selectedAnalysis.cta_analysis.ctaPresent ? 'text-emerald-400' : 'text-red-400'}>{selectedAnalysis.cta_analysis.ctaPresent ? 'Yes' : 'No'}</span></div>
+                            <div><span className="text-zinc-500">Clarity:</span> <span className="font-mono">{selectedAnalysis.cta_analysis.ctaClarity}/10</span></div>
+                            <div><span className="text-zinc-500">Type:</span> <span className="capitalize">{selectedAnalysis.cta_analysis.ctaType}</span></div>
+                            <div><span className="text-zinc-500">Friction:</span> <span className={`capitalize ${selectedAnalysis.cta_analysis.frictionLevel === 'low' ? 'text-emerald-400' : selectedAnalysis.cta_analysis.frictionLevel === 'medium' ? 'text-amber-400' : 'text-red-400'}`}>{selectedAnalysis.cta_analysis.frictionLevel}</span></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Fix Suggestions */}
+                    {selectedAnalysis.fix_suggestions?.length > 0 && (
+                      <div className="mt-4 bg-zinc-800/50 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Target className="w-4 h-4 text-amber-400" />
+                          <span className="text-sm font-medium">Fix This ({selectedAnalysis.fix_suggestions.length} issues)</span>
+                        </div>
+                        <div className="space-y-2">
+                          {selectedAnalysis.fix_suggestions.map((sug, i) => (
+                            <div key={i} className={`p-2 rounded border-l-2 ${
+                              sug.priority === 'high' ? 'bg-red-500/10 border-red-500' :
+                              sug.priority === 'medium' ? 'bg-amber-500/10 border-amber-500' :
+                              'bg-blue-500/10 border-blue-500'
+                            }`}>
+                              <div className="flex items-center gap-2">
+                                <span className={`text-xs uppercase font-mono ${
+                                  sug.priority === 'high' ? 'text-red-400' :
+                                  sug.priority === 'medium' ? 'text-amber-400' :
+                                  'text-blue-400'
+                                }`}>{sug.priority}</span>
+                                <span className="text-sm font-medium">{sug.issue}</span>
+                              </div>
+                              <p className="text-xs text-zinc-400 mt-1">{sug.fix}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Pro+ Metrics */}
+                {isPro && (
+                  <div className="border-t border-zinc-800 pt-6">
+                    <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-4">Pro+ Metrics</p>
+                    
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* Inbox Placement */}
+                      {selectedAnalysis.inbox_placement_score !== null && selectedAnalysis.inbox_placement_score !== undefined && (
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <TrendingUp className="w-4 h-4 text-cyan-400" />
+                            <span className="text-sm font-medium">Inbox Placement</span>
+                            <span className="px-2 py-0.5 text-[10px] bg-cyan-500/20 text-cyan-300 rounded font-mono">PRO</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl font-mono font-bold" style={{ color: selectedAnalysis.inbox_placement_score >= 80 ? '#a3e635' : selectedAnalysis.inbox_placement_score >= 60 ? '#d4af37' : '#ef4444' }}>
+                              {selectedAnalysis.inbox_placement_score}%
+                            </span>
+                            <span className="text-xs text-zinc-500">
+                              {selectedAnalysis.inbox_placement_score >= 80 ? 'Excellent deliverability' : selectedAnalysis.inbox_placement_score >= 60 ? 'Good deliverability' : 'At risk'}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Emotional Tone */}
+                      {selectedAnalysis.emotional_tone && (
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <BarChart3 className="w-4 h-4 text-pink-400" />
+                            <span className="text-sm font-medium">Emotional Tone</span>
+                            <span className="px-2 py-0.5 text-[10px] bg-pink-500/20 text-pink-300 rounded font-mono">PRO</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="px-3 py-1 bg-violet-500/20 text-violet-400 text-sm font-bold capitalize rounded">
+                              {selectedAnalysis.emotional_tone.primary}
+                            </span>
+                            <span className="text-xs text-zinc-500">Score: {selectedAnalysis.emotional_tone.score}/10</span>
+                          </div>
+                          {selectedAnalysis.emotional_tone.persuasionTechniques?.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {selectedAnalysis.emotional_tone.persuasionTechniques.map((tech, i) => (
+                                <span key={i} className="px-2 py-0.5 bg-zinc-700 text-zinc-400 text-xs rounded">{tech}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Industry Benchmark */}
+                      {selectedAnalysis.industry_benchmark && (
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <BarChart3 className="w-4 h-4 text-indigo-400" />
+                            <span className="text-sm font-medium">Industry Benchmark</span>
+                            <span className="px-2 py-0.5 text-[10px] bg-indigo-500/20 text-indigo-300 rounded font-mono">PRO</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div><span className="text-zinc-500">Avg Open:</span> <span className="font-mono">{selectedAnalysis.industry_benchmark.avgOpenRate}%</span></div>
+                            <div><span className="text-zinc-500">Avg Response:</span> <span className="font-mono">{selectedAnalysis.industry_benchmark.avgResponseRate}%</span></div>
+                          </div>
+                          <div className={`mt-2 text-sm font-medium ${
+                            selectedAnalysis.industry_benchmark.yourVsAvg === 'above' ? 'text-emerald-400' :
+                            selectedAnalysis.industry_benchmark.yourVsAvg === 'below' ? 'text-amber-400' : 'text-zinc-400'
+                          }`}>
+                            {selectedAnalysis.industry_benchmark.yourVsAvg === 'above' && '✓ Above average'}
+                            {selectedAnalysis.industry_benchmark.yourVsAvg === 'at' && '≈ At average'}
+                            {selectedAnalysis.industry_benchmark.yourVsAvg === 'below' && '↓ Below average'}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* A/B Test Suggestions */}
+                      {selectedAnalysis.ab_test_suggestions?.length > 0 && (
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Lightbulb className="w-4 h-4 text-amber-400" />
+                            <span className="text-sm font-medium">A/B Test Ideas</span>
+                            <span className="px-2 py-0.5 text-[10px] bg-amber-500/20 text-amber-300 rounded font-mono">PRO</span>
+                          </div>
+                          <div className="space-y-2">
+                            {selectedAnalysis.ab_test_suggestions.slice(0, 2).map((sug, i) => (
+                              <div key={i} className="text-xs">
+                                <span className="text-amber-400 font-mono uppercase">{sug.element}:</span>
+                                <span className="text-zinc-300 ml-1">{sug.testIdea}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Alternative Subject Lines */}
+                    {selectedAnalysis.alternative_subjects?.length > 0 && (
+                      <div className="mt-4 bg-gradient-to-br from-violet-500/10 to-indigo-500/10 border border-violet-500/20 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Sparkles className="w-4 h-4 text-violet-400" />
+                          <span className="text-sm font-medium">AI Subject Line Variants</span>
+                          <span className="px-2 py-0.5 text-[10px] bg-violet-500/20 text-violet-300 rounded font-mono">PRO</span>
+                        </div>
+                        <div className="space-y-2">
+                          {selectedAnalysis.alternative_subjects.map((subj, i) => (
+                            <div key={i} className="flex items-center gap-2 p-2 bg-zinc-900/50 border border-zinc-800 hover:border-violet-500/30 cursor-pointer transition-colors"
+                              onClick={() => copyToClipboard(subj)}>
+                              <span className="w-5 h-5 flex items-center justify-center bg-violet-500/20 text-violet-400 text-xs font-mono">{i + 1}</span>
+                              <span className="flex-1 text-sm font-mono truncate">{subj}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 {/* Optimized Version */}
                 <div className="space-y-2">
