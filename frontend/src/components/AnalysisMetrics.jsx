@@ -1,7 +1,7 @@
 import React from "react";
 import { 
   AlertTriangle, CheckCircle, BookOpen, MousePointer, Mail,
-  Sparkles, TrendingUp, BarChart3, Lightbulb, Lock, ArrowRight
+  Sparkles, TrendingUp, BarChart3, Lightbulb, Lock, ArrowRight, Target
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
