@@ -213,6 +213,8 @@ function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/sms-opt-in" element={<SmsOptIn />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/performance" element={<PrivateRoute><Performance /></PrivateRoute>} />
+              <Route path="/sequence" element={<PrivateRoute><SequenceAnalyzer /></PrivateRoute>} />
               
               {/* Protected Routes */}
               <Route path="/onboarding" element={
