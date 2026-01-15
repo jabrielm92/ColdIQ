@@ -775,6 +775,175 @@ async def reset_password(data: PasswordResetConfirm):
     
     return {"message": "Password reset successfully"}
 
+# ================= PHONE VERIFICATION ROUTES =================
+
+class PhoneVerificationRequest(BaseModel):
+    phone_number: str
+
+class PhoneOTPVerifyRequest(BaseModel):
+    phone_number: str
+    otp: str
+
+@api_router.post("/auth/phone/send-otp")
+async def send_phone_otp(data: PhoneVerificationRequest):
+    """Send OTP to phone number for verification"""
+    phone = data.phone_number.strip()
+    
+    # Basic phone validation (E.164 format preferred)
+    if not phone or len(phone) < 10:
+        raise HTTPException(status_code=400, detail="Invalid phone number format")
+    
+    # Normalize phone number (ensure it starts with +)
+    if not phone.startswith('+'):
+        # Assume US number if no country code
+        if phone.startswith('1'):
+            phone = '+' + phone
+        else:
+            phone = '+1' + phone
+    
+    # Check if phone is already registered
+    existing_user = await db.users.find_one({"phone_number": phone, "phone_verified": True})
+    if existing_user:
+        raise HTTPException(
+            status_code=400, 
+            detail="This phone number is already registered with another account"
+        )
+    
+    # Check rate limiting (max 3 OTPs per phone per hour)
+    one_hour_ago = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+    recent_otps = await db.phone_otps.count_documents({
+        "phone_number": phone,
+        "created_at": {"$gte": one_hour_ago}
+    })
+    
+    if recent_otps >= 3:
+        raise HTTPException(
+            status_code=429, 
+            detail="Too many verification attempts. Please try again in 1 hour."
+        )
+    
+    # Generate OTP
+    otp = generate_phone_otp()
+    
+    # Store OTP with 5-minute expiration
+    otp_doc = {
+        "id": str(uuid.uuid4()),
+        "phone_number": phone,
+        "otp_hash": hash_password(otp),  # Store hashed for security
+        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat(),
+        "attempts": 0,
+        "used": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.phone_otps.insert_one(otp_doc)
+    
+    # Send OTP via SMS (mock mode for now)
+    await send_sms_otp(phone, otp)
+    
+    return {
+        "message": "Verification code sent",
+        "phone_number": phone,
+        "expires_in_seconds": 300
+    }
+
+@api_router.post("/auth/phone/verify-otp")
+async def verify_phone_otp(data: PhoneOTPVerifyRequest, user: dict = Depends(get_current_user)):
+    """Verify OTP and link phone to user account"""
+    phone = data.phone_number.strip()
+    
+    # Normalize phone number
+    if not phone.startswith('+'):
+        if phone.startswith('1'):
+            phone = '+' + phone
+        else:
+            phone = '+1' + phone
+    
+    # Check if phone is already registered to another user
+    existing_user = await db.users.find_one({
+        "phone_number": phone, 
+        "phone_verified": True,
+        "id": {"$ne": user["id"]}
+    })
+    if existing_user:
+        raise HTTPException(
+            status_code=400, 
+            detail="This phone number is already registered with another account"
+        )
+    
+    # Find the most recent unused OTP for this phone
+    otp_doc = await db.phone_otps.find_one(
+        {
+            "phone_number": phone,
+            "used": False
+        },
+        sort=[("created_at", -1)]
+    )
+    
+    if not otp_doc:
+        raise HTTPException(status_code=400, detail="No verification code found. Please request a new one.")
+    
+    # Check expiration
+    expires_at = datetime.fromisoformat(otp_doc["expires_at"].replace("Z", "+00:00"))
+    if datetime.now(timezone.utc) > expires_at:
+        raise HTTPException(status_code=400, detail="Verification code has expired. Please request a new one.")
+    
+    # Check attempts (max 3)
+    if otp_doc["attempts"] >= 3:
+        raise HTTPException(status_code=400, detail="Too many failed attempts. Please request a new code.")
+    
+    # Verify OTP
+    if not verify_password(data.otp, otp_doc["otp_hash"]):
+        # Increment attempts
+        await db.phone_otps.update_one(
+            {"id": otp_doc["id"]},
+            {"$inc": {"attempts": 1}}
+        )
+        remaining = 2 - otp_doc["attempts"]
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid verification code. {remaining} attempts remaining."
+        )
+    
+    # Mark OTP as used
+    await db.phone_otps.update_one(
+        {"id": otp_doc["id"]},
+        {"$set": {"used": True}}
+    )
+    
+    # Update user with verified phone
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "phone_number": phone,
+            "phone_verified": True,
+            "phone_verified_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {
+        "message": "Phone number verified successfully",
+        "phone_number": phone
+    }
+
+@api_router.get("/auth/phone/check/{phone_number}")
+async def check_phone_availability(phone_number: str):
+    """Check if a phone number is already registered"""
+    phone = phone_number.strip()
+    
+    # Normalize
+    if not phone.startswith('+'):
+        if phone.startswith('1'):
+            phone = '+' + phone
+        else:
+            phone = '+1' + phone
+    
+    existing = await db.users.find_one({"phone_number": phone, "phone_verified": True})
+    
+    return {
+        "phone_number": phone,
+        "available": existing is None
+    }
+
 # ================= EMAIL ANALYSIS ROUTES =================
 
 @api_router.post("/analysis/analyze", response_model=AnalysisResponse)
