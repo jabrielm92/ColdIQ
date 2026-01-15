@@ -13,6 +13,17 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 
 ## Completed Features (January 2025)
 
+### Phase 1: Pricing & Tier Expansion (NEW)
+- ✅ **Pricing Page Redesign** - New marketing copy ("Cold emails shouldn't be guesswork")
+- ✅ **Renamed Agency → Growth Agency** - Better positioning
+- ✅ **Feature Comparison Table** - Expandable with all tier differences
+- ✅ **ROI Section** - Shows upgrade value (Starter→Pro, Pro→Growth Agency)
+- ✅ **Annual Billing Default** - 20% savings prominently displayed
+- ✅ **Enhanced Tier Features**:
+  - Starter: +spam detection, +readability score, +CTA analysis, +subject analysis
+  - Pro: +AI rewrites, +multiple variants, +inbox placement, +emotional tone, +performance tracking, +industry benchmarks, +sequence analysis, +A/B test suggestions
+  - Growth Agency: +client workspaces, +white-label reports, +approval workflows, +AI voice profiles
+
 ### Authentication & User Management
 - ✅ JWT signup/login
 - ✅ 3-step onboarding
