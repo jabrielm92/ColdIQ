@@ -1,0 +1,306 @@
+/* ColdIQ Chrome Extension - Gmail Content Styles */
+
+/* ColdIQ Button */
+.coldiq-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  margin-right: 8px;
+  background: #d4af37;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.coldiq-button:hover {
+  background: #b5952f;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+.coldiq-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ColdIQ Panel */
+.coldiq-panel {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: 380px;
+  max-height: 80vh;
+  background: #0a0a0a;
+  border: 1px solid #27272a;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: none;
+  flex-direction: column;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #e5e5e5;
+}
+
+.coldiq-panel-visible {
+  display: flex;
+}
+
+.coldiq-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid #27272a;
+  background: #050505;
+}
+
+.coldiq-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.coldiq-panel-title svg {
+  width: 20px;
+  height: 20px;
+}
+
+.coldiq-panel-close {
+  background: transparent;
+  border: none;
+  color: #71717a;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.coldiq-panel-close:hover {
+  color: #e5e5e5;
+}
+
+.coldiq-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Loading */
+.coldiq-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.coldiq-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #27272a;
+  border-top-color: #d4af37;
+  border-radius: 50%;
+  animation: coldiq-spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes coldiq-spin {
+  to { transform: rotate(360deg); }
+}
+
+.coldiq-loading p {
+  color: #71717a;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Score */
+.coldiq-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border: 2px solid;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.coldiq-score-value {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  font-family: 'Segoe UI', monospace;
+}
+
+.coldiq-score-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #71717a;
+  margin-top: 8px;
+}
+
+/* Metrics */
+.coldiq-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.coldiq-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background: #18181b;
+  text-align: center;
+}
+
+.coldiq-metric-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #d4af37;
+  font-family: monospace;
+}
+
+.coldiq-metric-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #71717a;
+  margin-top: 4px;
+}
+
+/* Sections */
+.coldiq-section {
+  margin-bottom: 20px;
+}
+
+.coldiq-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #71717a;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #27272a;
+}
+
+.coldiq-section-title.coldiq-success {
+  color: #a3e635;
+}
+
+.coldiq-section-title.coldiq-warning {
+  color: #f59e0b;
+}
+
+/* List */
+.coldiq-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.coldiq-list li {
+  font-size: 13px;
+  color: #a1a1aa;
+  padding: 8px 0;
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.coldiq-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  width: 4px;
+  height: 4px;
+  background: #d4af37;
+}
+
+/* Optimized content */
+.coldiq-optimized {
+  background: #18181b;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a1a1aa;
+  position: relative;
+}
+
+.coldiq-optimized-body {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.coldiq-optimized p {
+  margin: 0;
+}
+
+.coldiq-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid #27272a;
+  color: #71717a;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.coldiq-copy-btn:hover {
+  border-color: #d4af37;
+  color: #d4af37;
+}
+
+/* CTA */
+.coldiq-cta {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  background: #d4af37;
+  color: #000;
+  margin-top: 16px;
+  transition: all 0.2s;
+}
+
+.coldiq-cta:hover {
+  background: #b5952f;
+}
+
+/* Error */
+.coldiq-error {
+  text-align: center;
+  padding: 20px;
+}
+
+.coldiq-error p {
+  color: #ef4444;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
