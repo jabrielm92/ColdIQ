@@ -222,6 +222,9 @@ function App() {
               <Route path="/templates" element={
                 <OnboardingRoute><Templates /></OnboardingRoute>
               } />
+              <Route path="/team-analytics" element={
+                <OnboardingRoute><TeamAnalytics /></OnboardingRoute>
+              } />
             </Routes>
           </BrowserRouter>
           <ToasterWrapper />
