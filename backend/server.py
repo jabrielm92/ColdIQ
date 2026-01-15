@@ -1223,6 +1223,102 @@ Be specific, actionable, and focus on what makes cold emails convert. For spam k
     
     return analysis_doc
 
+# Sequence Analysis Models
+class SequenceEmail(BaseModel):
+    subject: str
+    body: str
+    position: int
+
+class SequenceAnalysisRequest(BaseModel):
+    emails: List[SequenceEmail]
+
+class SequenceAnalysisResponse(BaseModel):
+    overall_score: int
+    key_insight: str
+    issues: List[str]
+    email_scores: List[int]
+    recommendations: List[str]
+
+@api_router.post("/analysis/sequence", response_model=SequenceAnalysisResponse)
+async def analyze_sequence(data: SequenceAnalysisRequest, user: dict = Depends(get_current_user)):
+    """Analyze a full email sequence (Pro+ feature)"""
+    features = get_tier_features(user.get("subscription_tier", "free"))
+    
+    # Check if user has sequence analysis feature
+    if not features.get("sequence_analysis"):
+        raise HTTPException(status_code=403, detail="Sequence analysis requires Pro or higher plan")
+    
+    if len(data.emails) < 2:
+        raise HTTPException(status_code=400, detail="Sequence must have at least 2 emails")
+    
+    if len(data.emails) > 5:
+        raise HTTPException(status_code=400, detail="Maximum 5 emails per sequence")
+    
+    api_key = os.environ.get('EMERGENT_LLM_KEY')
+    if not api_key:
+        raise HTTPException(status_code=500, detail="AI service not configured")
+    
+    # Build the sequence for analysis
+    sequence_text = "\n\n---\n\n".join([
+        f"EMAIL {e.position}:\nSubject: {e.subject}\nBody: {e.body}"
+        for e in data.emails
+    ])
+    
+    prompt = f"""Analyze this cold email SEQUENCE (multi-touch outreach):
+
+{sequence_text}
+
+Analyze the entire sequence holistically. Look for:
+1. Repetition between emails (same phrases, same value props)
+2. Escalation/urgency progression
+3. Value variation across touches
+4. Follow-up timing logic (based on content)
+5. CTA progression (asking for more vs less over time)
+6. Narrative flow and story arc
+
+Return JSON only (no markdown):
+{{
+  "overallScore": <0-100 integer for the full sequence>,
+  "keyInsight": "<single most important finding about the sequence>",
+  "issues": ["<issue 1>", "<issue 2>", "<issue 3>"],
+  "emailScores": [<score for email 1>, <score for email 2>, ...],
+  "recommendations": ["<rec 1>", "<rec 2>", "<rec 3>"]
+}}"""
+
+    try:
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"sequence_{user['id']}_{uuid.uuid4()}",
+            system_message="You are ColdIQ, an expert cold email sequence analyzer. Always respond with valid JSON only."
+        )
+        chat.with_model("anthropic", "claude-sonnet-4-5-20250929")
+        
+        user_message = UserMessage(text=prompt)
+        response = await chat.send_message(user_message)
+        
+        response_text = response.strip()
+        if response_text.startswith("```"):
+            response_text = response_text.split("```")[1]
+            if response_text.startswith("json"):
+                response_text = response_text[4:]
+        
+        analysis_data = json.loads(response_text)
+        
+        return SequenceAnalysisResponse(
+            overall_score=analysis_data.get("overallScore", 50),
+            key_insight=analysis_data.get("keyInsight", ""),
+            issues=analysis_data.get("issues", []),
+            email_scores=analysis_data.get("emailScores", []),
+            recommendations=analysis_data.get("recommendations", [])
+        )
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"Sequence analysis JSON parse error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to parse AI response")
+    except Exception as e:
+        logger.error(f"Sequence analysis error: {e}")
+        raise HTTPException(status_code=500, detail=f"Sequence analysis failed: {str(e)}")
+
 @api_router.get("/analysis/history")
 async def get_analysis_history(
     page: int = 1, 
