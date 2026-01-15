@@ -317,6 +317,12 @@ const Analyzer = () => {
                         exit={{ opacity: 0, height: 0 }}
                         className="space-y-4"
                       >
+                        {/* Fix This - Rule-based suggestions (Starter+) */}
+                        <FixSuggestionsCard 
+                          suggestions={analysis.fix_suggestions}
+                          tierHasAccess={hasStarterFeatures}
+                        />
+                        
                         {/* Starter+ Metrics Row */}
                         <div className="grid md:grid-cols-2 gap-4">
                           <SpamKeywordsCard 
