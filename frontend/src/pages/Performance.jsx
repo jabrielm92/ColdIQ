@@ -358,6 +358,119 @@ const Performance = () => {
                 </div>
               </div>
 
+              {/* Industry Benchmark Comparison - Pro Feature */}
+              <div className="bg-zinc-900/50 border border-zinc-800 p-6 mt-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <BarChart3 className="w-4 h-4 text-indigo-400" />
+                  <h3 className="text-sm font-medium">Compare to Industry Benchmarks</h3>
+                  <span className="px-2 py-0.5 text-[10px] bg-indigo-500/20 text-indigo-300 rounded font-mono">PRO</span>
+                </div>
+                
+                {stats && (
+                  <div className="grid md:grid-cols-3 gap-6">
+                    {/* Score Comparison */}
+                    <div className="text-center">
+                      <p className="text-xs text-zinc-500 mb-3">Email Quality Score</p>
+                      <div className="relative h-32 flex items-end justify-center gap-8">
+                        {/* Your Score */}
+                        <div className="flex flex-col items-center">
+                          <motion.div 
+                            initial={{ height: 0 }}
+                            animate={{ height: `${Math.min(stats.avgScore, 100)}%` }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="w-12 bg-gradient-to-t from-[#d4af37] to-[#d4af37]/60 relative"
+                          >
+                            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-mono font-bold text-[#d4af37]">
+                              {stats.avgScore}
+                            </span>
+                          </motion.div>
+                          <span className="text-xs text-zinc-400 mt-2">You</span>
+                        </div>
+                        {/* Industry Avg */}
+                        <div className="flex flex-col items-center">
+                          <motion.div 
+                            initial={{ height: 0 }}
+                            animate={{ height: "62%" }}
+                            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                            className="w-12 bg-gradient-to-t from-zinc-600 to-zinc-600/60 relative"
+                          >
+                            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-mono text-zinc-400">
+                              62
+                            </span>
+                          </motion.div>
+                          <span className="text-xs text-zinc-500 mt-2">Industry</span>
+                        </div>
+                      </div>
+                      <p className={`text-xs mt-4 ${stats.avgScore >= 62 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                        {stats.avgScore >= 62 ? '↑ Above' : '↓ Below'} industry average
+                      </p>
+                    </div>
+                    
+                    {/* Response Rate Comparison */}
+                    <div className="text-center">
+                      <p className="text-xs text-zinc-500 mb-3">Response Rate</p>
+                      <div className="relative h-32 flex items-end justify-center gap-8">
+                        <div className="flex flex-col items-center">
+                          <motion.div 
+                            initial={{ height: 0 }}
+                            animate={{ height: `${Math.min(parseFloat(stats.avgResponse) * 10, 100)}%` }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="w-12 bg-gradient-to-t from-cyan-500 to-cyan-500/60 relative"
+                          >
+                            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-mono font-bold text-cyan-400">
+                              {stats.avgResponse}%
+                            </span>
+                          </motion.div>
+                          <span className="text-xs text-zinc-400 mt-2">You</span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <motion.div 
+                            initial={{ height: 0 }}
+                            animate={{ height: "25%" }}
+                            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                            className="w-12 bg-gradient-to-t from-zinc-600 to-zinc-600/60 relative"
+                          >
+                            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-mono text-zinc-400">
+                              2.5%
+                            </span>
+                          </motion.div>
+                          <span className="text-xs text-zinc-500 mt-2">Industry</span>
+                        </div>
+                      </div>
+                      <p className={`text-xs mt-4 ${parseFloat(stats.avgResponse) >= 2.5 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                        {parseFloat(stats.avgResponse) >= 2.5 ? '↑ Above' : '↓ Below'} 2.5% avg
+                      </p>
+                    </div>
+                    
+                    {/* Top Performers Insight */}
+                    <div className="bg-zinc-800/50 rounded-lg p-4">
+                      <p className="text-xs text-zinc-500 mb-3">Top Performer Benchmarks</p>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-zinc-400">Score</span>
+                          <span className="text-xs font-mono text-emerald-400">75+</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-zinc-400">Response Rate</span>
+                          <span className="text-xs font-mono text-emerald-400">5%+</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-zinc-400">Open Rate</span>
+                          <span className="text-xs font-mono text-emerald-400">45%+</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-zinc-400">Readability</span>
+                          <span className="text-xs font-mono text-emerald-400">70+</span>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-zinc-600 mt-4">
+                        Based on top 10% of cold emails in B2B SaaS
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Recent Analyses Table */}
               <div className="bg-zinc-900/50 border border-zinc-800 p-6 mt-6">
                 <h3 className="text-sm font-medium mb-4">Recent Analyses</h3>
