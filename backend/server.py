@@ -73,7 +73,25 @@ TIER_FEATURES = {
         "templates": False,
         "team_seats": 0,
         "api_access": False,
-        "priority_support": False
+        "priority_support": False,
+        # New features
+        "spam_detection": False,
+        "readability_score": False,
+        "cta_analysis": False,
+        "subject_analysis": False,
+        "ai_rewrites": False,
+        "multiple_variants": False,
+        "inbox_placement": False,
+        "personalization_score": False,
+        "emotional_tone": False,
+        "performance_tracking": False,
+        "industry_benchmarks": False,
+        "sequence_analysis": False,
+        "ab_test_suggestions": False,
+        "client_workspaces": False,
+        "white_label_reports": False,
+        "approval_workflows": False,
+        "ai_voice_profiles": False
     },
     "starter": {
         "analyses_limit": 50,
@@ -85,7 +103,25 @@ TIER_FEATURES = {
         "templates": False,
         "team_seats": 0,
         "api_access": False,
-        "priority_support": False
+        "priority_support": False,
+        # New features - Starter gets basic analysis
+        "spam_detection": True,
+        "readability_score": True,
+        "cta_analysis": True,
+        "subject_analysis": True,
+        "ai_rewrites": False,
+        "multiple_variants": False,
+        "inbox_placement": False,
+        "personalization_score": False,
+        "emotional_tone": False,
+        "performance_tracking": False,
+        "industry_benchmarks": False,
+        "sequence_analysis": False,
+        "ab_test_suggestions": False,
+        "client_workspaces": False,
+        "white_label_reports": False,
+        "approval_workflows": False,
+        "ai_voice_profiles": False
     },
     "pro": {
         "analyses_limit": 999999,
@@ -97,9 +133,27 @@ TIER_FEATURES = {
         "templates": True,
         "team_seats": 0,
         "api_access": False,
-        "priority_support": True
+        "priority_support": True,
+        # New features - Pro gets full optimization
+        "spam_detection": True,
+        "readability_score": True,
+        "cta_analysis": True,
+        "subject_analysis": True,
+        "ai_rewrites": True,
+        "multiple_variants": True,
+        "inbox_placement": True,
+        "personalization_score": True,
+        "emotional_tone": True,
+        "performance_tracking": True,
+        "industry_benchmarks": True,
+        "sequence_analysis": True,
+        "ab_test_suggestions": True,
+        "client_workspaces": False,
+        "white_label_reports": False,
+        "approval_workflows": False,
+        "ai_voice_profiles": False
     },
-    "agency": {
+    "growth_agency": {
         "analyses_limit": 999999,
         "history_limit": 999999,
         "insights_dashboard": True,
@@ -109,17 +163,41 @@ TIER_FEATURES = {
         "templates": True,
         "team_seats": 5,
         "api_access": True,
-        "priority_support": True
+        "priority_support": True,
+        # New features - Growth Agency gets everything
+        "spam_detection": True,
+        "readability_score": True,
+        "cta_analysis": True,
+        "subject_analysis": True,
+        "ai_rewrites": True,
+        "multiple_variants": True,
+        "inbox_placement": True,
+        "personalization_score": True,
+        "emotional_tone": True,
+        "performance_tracking": True,
+        "industry_benchmarks": True,
+        "sequence_analysis": True,
+        "ab_test_suggestions": True,
+        "client_workspaces": True,
+        "white_label_reports": True,
+        "approval_workflows": True,
+        "ai_voice_profiles": True
     }
 }
+
+# Backwards compatibility - map old "agency" to new "growth_agency"
+TIER_FEATURES["agency"] = TIER_FEATURES["growth_agency"]
 
 SUBSCRIPTION_PRICES = {
     "starter_monthly": 29.00,
     "starter_annual": 278.40,  # 29 * 12 * 0.8 = 20% discount
     "pro_monthly": 79.00,
     "pro_annual": 758.40,  # 79 * 12 * 0.8
+    "growth_agency_monthly": 199.00,
+    "growth_agency_annual": 1910.40,  # 199 * 12 * 0.8
+    # Backwards compatibility
     "agency_monthly": 199.00,
-    "agency_annual": 1910.40  # 199 * 12 * 0.8
+    "agency_annual": 1910.40
 }
 
 # Map price IDs to tiers
@@ -128,8 +206,11 @@ PRICE_TO_TIER = {
     "starter_annual": "starter",
     "pro_monthly": "pro",
     "pro_annual": "pro",
-    "agency_monthly": "agency",
-    "agency_annual": "agency"
+    "growth_agency_monthly": "growth_agency",
+    "growth_agency_annual": "growth_agency",
+    # Backwards compatibility
+    "agency_monthly": "growth_agency",
+    "agency_annual": "growth_agency"
 }
 
 def get_tier_features(tier: str) -> dict:
