@@ -451,6 +451,10 @@ def require_tier(min_tier: str):
 def generate_verification_token() -> str:
     return secrets.token_urlsafe(32)
 
+def generate_phone_otp() -> str:
+    """Generate a 6-digit OTP for phone verification"""
+    return ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+
 def create_verification_token(user_id: str, token_type: str, expires_hours: int = 24) -> dict:
     return {
         "id": str(uuid.uuid4()),
@@ -461,6 +465,43 @@ def create_verification_token(user_id: str, token_type: str, expires_hours: int 
         "used": False,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
+
+async def send_sms_otp(phone_number: str, otp: str) -> bool:
+    """
+    Send SMS OTP - Currently in MOCK MODE
+    TODO: Replace with AWS SNS when approved
+    
+    For AWS SNS integration:
+    import boto3
+    client = boto3.client('sns', 
+        region_name=os.environ.get('AWS_REGION', 'us-east-1'),
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY')
+    )
+    response = client.publish(
+        PhoneNumber=phone_number,
+        Message=f"Your ColdIQ verification code is: {otp}. Valid for 5 minutes.",
+        MessageAttributes={
+            'AWS.SNS.SMS.SenderID': {'DataType': 'String', 'StringValue': 'ColdIQ'},
+            'AWS.SNS.SMS.SMSType': {'DataType': 'String', 'StringValue': 'Transactional'}
+        }
+    )
+    """
+    # MOCK MODE - Log OTP to console for testing
+    logger.info(f"=" * 50)
+    logger.info(f"📱 MOCK SMS TO: {phone_number}")
+    logger.info(f"📱 OTP CODE: {otp}")
+    logger.info(f"=" * 50)
+    
+    # Store in mock_sms collection for testing
+    await db.mock_sms.insert_one({
+        "id": str(uuid.uuid4()),
+        "phone_number": phone_number,
+        "otp": otp,
+        "sent_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    return True
 
 async def send_email_notification(to_email: str, subject: str, body: str, html_body: str = None):
     """Send email using Resend"""
