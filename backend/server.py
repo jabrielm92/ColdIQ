@@ -1567,10 +1567,14 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     """Seed system templates on startup"""
-    # Check if system templates already exist
+    # Check if system templates need updating (check count and if new templates exist)
     existing_count = await db.templates.count_documents({"is_system": True})
-    if existing_count == 0:
-        logger.info("Seeding system templates...")
+    expected_count = len(SYSTEM_TEMPLATES)
+    
+    if existing_count < expected_count:
+        logger.info(f"Updating system templates... (found {existing_count}, expected {expected_count})")
+        # Delete old system templates and re-seed
+        await db.templates.delete_many({"is_system": True})
         for template in SYSTEM_TEMPLATES:
             await db.templates.insert_one({
                 "id": str(uuid.uuid4()),
@@ -1580,6 +1584,7 @@ async def startup_event():
                 "subject": template["subject"],
                 "body": template["body"],
                 "category": template["category"],
+                "industry": template.get("industry", "General"),
                 "avg_score": template.get("avg_score"),
                 "is_shared": False,
                 "is_system": True,
