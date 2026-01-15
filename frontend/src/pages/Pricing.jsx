@@ -113,10 +113,11 @@ const Pricing = () => {
         "Client-specific AI voice profiles",
         "Dedicated account support"
       ],
-      cta: "Start Agency Trial",
+      cta: "Contact Us",
       upgradeHint: "ColdIQ becomes part of your service offering",
       popular: false,
-      icon: Users
+      icon: Users,
+      isContactForm: true
     }
   ];
 
