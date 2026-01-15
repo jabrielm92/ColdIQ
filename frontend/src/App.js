@@ -24,6 +24,49 @@ import Templates from "@/pages/Templates";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
 
+// Theme Context
+const ThemeContext = createContext(null);
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useTheme must be used within ThemeProvider");
+  }
+  return context;
+};
+
+// Theme Provider
+const ThemeProvider = ({ children }) => {
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem("coldiq_theme") || "dark";
+    }
+    return "dark";
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "light") {
+      root.classList.add("light");
+      root.classList.remove("dark");
+    } else {
+      root.classList.add("dark");
+      root.classList.remove("light");
+    }
+    localStorage.setItem("coldiq_theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === "dark" ? "light" : "dark");
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
 // Auth Context
 const AuthContext = createContext(null);
 
@@ -101,8 +144,8 @@ const ProtectedRoute = ({ children }) => {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-theme flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -120,8 +163,8 @@ const OnboardingRoute = ({ children }) => {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-theme flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -139,50 +182,58 @@ const OnboardingRoute = ({ children }) => {
 
 function App() {
   return (
-    <div className="App min-h-screen bg-[#050505]">
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            
-            {/* Protected Routes */}
-            <Route path="/onboarding" element={
-              <ProtectedRoute><Onboarding /></ProtectedRoute>
-            } />
-            <Route path="/dashboard" element={
-              <OnboardingRoute><Dashboard /></OnboardingRoute>
-            } />
-            <Route path="/analyze" element={
-              <OnboardingRoute><Analyzer /></OnboardingRoute>
-            } />
-            <Route path="/history" element={
-              <OnboardingRoute><History /></OnboardingRoute>
-            } />
-            <Route path="/insights" element={
-              <OnboardingRoute><Insights /></OnboardingRoute>
-            } />
-            <Route path="/settings" element={
-              <OnboardingRoute><Settings /></OnboardingRoute>
-            } />
-            <Route path="/billing/success" element={
-              <OnboardingRoute><BillingSuccess /></OnboardingRoute>
-            } />
-            <Route path="/templates" element={
-              <OnboardingRoute><Templates /></OnboardingRoute>
-            } />
-          </Routes>
-        </BrowserRouter>
-        <Toaster position="top-right" theme="dark" />
-      </AuthProvider>
-    </div>
+    <ThemeProvider>
+      <div className="App min-h-screen bg-theme transition-colors duration-300">
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              
+              {/* Protected Routes */}
+              <Route path="/onboarding" element={
+                <ProtectedRoute><Onboarding /></ProtectedRoute>
+              } />
+              <Route path="/dashboard" element={
+                <OnboardingRoute><Dashboard /></OnboardingRoute>
+              } />
+              <Route path="/analyze" element={
+                <OnboardingRoute><Analyzer /></OnboardingRoute>
+              } />
+              <Route path="/history" element={
+                <OnboardingRoute><History /></OnboardingRoute>
+              } />
+              <Route path="/insights" element={
+                <OnboardingRoute><Insights /></OnboardingRoute>
+              } />
+              <Route path="/settings" element={
+                <OnboardingRoute><Settings /></OnboardingRoute>
+              } />
+              <Route path="/billing/success" element={
+                <OnboardingRoute><BillingSuccess /></OnboardingRoute>
+              } />
+              <Route path="/templates" element={
+                <OnboardingRoute><Templates /></OnboardingRoute>
+              } />
+            </Routes>
+          </BrowserRouter>
+          <ToasterWrapper />
+        </AuthProvider>
+      </div>
+    </ThemeProvider>
   );
 }
+
+// Toaster wrapper to access theme
+const ToasterWrapper = () => {
+  const { theme } = useTheme();
+  return <Toaster position="top-right" theme={theme} />;
+};
 
 export default App;
