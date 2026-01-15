@@ -79,7 +79,12 @@ const DashboardLayout = ({ children }) => {
               data-testid={`nav-${item.label.toLowerCase()}`}
             >
               {item.icon}
-              <span>{item.label}</span>
+              <span className="flex-1">{item.label}</span>
+              {item.badge && (
+                <span className="px-1.5 py-0.5 text-[9px] bg-[#d4af37]/20 text-[#d4af37] font-mono">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           ))}
         </nav>
