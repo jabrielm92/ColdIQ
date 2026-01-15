@@ -23,7 +23,8 @@ import {
   ABTestSuggestionsCard,
   InboxPlacementCard,
   EmotionalToneCard,
-  IndustryBenchmarkCard
+  IndustryBenchmarkCard,
+  FixSuggestionsCard
 } from "@/components/AnalysisMetrics";
 
 const Analyzer = () => {
