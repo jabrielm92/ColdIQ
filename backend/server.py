@@ -1046,17 +1046,10 @@ async def analyze_email(data: EmailAnalysisRequest, user: dict = Depends(get_cur
     
     user_role = data.target_role or user.get("role", "sales professional")
     industry = data.target_industry or user.get("target_industry", "B2B")
+    tier = user.get("subscription_tier", "free")
     
-    prompt = f"""You are ColdIQ, an expert cold email analyst who has helped generate $100M+ in pipeline.
-
-Analyze this cold email for a {user_role} targeting {industry}:
-
-Subject: {data.subject}
-Body: {data.body}
-
-Provide analysis in JSON format ONLY (no markdown, no code blocks, just pure JSON):
-{{
-  "overallScore": <0-100 integer>,
+    # Enhanced prompt with tier-specific features
+    base_metrics = """  "overallScore": <0-100 integer>,
   "estimatedResponseRate": <percentage as number 0-100>,
   "estimatedOpenRate": <percentage as number 0-100>,
   "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
@@ -1067,10 +1060,70 @@ Provide analysis in JSON format ONLY (no markdown, no code blocks, just pure JSO
   "rewrittenBody": "<complete rewritten email, max 120 words, implements all improvements>",
   "personalizationScore": <0-10 integer>,
   "valuePropositionClarity": <0-10 integer>,
-  "callToActionStrength": <0-10 integer>
+  "callToActionStrength": <0-10 integer>"""
+    
+    # Starter+ features: Basic analysis metrics
+    starter_metrics = ""
+    if features.get("readability_score"):
+        starter_metrics = """,
+  "readabilityScore": <0-100 integer, Flesch reading ease>,
+  "readabilityLevel": "<grade level: Easy/Medium/Hard>",
+  "sentenceCount": <integer>,
+  "avgWordsPerSentence": <number>,
+  "spamKeywords": ["<spam word 1>", "<spam word 2>"],
+  "spamRiskScore": <0-100 integer, likelihood of hitting spam folder>,
+  "subjectLineAnalysis": {
+    "length": <character count>,
+    "hasPersonalization": <boolean>,
+    "hasUrgency": <boolean>,
+    "hasCuriosity": <boolean>,
+    "effectiveness": <0-10 integer>
+  },
+  "ctaAnalysis": {
+    "ctaPresent": <boolean>,
+    "ctaClarity": <0-10 integer>,
+    "ctaType": "<meeting/call/reply/link>",
+    "ctaPlacement": "<beginning/middle/end>",
+    "frictionLevel": "<low/medium/high>"
+  }"""
+    
+    # Pro+ features: Advanced optimization
+    pro_metrics = ""
+    if features.get("ai_rewrites") and features.get("multiple_variants"):
+        pro_metrics = """,
+  "alternativeSubjects": ["<variant 1>", "<variant 2>", "<variant 3>"],
+  "emotionalTone": {
+    "primary": "<professional/friendly/urgent/curious/authoritative>",
+    "score": <0-10 integer>,
+    "persuasionTechniques": ["<technique 1>", "<technique 2>"]
+  },
+  "personalizationAnalysis": {
+    "score": <0-10 integer>,
+    "authenticityLevel": "<generic/templated/personalized/highly-personalized>",
+    "suggestions": ["<suggestion 1>", "<suggestion 2>"]
+  },
+  "inboxPlacementScore": <0-100 integer, estimated deliverability>,
+  "industryBenchmark": {
+    "avgOpenRate": <industry average>,
+    "avgResponseRate": <industry average>,
+    "yourVsAvg": "<above/at/below>"
+  },
+  "abTestSuggestions": [
+    {"element": "<subject/opening/cta/length>", "testIdea": "<what to test>", "hypothesis": "<why it might improve>"}
+  ]"""
+    
+    prompt = f"""You are ColdIQ, an expert cold email analyst who has helped generate $100M+ in pipeline.
+
+Analyze this cold email for a {user_role} targeting {industry}:
+
+Subject: {data.subject}
+Body: {data.body}
+
+Provide analysis in JSON format ONLY (no markdown, no code blocks, just pure JSON):
+{{{base_metrics}{starter_metrics}{pro_metrics}
 }}
 
-Be specific, actionable, and focus on what makes cold emails convert."""
+Be specific, actionable, and focus on what makes cold emails convert. For spam keywords, identify any words that commonly trigger spam filters (like "free", "guarantee", "act now", etc)."""
 
     try:
         chat = LlmChat(
@@ -1121,6 +1174,20 @@ Be specific, actionable, and focus on what makes cold emails convert."""
         "personalization_score": analysis_data.get("personalizationScore", 0),
         "cta_score": analysis_data.get("callToActionStrength", 0),
         "value_proposition_clarity": analysis_data.get("valuePropositionClarity", 0),
+        # Starter+ metrics
+        "readability_score": analysis_data.get("readabilityScore"),
+        "readability_level": analysis_data.get("readabilityLevel"),
+        "spam_keywords": analysis_data.get("spamKeywords", []),
+        "spam_risk_score": analysis_data.get("spamRiskScore"),
+        "subject_line_analysis": analysis_data.get("subjectLineAnalysis"),
+        "cta_analysis": analysis_data.get("ctaAnalysis"),
+        # Pro+ metrics
+        "alternative_subjects": analysis_data.get("alternativeSubjects", []),
+        "emotional_tone": analysis_data.get("emotionalTone"),
+        "personalization_analysis": analysis_data.get("personalizationAnalysis"),
+        "inbox_placement_score": analysis_data.get("inboxPlacementScore"),
+        "industry_benchmark": analysis_data.get("industryBenchmark"),
+        "ab_test_suggestions": analysis_data.get("abTestSuggestions", []),
         "user_feedback": None,
         "created_at": now
     }
