@@ -32,6 +32,7 @@ const Templates = () => {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIndustry, setSelectedIndustry] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [copied, setCopied] = useState(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -97,48 +98,51 @@ const Templates = () => {
     setTimeout(() => setCopied(null), 2000);
   };
 
+  // Get unique industries and categories
+  const industries = ["all", ...new Set(templates.map(t => t.industry).filter(Boolean))];
   const categories = ["all", ...new Set(templates.map(t => t.category).filter(Boolean))];
 
   const filteredTemplates = templates.filter(t => {
     const matchesSearch = 
       t.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       t.subject?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesIndustry = selectedIndustry === "all" || t.industry === selectedIndustry;
     const matchesCategory = selectedCategory === "all" || t.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesIndustry && matchesCategory;
   });
 
   // Locked state for non-Pro users
   if (!isPro) {
     return (
       <DashboardLayout>
-        <div className="p-6 lg:p-8" data-testid="templates-page">
+        <div className="p-6 lg:p-10" data-testid="templates-page">
           <div className="max-w-2xl mx-auto text-center py-16">
-            <div className="w-20 h-20 rounded-2xl bg-zinc-800 flex items-center justify-center mx-auto mb-6">
-              <Lock className="w-10 h-10 text-zinc-500" />
+            <div className="w-20 h-20 border border-theme flex items-center justify-center mx-auto mb-6">
+              <Lock className="w-10 h-10 text-theme-dim" />
             </div>
-            <h1 className="text-2xl font-bold mb-3" style={{ fontFamily: 'Manrope' }}>
+            <h1 className="font-serif text-3xl tracking-tight mb-3">
               Unlock Email Templates
             </h1>
-            <p className="text-zinc-400 mb-4 max-w-md mx-auto">
-              Upgrade to Pro or Agency to access high-converting email templates and create your own.
+            <p className="text-theme-muted mb-6 max-w-md mx-auto">
+              Upgrade to Pro or Agency to access 17+ high-converting email templates across multiple industries.
             </p>
             
             <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-8 text-left">
               {[
-                "5+ proven templates",
+                "17+ proven templates",
+                "Industry-specific",
                 "Customizable fields",
-                "Save your own",
-                "Share with team"
+                "Save your own"
               ].map((feature, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-zinc-500">
-                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                <div key={i} className="flex items-center gap-2 text-sm text-theme-muted">
+                  <div className="w-1.5 h-1.5 bg-[#d4af37]" />
                   {feature}
                 </div>
               ))}
             </div>
             
             <Link to="/pricing">
-              <Button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 glow-primary">
+              <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-4 h-auto">
                 Upgrade to Pro
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -151,56 +155,57 @@ const Templates = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-6 lg:p-8" data-testid="templates-page">
+      <div className="p-6 lg:p-10" data-testid="templates-page">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
             <div>
-              <h1 className="text-2xl lg:text-3xl font-bold mb-2" style={{ fontFamily: 'Manrope' }}>
+              <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3">Templates</p>
+              <h1 className="font-serif text-4xl tracking-tight mb-2">
                 Email Templates
               </h1>
-              <p className="text-zinc-400">High-converting templates ready to customize</p>
+              <p className="text-theme-muted">17 high-converting templates across 7 industries</p>
             </div>
             
             <div className="flex items-center gap-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                <Input
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-dim" />
+                <input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search templates..."
-                  className="pl-10 bg-zinc-900/50 border-zinc-800 w-full md:w-64"
+                  className="pl-10 w-full md:w-64 bg-transparent border-b border-theme focus:border-[#d4af37] text-theme px-3 py-3 outline-none transition-colors placeholder:text-theme-dim font-mono text-sm"
                 />
               </div>
               
               <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-indigo-600 to-violet-600" data-testid="create-template-btn">
+                  <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-6 py-3 h-auto" data-testid="create-template-btn">
                     <Plus className="w-4 h-4 mr-2" />
-                    New Template
+                    New
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-lg bg-zinc-900 border-zinc-800">
+                <DialogContent className="max-w-lg bg-theme-secondary border-theme">
                   <DialogHeader>
-                    <DialogTitle style={{ fontFamily: 'Manrope' }}>Create Template</DialogTitle>
+                    <DialogTitle className="font-serif text-2xl">Create Template</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 mt-4">
                     <div className="space-y-2">
-                      <Label>Template Name</Label>
-                      <Input
+                      <Label className="text-xs font-mono tracking-widest uppercase text-theme-muted">Template Name</Label>
+                      <input
                         value={newTemplate.name}
                         onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
                         placeholder="e.g., SaaS Outreach"
-                        className="bg-zinc-800 border-zinc-700"
+                        className="w-full bg-transparent border-b border-theme focus:border-[#d4af37] text-theme py-3 outline-none transition-colors placeholder:text-theme-dim"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Category</Label>
+                      <Label className="text-xs font-mono tracking-widest uppercase text-theme-muted">Category</Label>
                       <Select 
                         value={newTemplate.category}
                         onValueChange={(v) => setNewTemplate({ ...newTemplate, category: v })}
                       >
-                        <SelectTrigger className="bg-zinc-800 border-zinc-700">
+                        <SelectTrigger className="bg-theme-tertiary border-theme rounded-none">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -214,26 +219,26 @@ const Templates = () => {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Subject Line</Label>
-                      <Input
+                      <Label className="text-xs font-mono tracking-widest uppercase text-theme-muted">Subject Line</Label>
+                      <input
                         value={newTemplate.subject}
                         onChange={(e) => setNewTemplate({ ...newTemplate, subject: e.target.value })}
                         placeholder="Use {{variables}} for personalization"
-                        className="bg-zinc-800 border-zinc-700"
+                        className="w-full bg-transparent border-b border-theme focus:border-[#d4af37] text-theme py-3 outline-none transition-colors placeholder:text-theme-dim"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Email Body</Label>
+                      <Label className="text-xs font-mono tracking-widest uppercase text-theme-muted">Email Body</Label>
                       <Textarea
                         value={newTemplate.body}
                         onChange={(e) => setNewTemplate({ ...newTemplate, body: e.target.value })}
                         placeholder="Hi {{first_name}},&#10;&#10;..."
-                        className="bg-zinc-800 border-zinc-700 min-h-[150px]"
+                        className="bg-theme-tertiary border-theme min-h-[150px] rounded-none"
                       />
                     </div>
                     <Button 
                       onClick={handleCreateTemplate}
-                      className="w-full bg-gradient-to-r from-indigo-600 to-violet-600"
+                      className="w-full bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs py-4 h-auto"
                     >
                       Create Template
                     </Button>
@@ -243,72 +248,99 @@ const Templates = () => {
             </div>
           </div>
           
+          {/* Industry Filter */}
+          <div className="mb-4">
+            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3">Industry</p>
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {industries.map((ind) => (
+                <button
+                  key={ind}
+                  onClick={() => setSelectedIndustry(ind)}
+                  className={`px-4 py-2 text-xs font-mono tracking-wide uppercase transition-all whitespace-nowrap ${
+                    selectedIndustry === ind 
+                      ? 'bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/30' 
+                      : 'border border-theme text-theme-muted hover:border-theme-muted'
+                  }`}
+                >
+                  {ind === "all" ? "All Industries" : ind}
+                </button>
+              ))}
+            </div>
+          </div>
+          
           {/* Category Filter */}
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-            {categories.map((cat) => (
-              <Button
-                key={cat}
-                size="sm"
-                variant={selectedCategory === cat ? "default" : "outline"}
-                onClick={() => setSelectedCategory(cat)}
-                className={selectedCategory === cat 
-                  ? "bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 border-indigo-500/30" 
-                  : "border-zinc-700 text-zinc-400"
-                }
-              >
-                {cat === "all" ? "All" : cat}
-              </Button>
-            ))}
+          <div className="mb-8">
+            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3">Category</p>
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2 text-xs font-mono tracking-wide uppercase transition-all whitespace-nowrap ${
+                    selectedCategory === cat 
+                      ? 'bg-[#a3e635]/10 text-[#a3e635] border border-[#a3e635]/30' 
+                      : 'border border-theme text-theme-muted hover:border-theme-muted'
+                  }`}
+                >
+                  {cat === "all" ? "All Categories" : cat}
+                </button>
+              ))}
+            </div>
           </div>
           
           {/* Templates Grid */}
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : filteredTemplates.length === 0 ? (
-            <div className="text-center py-16">
-              <FileText className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-              <p className="text-zinc-400">No templates found</p>
+            <div className="text-center py-16 border border-theme">
+              <FileText className="w-12 h-12 text-theme-dim mx-auto mb-4" />
+              <p className="text-theme-muted">No templates found</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-theme-tertiary">
               {filteredTemplates.map((template) => (
                 <motion.div
                   key={template.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-colors group"
+                  className="bg-theme p-6 hover:bg-theme-secondary transition-colors group"
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-2 flex-wrap">
                       {template.is_system && (
-                        <div className="w-6 h-6 rounded bg-indigo-500/20 flex items-center justify-center">
-                          <Sparkles className="w-3 h-3 text-indigo-400" />
+                        <div className="w-6 h-6 bg-[#d4af37]/10 flex items-center justify-center">
+                          <Sparkles className="w-3 h-3 text-[#d4af37]" />
                         </div>
                       )}
-                      <span className="text-xs px-2 py-1 rounded-full bg-zinc-800 text-zinc-400">
+                      {template.industry && (
+                        <span className="text-xs px-2 py-1 bg-theme-tertiary text-theme-muted font-mono">
+                          {template.industry}
+                        </span>
+                      )}
+                      <span className="text-xs px-2 py-1 bg-theme-tertiary text-theme-muted font-mono">
                         {template.category}
                       </span>
                     </div>
                     {template.avg_score && (
-                      <span className="text-xs text-emerald-400 font-medium" style={{ fontFamily: 'JetBrains Mono' }}>
-                        {template.avg_score} avg
+                      <span className="text-xs text-[#a3e635] font-mono font-bold">
+                        {template.avg_score}
                       </span>
                     )}
                   </div>
                   
-                  <h3 className="font-semibold mb-2" style={{ fontFamily: 'Manrope' }}>{template.name}</h3>
-                  <p className="text-sm text-zinc-500 mb-1">Subject:</p>
-                  <p className="text-sm text-zinc-300 mb-3 truncate">{template.subject}</p>
-                  <p className="text-sm text-zinc-500 mb-1">Preview:</p>
-                  <p className="text-xs text-zinc-400 line-clamp-3">{template.body}</p>
+                  <h3 className="font-sans font-semibold mb-3">{template.name}</h3>
+                  <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-1">Subject</p>
+                  <p className="text-sm text-theme-muted mb-4 truncate">{template.subject}</p>
+                  <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-1">Preview</p>
+                  <p className="text-xs text-theme-dim line-clamp-3">{template.body}</p>
                   
-                  <div className="flex items-center gap-2 mt-4 pt-4 border-t border-zinc-800">
+                  <div className="flex items-center gap-2 mt-6 pt-4 border-t border-theme">
                     <Button
                       size="sm"
                       onClick={() => copyToClipboard(template)}
-                      className="flex-1 bg-zinc-800 hover:bg-zinc-700"
+                      className="flex-1 bg-theme-tertiary hover:bg-[#d4af37]/10 hover:text-[#d4af37] text-theme-muted rounded-none text-xs font-mono uppercase tracking-wide"
                     >
                       {copied === template.id ? (
                         <><Check className="w-3 h-3 mr-1" /> Copied</>
@@ -321,7 +353,7 @@ const Templates = () => {
                         size="sm"
                         variant="ghost"
                         onClick={() => handleDeleteTemplate(template.id)}
-                        className="text-zinc-400 hover:text-red-400"
+                        className="text-red-500 hover:bg-red-500/10 rounded-none"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
