@@ -31,7 +31,7 @@ const Performance = () => {
     setLoading(true);
     try {
       const res = await axios.get(`${API}/analysis/history?limit=100`);
-      const analyses = res.data || [];
+      const analyses = res.data?.analyses || [];
       
       // Filter by time range
       const cutoffDate = new Date();
