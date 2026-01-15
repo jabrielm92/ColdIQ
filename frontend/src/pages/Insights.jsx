@@ -37,7 +37,7 @@ const Insights = () => {
     return (
       <DashboardLayout>
         <div className="p-6 lg:p-8 flex items-center justify-center min-h-[60vh]">
-          <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
         </div>
       </DashboardLayout>
     );
@@ -47,19 +47,18 @@ const Insights = () => {
   if (!insights?.available) {
     return (
       <DashboardLayout>
-        <div className="p-6 lg:p-8" data-testid="insights-page">
+        <div className="p-6 lg:p-10" data-testid="insights-page">
           <div className="max-w-2xl mx-auto text-center py-16">
-            <div className="w-20 h-20 rounded-2xl bg-zinc-800 flex items-center justify-center mx-auto mb-6">
-              <Lock className="w-10 h-10 text-zinc-500" />
+            <div className="w-20 h-20 border border-theme flex items-center justify-center mx-auto mb-6">
+              <Lock className="w-10 h-10 text-theme-dim" />
             </div>
-            <h1 className="text-2xl font-bold mb-3" style={{ fontFamily: 'Manrope' }}>
+            <h1 className="font-serif text-3xl tracking-tight mb-3">
               Unlock Personalized Insights
             </h1>
-            <p className="text-zinc-400 mb-4 max-w-md mx-auto">
+            <p className="text-theme-muted mb-4 max-w-md mx-auto">
               Upgrade to {insights?.required_tier === "starter" ? "Starter" : "Pro"} or higher to access detailed performance analytics and personalized recommendations.
             </p>
             
-            {/* Feature preview */}
             <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-8 text-left">
               {[
                 "Performance Trends",
@@ -67,15 +66,15 @@ const Insights = () => {
                 "Word Count Insights",
                 "AI Recommendations"
               ].map((feature, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-zinc-500">
-                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                <div key={i} className="flex items-center gap-2 text-sm text-theme-muted">
+                  <div className="w-1.5 h-1.5 bg-[#d4af37]" />
                   {feature}
                 </div>
               ))}
             </div>
             
             <Link to="/pricing">
-              <Button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 glow-primary">
+              <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-4 h-auto">
                 View Plans
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -90,19 +89,19 @@ const Insights = () => {
   if (!insights?.has_data) {
     return (
       <DashboardLayout>
-        <div className="p-6 lg:p-8" data-testid="insights-page">
+        <div className="p-6 lg:p-10" data-testid="insights-page">
           <div className="max-w-2xl mx-auto text-center py-16">
-            <div className="w-20 h-20 rounded-2xl bg-zinc-800 flex items-center justify-center mx-auto mb-6">
-              <BarChart3 className="w-10 h-10 text-zinc-500" />
+            <div className="w-20 h-20 border border-theme flex items-center justify-center mx-auto mb-6">
+              <BarChart3 className="w-10 h-10 text-theme-dim" />
             </div>
-            <h1 className="text-2xl font-bold mb-3" style={{ fontFamily: 'Manrope' }}>
+            <h1 className="font-serif text-3xl tracking-tight mb-3">
               No Data Yet
             </h1>
-            <p className="text-zinc-400 mb-8 max-w-md mx-auto">
+            <p className="text-theme-muted mb-8 max-w-md mx-auto">
               Complete your first analysis to start seeing personalized insights and recommendations.
             </p>
             <Link to="/analyze">
-              <Button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 glow-primary">
+              <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-4 h-auto">
                 Analyze Your First Email
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
