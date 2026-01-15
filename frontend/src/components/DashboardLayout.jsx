@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/App";
 import {
   Mail, LayoutDashboard, History, BarChart3, Settings, LogOut,
-  Plus, Menu, X, FileText, Users
+  Plus, Menu, X, FileText, Users, TrendingUp, Layers
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -19,13 +19,20 @@ const DashboardLayout = ({ children }) => {
     navigate("/");
   };
 
-  const isAgency = user?.subscription_tier === "agency";
+  const userTier = user?.subscription_tier || "free";
+  const isAgency = userTier === "agency" || userTier === "growth_agency";
+  const isPro = ["pro", "agency", "growth_agency"].includes(userTier);
 
   const navItems = [
     { path: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { path: "/analyze", label: "Analyze", icon: <Plus className="w-5 h-5" /> },
     { path: "/history", label: "History", icon: <History className="w-5 h-5" /> },
     { path: "/templates", label: "Templates", icon: <FileText className="w-5 h-5" /> },
+    // Pro features
+    ...(isPro ? [
+      { path: "/sequence", label: "Sequences", icon: <Layers className="w-5 h-5" />, badge: "PRO" },
+      { path: "/performance", label: "Performance", icon: <TrendingUp className="w-5 h-5" />, badge: "PRO" }
+    ] : []),
     { path: "/insights", label: "Insights", icon: <BarChart3 className="w-5 h-5" /> },
     ...(isAgency ? [{ path: "/team-analytics", label: "Team", icon: <Users className="w-5 h-5" /> }] : []),
     { path: "/settings", label: "Settings", icon: <Settings className="w-5 h-5" /> }
@@ -37,7 +44,8 @@ const DashboardLayout = ({ children }) => {
     free: { label: "Free", bg: "bg-theme-tertiary", text: "text-theme-muted" },
     starter: { label: "Starter", bg: "bg-[#a3e635]/10", text: "text-[#a3e635]" },
     pro: { label: "Pro", bg: "bg-[#d4af37]/10", text: "text-[#d4af37]" },
-    agency: { label: "Agency", bg: "bg-[#d4af37]/20", text: "text-[#d4af37]" }
+    agency: { label: "Agency", bg: "bg-[#d4af37]/20", text: "text-[#d4af37]" },
+    growth_agency: { label: "Growth", bg: "bg-[#d4af37]/20", text: "text-[#d4af37]" }
   };
 
   const tier = tierConfig[user?.subscription_tier] || tierConfig.free;
