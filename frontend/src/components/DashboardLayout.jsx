@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/App";
 import {
   Mail, LayoutDashboard, History, BarChart3, Settings, LogOut,
-  Plus, Menu, X, FileText
+  Plus, Menu, X, FileText, Users
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -19,12 +19,15 @@ const DashboardLayout = ({ children }) => {
     navigate("/");
   };
 
+  const isAgency = user?.subscription_tier === "agency";
+
   const navItems = [
     { path: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { path: "/analyze", label: "Analyze", icon: <Plus className="w-5 h-5" /> },
     { path: "/history", label: "History", icon: <History className="w-5 h-5" /> },
     { path: "/templates", label: "Templates", icon: <FileText className="w-5 h-5" /> },
     { path: "/insights", label: "Insights", icon: <BarChart3 className="w-5 h-5" /> },
+    ...(isAgency ? [{ path: "/team-analytics", label: "Team", icon: <Users className="w-5 h-5" /> }] : []),
     { path: "/settings", label: "Settings", icon: <Settings className="w-5 h-5" /> }
   ];
 
