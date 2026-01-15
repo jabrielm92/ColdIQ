@@ -181,6 +181,12 @@ const Pricing = () => {
     
     if (planId === "free") return;
     
+    // Growth Agency goes to contact form
+    if (planId === "growth_agency") {
+      navigate("/contact");
+      return;
+    }
+    
     const priceKey = `${planId}_${isAnnual ? "annual" : "monthly"}`;
     
     setLoading(planId);
