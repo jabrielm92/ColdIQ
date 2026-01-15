@@ -2,17 +2,20 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/App";
-import { Mail, ArrowLeft, Eye, EyeOff, Check } from "lucide-react";
+import { Mail, ArrowLeft, Eye, EyeOff, Check, Phone } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
+import PhoneVerification from "@/components/PhoneVerification";
 
 const Signup = () => {
+  const [step, setStep] = useState("signup"); // "signup" | "phone"
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState(null);
   const { signup } = useAuth();
   const navigate = useNavigate();
 
@@ -32,9 +35,12 @@ const Signup = () => {
     setLoading(true);
     
     try {
-      await signup(email, password, fullName);
-      toast.success("Account created successfully!");
-      navigate("/onboarding");
+      const result = await signup(email, password, fullName);
+      // Get token from localStorage (set by signup)
+      const authToken = localStorage.getItem("coldiq_token");
+      setToken(authToken);
+      toast.success("Account created! Please verify your phone.");
+      setStep("phone");
     } catch (err) {
       let message = "Failed to create account";
       const detail = err.response?.data?.detail;
@@ -47,6 +53,11 @@ const Signup = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePhoneVerified = () => {
+    toast.success("Phone verified! Let's set up your profile.");
+    navigate("/onboarding");
   };
 
   return (
@@ -80,112 +91,176 @@ const Signup = () => {
       
       {/* Right Side - Form */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-12 py-8 lg:py-0">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
-        >
-          <div className="mb-8 lg:mb-10">
-            <Link to="/" className="inline-flex items-center gap-2 text-theme-muted hover:text-theme transition-colors mb-6 lg:mb-10 text-sm font-mono tracking-wide uppercase">
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Link>
-            
-            <div className="hidden lg:flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 bg-[#d4af37] flex items-center justify-center">
-                <Mail className="w-5 h-5 text-black" />
-              </div>
-              <span className="text-xl font-semibold tracking-tight font-sans">ColdIQ</span>
-            </div>
-            
-            <h1 className="font-serif text-3xl sm:text-4xl tracking-tight mb-2 sm:mb-3">Create your account</h1>
-            <p className="text-theme-muted text-sm sm:text-base">Start writing cold emails that convert</p>
-          </div>
-          
-          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" data-testid="signup-form">
-            <div className="space-y-2">
-              <label htmlFor="fullName" className="text-xs font-mono tracking-widest uppercase text-theme-muted">Full Name</label>
-              <input
-                id="fullName"
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="John Smith"
-                required
-                className="w-full bg-transparent border-b border-theme focus:border-[#d4af37] text-theme px-0 py-3 sm:py-4 outline-none transition-colors placeholder:text-theme-dim font-mono text-sm"
-                data-testid="signup-name-input"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-xs font-mono tracking-widest uppercase text-theme-muted">Email</label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                required
-                className="w-full bg-transparent border-b border-theme focus:border-[#d4af37] text-theme px-0 py-3 sm:py-4 outline-none transition-colors placeholder:text-theme-dim font-mono text-sm"
-                data-testid="signup-email-input"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-xs font-mono tracking-widest uppercase text-theme-muted">Password</label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="w-full bg-transparent border-b border-theme focus:border-[#d4af37] text-theme px-0 py-3 sm:py-4 pr-10 outline-none transition-colors placeholder:text-theme-dim font-mono text-sm"
-                  data-testid="signup-password-input"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-theme-dim hover:text-theme transition-colors p-2"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+        <AnimatePresence mode="wait">
+          {step === "signup" ? (
+            <motion.div 
+              key="signup"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="w-full max-w-md"
+            >
+              <div className="mb-8 lg:mb-10">
+                <Link to="/" className="inline-flex items-center gap-2 text-theme-muted hover:text-theme transition-colors mb-6 lg:mb-10 text-sm font-mono tracking-wide uppercase">
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </Link>
+                
+                <div className="hidden lg:flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 bg-[#d4af37] flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-black" />
+                  </div>
+                  <span className="text-xl font-semibold tracking-tight font-sans">ColdIQ</span>
+                </div>
+                
+                <h1 className="font-serif text-3xl sm:text-4xl tracking-tight mb-2 sm:mb-3">Create your account</h1>
+                <p className="text-theme-muted text-sm sm:text-base">Start writing cold emails that convert</p>
+                
+                {/* Progress indicator */}
+                <div className="flex items-center gap-2 mt-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-[#d4af37] flex items-center justify-center text-black text-sm font-bold">1</div>
+                    <span className="text-sm font-medium">Account</span>
+                  </div>
+                  <div className="flex-1 h-px bg-theme-tertiary" />
+                  <div className="flex items-center gap-2 opacity-50">
+                    <div className="w-8 h-8 border border-theme flex items-center justify-center text-theme-dim text-sm">2</div>
+                    <span className="text-sm text-theme-dim">Phone</span>
+                  </div>
+                </div>
               </div>
               
-              <div className="flex flex-wrap gap-3 sm:gap-4 mt-3 sm:mt-4">
-                {passwordChecks.map((check, i) => (
-                  <div key={i} className="flex items-center gap-2 text-xs">
-                    <div className={`w-4 h-4 flex items-center justify-center ${check.valid ? 'bg-[#a3e635]/20 text-[#a3e635]' : 'bg-theme-tertiary text-theme-dim'}`}>
-                      <Check className="w-2.5 h-2.5" />
-                    </div>
-                    <span className={check.valid ? 'text-theme-muted' : 'text-theme-dim'}>{check.label}</span>
+              <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6" data-testid="signup-form">
+                <div className="space-y-2">
+                  <label htmlFor="fullName" className="text-xs font-mono tracking-widest uppercase text-theme-muted">Full Name</label>
+                  <input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="John Smith"
+                    required
+                    className="w-full bg-transparent border-b border-theme focus:border-[#d4af37] text-theme px-0 py-3 sm:py-4 outline-none transition-colors placeholder:text-theme-dim font-mono text-sm"
+                    data-testid="signup-name-input"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-xs font-mono tracking-widest uppercase text-theme-muted">Email</label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    required
+                    className="w-full bg-transparent border-b border-theme focus:border-[#d4af37] text-theme px-0 py-3 sm:py-4 outline-none transition-colors placeholder:text-theme-dim font-mono text-sm"
+                    data-testid="signup-email-input"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-xs font-mono tracking-widest uppercase text-theme-muted">Password</label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      className="w-full bg-transparent border-b border-theme focus:border-[#d4af37] text-theme px-0 py-3 sm:py-4 pr-10 outline-none transition-colors placeholder:text-theme-dim font-mono text-sm"
+                      data-testid="signup-password-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 text-theme-dim hover:text-theme transition-colors p-2"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
-                ))}
-              </div>
-            </div>
-            
-            <Button 
-              type="submit" 
-              disabled={loading}
-              className="w-full bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-4 sm:py-5 h-auto transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] mt-6 sm:mt-8"
-              data-testid="signup-submit-btn"
+                  
+                  <div className="flex flex-wrap gap-3 sm:gap-4 mt-3 sm:mt-4">
+                    {passwordChecks.map((check, i) => (
+                      <div key={i} className="flex items-center gap-2 text-xs">
+                        <div className={`w-4 h-4 flex items-center justify-center ${check.valid ? 'bg-[#a3e635]/20 text-[#a3e635]' : 'bg-theme-tertiary text-theme-dim'}`}>
+                          <Check className="w-2.5 h-2.5" />
+                        </div>
+                        <span className={check.valid ? 'text-theme-muted' : 'text-theme-dim'}>{check.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="text-xs text-theme-dim">
+                  By signing up, you agree to our{" "}
+                  <Link to="/terms" className="text-[#d4af37] hover:underline">Terms of Service</Link>
+                  {" "}and{" "}
+                  <Link to="/privacy" className="text-[#d4af37] hover:underline">Privacy Policy</Link>.
+                </p>
+                
+                <Button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-4 sm:py-5 h-auto transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.2)] mt-6 sm:mt-8"
+                  data-testid="signup-submit-btn"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  ) : (
+                    "Continue to Phone Verification"
+                  )}
+                </Button>
+              </form>
+              
+              <p className="mt-6 sm:mt-8 text-theme-muted text-sm">
+                Already have an account?{" "}
+                <Link to="/login" className="text-[#d4af37] hover:text-[#b5952f] font-medium transition-colors" data-testid="signup-login-link">
+                  Sign in
+                </Link>
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="phone"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="w-full max-w-md"
             >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-              ) : (
-                "Create account"
-              )}
-            </Button>
-          </form>
-          
-          <p className="mt-6 sm:mt-8 text-theme-muted text-sm">
-            Already have an account?{" "}
-            <Link to="/login" className="text-[#d4af37] hover:text-[#b5952f] font-medium transition-colors" data-testid="signup-login-link">
-              Sign in
-            </Link>
-          </p>
-        </motion.div>
+              <div className="mb-8">
+                <button 
+                  onClick={() => setStep("signup")}
+                  className="inline-flex items-center gap-2 text-theme-muted hover:text-theme transition-colors mb-6 text-sm font-mono tracking-wide uppercase"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </button>
+                
+                {/* Progress indicator */}
+                <div className="flex items-center gap-2 mt-4">
+                  <div className="flex items-center gap-2 opacity-50">
+                    <div className="w-8 h-8 bg-[#a3e635] flex items-center justify-center text-black text-sm font-bold">
+                      <Check className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm text-theme-muted">Account</span>
+                  </div>
+                  <div className="flex-1 h-px bg-[#a3e635]" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-[#d4af37] flex items-center justify-center text-black text-sm font-bold">2</div>
+                    <span className="text-sm font-medium">Phone</span>
+                  </div>
+                </div>
+              </div>
+              
+              <PhoneVerification 
+                onVerified={handlePhoneVerified}
+                token={token}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
