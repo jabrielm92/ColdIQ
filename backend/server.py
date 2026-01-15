@@ -137,11 +137,13 @@ def get_tier_features(tier: str) -> dict:
 
 # Email templates seed data
 SYSTEM_TEMPLATES = [
+    # General Outreach Templates
     {
         "name": "The Personalized Opener",
         "subject": "{{trigger_event}} at {{company}} - quick thought",
         "body": "Hi {{first_name}},\n\nI noticed {{company}} just {{trigger_event}}. Congrats!\n\nWe've helped similar companies in {{industry}} achieve {{specific_result}} by {{value_prop}}.\n\nWould you be open to a quick 15-min call to explore if we could help {{company}} do the same?\n\nBest,\n{{your_name}}",
         "category": "Outreach",
+        "industry": "General",
         "avg_score": 78
     },
     {
@@ -149,6 +151,7 @@ SYSTEM_TEMPLATES = [
         "subject": "{{pain_point}} costing {{company}} revenue?",
         "body": "Hi {{first_name}},\n\nMost {{role}}s I talk to are struggling with {{pain_point}}. It's frustrating because {{agitate_problem}}.\n\nWe built {{product}} specifically to solve this - our clients typically see {{result}} within {{timeframe}}.\n\nCurious if this resonates with you?\n\nBest,\n{{your_name}}",
         "category": "Pain Point",
+        "industry": "General",
         "avg_score": 75
     },
     {
@@ -156,6 +159,7 @@ SYSTEM_TEMPLATES = [
         "subject": "How {{similar_company}} achieved {{result}}",
         "body": "Hi {{first_name}},\n\n{{similar_company}} was facing {{challenge}} just like {{company}} might be.\n\nAfter implementing our solution, they achieved {{specific_result}} in {{timeframe}}.\n\nI'd love to share how we did it and see if we could replicate similar results for you.\n\nFree for a quick call this week?\n\nBest,\n{{your_name}}",
         "category": "Case Study",
+        "industry": "General",
         "avg_score": 82
     },
     {
@@ -163,6 +167,7 @@ SYSTEM_TEMPLATES = [
         "subject": "15 min - {{value_prop}} for {{company}}",
         "body": "Hi {{first_name}},\n\nI help {{target_role}}s at {{industry}} companies {{achieve_outcome}}.\n\nWould you be the right person to speak with about this at {{company}}?\n\nIf so, are you free for 15 minutes this Thursday or Friday?\n\nBest,\n{{your_name}}",
         "category": "Direct",
+        "industry": "General",
         "avg_score": 71
     },
     {
@@ -170,7 +175,111 @@ SYSTEM_TEMPLATES = [
         "subject": "Quick question, {{first_name}}",
         "body": "Hi {{first_name}},\n\nI have an idea that could help {{company}} {{achieve_benefit}}.\n\nWould it be okay if I sent over a few bullet points on how?\n\nBest,\n{{your_name}}",
         "category": "Soft Ask",
+        "industry": "General",
         "avg_score": 68
+    },
+    # SaaS Industry Templates
+    {
+        "name": "SaaS - Product-Led Growth",
+        "subject": "Noticed your team trialing {{your_product}}",
+        "body": "Hi {{first_name}},\n\nI saw {{company}} has been exploring {{your_product}} - thanks for giving us a shot!\n\nTeams like yours in the {{industry}} space typically get the most value from {{key_feature}}. Would a quick walkthrough help?\n\nI've helped similar companies cut their {{pain_point}} by 40% in the first month.\n\n15 mins this week?\n\nBest,\n{{your_name}}",
+        "category": "PLG",
+        "industry": "SaaS",
+        "avg_score": 81
+    },
+    {
+        "name": "SaaS - Competitive Displacement",
+        "subject": "{{competitor}} vs. us - honest comparison",
+        "body": "Hi {{first_name}},\n\nI noticed {{company}} is using {{competitor}}. Makes sense - they're solid.\n\nThat said, {{company_type}} companies have been switching to us because {{differentiator}}.\n\n{{customer_example}} made the switch and saw {{result}}.\n\nWorth a 10-min comparison call?\n\nBest,\n{{your_name}}",
+        "category": "Competitive",
+        "industry": "SaaS",
+        "avg_score": 76
+    },
+    # E-commerce Templates
+    {
+        "name": "E-commerce - BFCM Prep",
+        "subject": "{{company}}'s Q4 revenue potential",
+        "body": "Hi {{first_name}},\n\nWith BFCM approaching, I wanted to reach out.\n\nWe helped {{similar_brand}} increase their holiday revenue by {{percentage}} last year through {{solution}}.\n\nGiven {{company}}'s growth, you could be leaving {{estimated_revenue}} on the table.\n\nQuick call to see if there's a fit?\n\nBest,\n{{your_name}}",
+        "category": "Seasonal",
+        "industry": "E-commerce",
+        "avg_score": 79
+    },
+    {
+        "name": "E-commerce - Cart Abandonment",
+        "subject": "Recovering {{company}}'s lost revenue",
+        "body": "Hi {{first_name}},\n\nE-commerce brands typically lose 70% of carts to abandonment. For {{company}}'s traffic, that could be {{estimated_loss}}/month.\n\nWe've built an AI-powered recovery system that's helping brands like {{example}} recover {{recovery_rate}}% of those carts.\n\nWorth exploring?\n\nBest,\n{{your_name}}",
+        "category": "Pain Point",
+        "industry": "E-commerce",
+        "avg_score": 77
+    },
+    # Healthcare Templates
+    {
+        "name": "Healthcare - Compliance First",
+        "subject": "HIPAA-compliant {{solution_type}} for {{company}}",
+        "body": "Hi {{first_name}},\n\nI know compliance is non-negotiable in healthcare. That's why I wanted to introduce our HIPAA-compliant {{solution}}.\n\n{{healthcare_client}} recently implemented it and reduced {{metric}} by {{percentage}} while maintaining full compliance.\n\nWould you be open to seeing how it works?\n\nBest,\n{{your_name}}",
+        "category": "Compliance",
+        "industry": "Healthcare",
+        "avg_score": 74
+    },
+    {
+        "name": "Healthcare - Patient Outcomes",
+        "subject": "Improving patient outcomes at {{company}}",
+        "body": "Hi {{first_name}},\n\n{{similar_org}} was struggling with {{challenge}} affecting patient care.\n\nAfter implementing our {{solution}}, they saw {{outcome_improvement}} in patient outcomes and {{efficiency_gain}} in staff efficiency.\n\nI'd love to share how this could work for {{company}}.\n\n15 minutes this week?\n\nBest,\n{{your_name}}",
+        "category": "Outcomes",
+        "industry": "Healthcare",
+        "avg_score": 80
+    },
+    # Financial Services Templates
+    {
+        "name": "FinTech - Security Focus",
+        "subject": "SOC 2 compliant solution for {{company}}",
+        "body": "Hi {{first_name}},\n\nI understand security and compliance are critical in financial services.\n\nOur SOC 2 Type II certified {{solution}} has helped {{client_example}} {{achieve_result}} without compromising security.\n\nWould you be interested in a brief demo?\n\nBest,\n{{your_name}}",
+        "category": "Security",
+        "industry": "Financial Services",
+        "avg_score": 73
+    },
+    {
+        "name": "FinTech - ROI Driven",
+        "subject": "3.2x ROI for {{company}}'s {{department}}",
+        "body": "Hi {{first_name}},\n\n{{similar_company}} in financial services was skeptical about our {{solution}} too.\n\n6 months later: 3.2x ROI, {{hours_saved}} hours saved monthly, and {{additional_benefit}}.\n\nI've put together a quick analysis of what this could look like for {{company}}.\n\nWorth 15 minutes?\n\nBest,\n{{your_name}}",
+        "category": "ROI",
+        "industry": "Financial Services",
+        "avg_score": 78
+    },
+    # Agency/Marketing Templates
+    {
+        "name": "Agency - White Label Pitch",
+        "subject": "White-label {{service}} for {{agency_name}}",
+        "body": "Hi {{first_name}},\n\nI noticed {{agency_name}} offers {{current_service}}. Have you considered adding {{complementary_service}} to your stack?\n\nWe provide white-label {{solution}} that agencies like {{example_agency}} use to {{benefit}}.\n\nIt's helped them increase client retainers by {{percentage}}.\n\nWant to see how it works?\n\nBest,\n{{your_name}}",
+        "category": "Partnership",
+        "industry": "Agency",
+        "avg_score": 75
+    },
+    {
+        "name": "Agency - Client Results",
+        "subject": "How {{agency_name}} could 3x client results",
+        "body": "Hi {{first_name}},\n\nI've been following {{agency_name}}'s work with {{client_type}} clients. Impressive stuff.\n\n{{similar_agency}} was delivering similar results until they added our {{solution}} - now they're seeing {{improved_metric}} for clients.\n\nWould a quick walkthrough be helpful?\n\nBest,\n{{your_name}}",
+        "category": "Results",
+        "industry": "Agency",
+        "avg_score": 77
+    },
+    # Real Estate Templates
+    {
+        "name": "Real Estate - Market Data",
+        "subject": "{{market}} insights for {{company}}",
+        "body": "Hi {{first_name}},\n\nWith {{market}} showing {{trend}}, I thought you'd find this interesting.\n\nWe're helping brokerages like {{example}} leverage market data to {{benefit}}, resulting in {{result}}.\n\nQuick call to discuss?\n\nBest,\n{{your_name}}",
+        "category": "Data",
+        "industry": "Real Estate",
+        "avg_score": 72
+    },
+    # Recruiting Templates
+    {
+        "name": "Recruiting - Talent Shortage",
+        "subject": "Solving {{company}}'s {{role}} hiring challenge",
+        "body": "Hi {{first_name}},\n\nI noticed {{company}} has had {{role}} positions open for {{duration}}. The market for {{skill}} talent is brutal right now.\n\nWe've helped {{similar_company}} fill similar roles in {{timeframe}} through {{approach}}.\n\nWorth a quick chat?\n\nBest,\n{{your_name}}",
+        "category": "Pain Point",
+        "industry": "Recruiting",
+        "avg_score": 76
     }
 ]
 
