@@ -34,7 +34,7 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 | Insights | ❌ | Basic | Advanced | Advanced |
 | Recommendations | ❌ | ❌ | ✅ | ✅ |
 | CSV Export | ❌ | ❌ | ✅ | ✅ |
-| Templates | ❌ | ❌ | ✅ | ✅ |
+| Templates | ❌ | ❌ | ✅ (17) | ✅ (17) |
 | Team Analytics | ❌ | ❌ | ❌ | ✅ |
 | Team (5 seats) | ❌ | ❌ | ❌ | ✅ |
 | API Access | ❌ | ❌ | ❌ | ✅ |
@@ -62,7 +62,25 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - ✅ Shared templates
 - ✅ API key management (up to 3 keys)
 
-### UI/UX - "Midnight Architect" Theme (January 2025)
+### Landing Page Enhancements
+- ✅ **Data-Driven Stats Section**: Before/after comparisons (Response Rate +158%, Open Rate +104%, Score +73%)
+- ✅ **Testimonials Carousel**: 5 testimonials with auto-rotate, star ratings, author info, key metrics
+- ✅ **Trust Badges**: "18,500+ Active Users", "2.4M Emails Analyzed", "127% Avg Response Increase"
+- ✅ **Social Proof**: Company names, roles, specific results
+
+### Chrome Extension (Complete)
+Located at `/app/chrome-extension/`
+- ✅ Manifest v3 configuration
+- ✅ Popup with login/dashboard UI
+- ✅ Gmail content script injection
+- ✅ In-compose "Analyze" button
+- ✅ Side panel with analysis results
+- ✅ Copy optimized subject/body
+- ✅ Context menu for quick analysis
+- ✅ Token storage via chrome.storage
+- ✅ Custom icons (16, 48, 128px)
+
+### UI/UX - "Midnight Architect" Theme
 - ✅ Metallic Gold (#d4af37) primary color
 - ✅ Acid Green (#a3e635) for success states
 - ✅ Obsidian (#050505) dark background
@@ -70,19 +88,9 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - ✅ Playfair Display serif for headings
 - ✅ Manrope sans-serif for body text
 - ✅ JetBrains Mono for code/numbers
-- ✅ Asymmetric "Tetris Grid" layouts
-- ✅ Split-screen auth pages
-- ✅ **Dark/Light Mode Toggle** - persists preference in localStorage
-- ✅ **Full Mobile Responsiveness** - optimized for 390px+ viewports
-- ✅ **Removed Emergent Branding** - title changed to "ColdIQ | Cold Email Analyzer"
-
-### Mobile Optimizations (January 2025)
-- ✅ Hamburger menu on all public pages
-- ✅ Full-width CTAs on mobile
-- ✅ Stacked pricing cards
-- ✅ Adjusted text sizes (sm/md/lg breakpoints)
-- ✅ Mobile header with logo and theme toggle
-- ✅ No horizontal scroll on any page
+- ✅ **Dark/Light Mode Toggle**
+- ✅ **Full Mobile Responsiveness**
+- ✅ **Removed Emergent Branding**
 
 ## API Endpoints
 - Auth: signup, login, verify-email, resend-verification, forgot-password, reset-password
@@ -92,6 +100,7 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - Team: get, invite, remove, analytics
 - API Keys: list, create, delete
 - Billing: create-checkout, prices, webhook
+- User: usage
 
 ## Tech Stack
 - Frontend: React + Tailwind + Framer Motion + Recharts
@@ -99,9 +108,10 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - AI: Claude via Emergent LLM Key
 - Payments: Stripe
 - Email: Resend
+- Extension: Chrome Manifest v3
 
 ## Next Tasks (Backlog)
-1. **P2** - Chrome Extension for Gmail integration
-2. **P3** - A/B testing suggestions feature
-3. **P3** - More template categories (Follow-up sequences, LinkedIn outreach)
-4. **P3** - PWA setup for mobile install
+1. **P3** - A/B testing suggestions feature
+2. **P3** - More template categories (Follow-up sequences, LinkedIn outreach)
+3. **P3** - PWA setup for mobile install
+4. **P3** - Publish Chrome Extension to Web Store
