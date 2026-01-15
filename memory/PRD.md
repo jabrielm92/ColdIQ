@@ -10,10 +10,10 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - ✅ 3-step onboarding
 - ✅ Email verification flow (tokens, confirmation page)
 - ✅ Password reset flow (forgot password, reset with token)
-- ✅ Email notifications (MOCKED - stored in DB)
+- ✅ Email notifications via Resend (verified working)
 
 ### Core Analysis
-- ✅ AI analysis via Claude Sonnet 4.5
+- ✅ AI analysis via Claude Sonnet 4.5 (Emergent LLM Key)
 - ✅ Score (0-100), response/open rates
 - ✅ Strengths, weaknesses, improvements
 - ✅ AI-rewritten optimized emails
@@ -50,6 +50,17 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - Shared templates
 - API key management (up to 3 keys)
 
+### UI/UX Redesign - "Midnight Architect" Theme (January 2025)
+- ✅ Metallic Gold (#d4af37) primary color
+- ✅ Acid Green (#a3e635) for success states
+- ✅ Obsidian (#050505) dark background
+- ✅ Sharp edges (rounded-none) - brutalist style
+- ✅ Playfair Display serif for headings
+- ✅ Manrope sans-serif for body text
+- ✅ JetBrains Mono for code/numbers
+- ✅ Asymmetric "Tetris Grid" layouts
+- ✅ Split-screen auth pages
+
 ## API Endpoints
 - Auth: signup, login, verify-email, resend-verification, forgot-password, reset-password
 - Analysis: analyze, history, export/csv
@@ -62,14 +73,16 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 ## Tech Stack
 - Frontend: React + Tailwind + Framer Motion
 - Backend: FastAPI + MongoDB
-- AI: Claude via Emergent LLM
+- AI: Claude via Emergent LLM Key
 - Payments: Stripe
+- Email: Resend
 
-## MOCKED Services
-- Email sending (SendGrid/Resend) - logged to `email_logs` collection
+## Bug Fixes Applied
+- ✅ FRONTEND_URL corrected from backend URL to `http://localhost:3000`
+- ✅ React hydration warnings addressed through proper useEffect patterns
 
-## Next Tasks
-1. Integrate actual email service (SendGrid/Resend)
-2. Add Chrome extension for Gmail
-3. Implement actual team analytics charts
-4. Add more templates by industry
+## Next Tasks (Backlog)
+1. **P1** - Add more industry-specific templates
+2. **P2** - Chrome Extension for Gmail integration
+3. **P2** - Implement actual team analytics charts
+4. **P3** - A/B testing suggestions feature
