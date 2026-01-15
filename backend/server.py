@@ -587,7 +587,10 @@ async def signup(data: UserSignup):
         "created_at": now,
         "onboarding_completed": False,
         "team_id": None,
-        "email_verified": False
+        "email_verified": False,
+        "phone_number": None,
+        "phone_verified": False,
+        "phone_verified_at": None
     }
     
     await db.users.insert_one(user_doc)
