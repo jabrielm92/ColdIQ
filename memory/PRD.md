@@ -19,6 +19,16 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - ✅ Email verification flow (tokens, confirmation page)
 - ✅ Password reset flow (forgot password, reset with token)
 - ✅ Email notifications via Resend (verified working)
+- ✅ **Phone Verification Flow** (MOCKED - ready for AWS SNS)
+  - 2-step signup (Account → Phone)
+  - OTP sending and verification
+  - Rate limiting (3 OTPs/phone/hour)
+  - One phone per account (fraud prevention)
+
+### Policy Pages (For AWS SNS Approval)
+- ✅ **Terms of Service** (`/terms`) - 12 sections including Phone Verification
+- ✅ **Privacy Policy** (`/privacy`) - SMS/Phone Verification Policy section
+- ✅ **SMS Opt-In Workflow** (`/sms-opt-in`) - Visual 3-step flow documentation
 
 ### Core Analysis
 - ✅ AI analysis via Claude Sonnet 4.5 (Emergent LLM Key)
@@ -68,7 +78,7 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - ✅ **Trust Badges**: "18,500+ Active Users", "2.4M Emails Analyzed", "127% Avg Response Increase"
 - ✅ **Social Proof**: Company names, roles, specific results
 
-### Chrome Extension (Complete)
+### Chrome Extension (Scaffolding Complete)
 Located at `/app/chrome-extension/`
 - ✅ Manifest v3 configuration
 - ✅ Popup with login/dashboard UI
@@ -88,12 +98,13 @@ Located at `/app/chrome-extension/`
 - ✅ Playfair Display serif for headings
 - ✅ Manrope sans-serif for body text
 - ✅ JetBrains Mono for code/numbers
-- ✅ **Dark/Light Mode Toggle**
+- ✅ **Dark/Light Mode Toggle** (hydration issue fixed)
 - ✅ **Full Mobile Responsiveness**
 - ✅ **Removed Emergent Branding**
 
 ## API Endpoints
 - Auth: signup, login, verify-email, resend-verification, forgot-password, reset-password
+- **Phone Verification**: send-otp, verify-otp, check/{phone} (MOCKED)
 - Analysis: analyze, history, export/csv
 - Insights: dashboard (tier-gated)
 - Templates: list, create, delete (with industry filtering)
@@ -108,10 +119,26 @@ Located at `/app/chrome-extension/`
 - AI: Claude via Emergent LLM Key
 - Payments: Stripe
 - Email: Resend
+- SMS: AWS SNS (MOCKED - pending production approval)
 - Extension: Chrome Manifest v3
 
 ## Next Tasks (Backlog)
-1. **P3** - A/B testing suggestions feature
-2. **P3** - More template categories (Follow-up sequences, LinkedIn outreach)
-3. **P3** - PWA setup for mobile install
-4. **P3** - Publish Chrome Extension to Web Store
+
+### P1 - Upcoming
+1. **Integrate Real AWS SNS** - Once production approval is received, swap mock with real SMS
+
+### P2 - Chrome Extension Build-Out
+1. Implement content script for Gmail injection
+2. Add analysis panel in Gmail compose
+3. Test extension locally with developer mode
+
+### P3 - Future Enhancements
+1. A/B testing suggestions feature
+2. More template categories (Follow-up sequences, LinkedIn outreach)
+3. PWA setup for mobile install
+4. Publish Chrome Extension to Web Store
+
+## Notes
+- Phone verification is MOCKED - OTPs logged to `/var/log/supervisor/backend.err.log`
+- Use `/sms-opt-in` page as screenshot for AWS SNS approval
+- FRONTEND_URL in backend .env has been updated to production URL
