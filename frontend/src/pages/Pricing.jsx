@@ -175,18 +175,18 @@ const Pricing = () => {
   ];
 
   const handleUpgrade = async (planId) => {
+    // Growth Agency always goes to contact form (no login required)
+    if (planId === "growth_agency") {
+      navigate("/contact");
+      return;
+    }
+    
     if (!user) {
       navigate("/signup");
       return;
     }
     
     if (planId === "free") return;
-    
-    // Growth Agency goes to contact form
-    if (planId === "growth_agency") {
-      navigate("/contact");
-      return;
-    }
     
     const priceKey = `${planId}_${isAnnual ? "annual" : "monthly"}`;
     
