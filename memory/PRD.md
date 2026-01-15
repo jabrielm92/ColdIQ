@@ -35,13 +35,41 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - Pro: $79/mo or $758.40/yr ($63.20/mo)
 - Agency: $199/mo or $1,910.40/yr ($159.20/mo)
 
-### Templates Library
-5 pre-built high-converting templates:
+### Templates Library - EXPANDED (January 2025)
+17 pre-built high-converting templates across 7 industries:
+
+**General Templates (5)**
 1. The Personalized Opener (78 avg score)
 2. The Problem-Agitate-Solve (75 avg score)
 3. The Social Proof Hook (82 avg score)
 4. The Direct Ask (71 avg score)
 5. The Permission-Based (68 avg score)
+
+**SaaS Templates (2)**
+6. Product-Led Growth (81 avg score)
+7. Competitive Displacement (76 avg score)
+
+**E-commerce Templates (2)**
+8. BFCM Prep (79 avg score)
+9. Cart Abandonment (77 avg score)
+
+**Healthcare Templates (2)**
+10. Compliance First (74 avg score)
+11. Patient Outcomes (80 avg score)
+
+**Financial Services Templates (2)**
+12. Security Focus (73 avg score)
+13. ROI Driven (78 avg score)
+
+**Agency Templates (2)**
+14. White Label Pitch (75 avg score)
+15. Client Results (77 avg score)
+
+**Real Estate Templates (1)**
+16. Market Data (72 avg score)
+
+**Recruiting Templates (1)**
+17. Talent Shortage (76 avg score)
 
 ### Team Features (Agency)
 - Team creation on subscription
@@ -50,7 +78,7 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - Shared templates
 - API key management (up to 3 keys)
 
-### UI/UX Redesign - "Midnight Architect" Theme (January 2025)
+### UI/UX - "Midnight Architect" Theme (January 2025)
 - ✅ Metallic Gold (#d4af37) primary color
 - ✅ Acid Green (#a3e635) for success states
 - ✅ Obsidian (#050505) dark background
@@ -60,12 +88,13 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - ✅ JetBrains Mono for code/numbers
 - ✅ Asymmetric "Tetris Grid" layouts
 - ✅ Split-screen auth pages
+- ✅ **Dark/Light Mode Toggle** - persists preference in localStorage
 
 ## API Endpoints
 - Auth: signup, login, verify-email, resend-verification, forgot-password, reset-password
 - Analysis: analyze, history, export/csv
 - Insights: dashboard (tier-gated)
-- Templates: list, create, delete
+- Templates: list, create, delete (with industry filtering)
 - Team: get, invite, remove, analytics
 - API Keys: list, create, delete
 - Billing: create-checkout, prices, webhook
@@ -82,7 +111,7 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - ✅ React hydration warnings addressed through proper useEffect patterns
 
 ## Next Tasks (Backlog)
-1. **P1** - Add more industry-specific templates
-2. **P2** - Chrome Extension for Gmail integration
-3. **P2** - Implement actual team analytics charts
-4. **P3** - A/B testing suggestions feature
+1. **P2** - Chrome Extension for Gmail integration
+2. **P2** - Implement actual team analytics charts
+3. **P3** - A/B testing suggestions feature
+4. **P3** - More template categories (Follow-up sequences, LinkedIn outreach)
