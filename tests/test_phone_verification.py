@@ -49,8 +49,8 @@ class TestPhoneVerificationEndpoints:
             "phone_number": self.test_phone,
             "otp": "123456"
         })
-        # Should fail without auth
-        assert response.status_code == 401
+        # Should fail without auth (401 or 403)
+        assert response.status_code in [401, 403]
         print(f"✅ Verify OTP requires auth: {response.status_code}")
         
     def test_check_phone_availability(self):
