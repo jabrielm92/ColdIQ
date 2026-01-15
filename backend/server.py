@@ -1319,6 +1319,144 @@ Return JSON only (no markdown):
         logger.error(f"Sequence analysis error: {e}")
         raise HTTPException(status_code=500, detail=f"Sequence analysis failed: {str(e)}")
 
+# Winning Patterns & Follow-up Recommendations (Pro+ feature)
+class WinningPatternsResponse(BaseModel):
+    winning_patterns: List[Dict[str, Any]]
+    follow_up_recommendations: List[Dict[str, str]]
+    top_performing_elements: Dict[str, Any]
+
+@api_router.get("/analysis/patterns", response_model=WinningPatternsResponse)
+async def get_winning_patterns(user: dict = Depends(get_current_user)):
+    """Analyze user's historical emails to find winning patterns (Pro+ feature)"""
+    features = get_tier_features(user.get("subscription_tier", "free"))
+    
+    if not features.get("performance_tracking"):
+        raise HTTPException(status_code=403, detail="Winning patterns requires Pro or higher plan")
+    
+    # Get user's analyses
+    analyses = await db.analyses.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("analysis_score", -1).to_list(100)
+    
+    if len(analyses) < 3:
+        return WinningPatternsResponse(
+            winning_patterns=[],
+            follow_up_recommendations=[
+                {"title": "Analyze More Emails", "description": "Analyze at least 3 emails to see winning patterns."}
+            ],
+            top_performing_elements={}
+        )
+    
+    # Find top performers (top 25%)
+    top_count = max(1, len(analyses) // 4)
+    top_performers = analyses[:top_count]
+    bottom_performers = analyses[-top_count:] if len(analyses) > top_count else []
+    
+    winning_patterns = []
+    
+    # Analyze word count patterns
+    top_word_counts = [a.get("email_word_count", 0) for a in top_performers]
+    avg_top_words = sum(top_word_counts) / len(top_word_counts) if top_word_counts else 0
+    
+    if avg_top_words > 0:
+        word_range = "short (under 75)" if avg_top_words < 75 else "medium (75-120)" if avg_top_words < 120 else "longer (120+)"
+        winning_patterns.append({
+            "pattern": f"Your best emails are {word_range} words",
+            "metric": f"Avg: {int(avg_top_words)} words",
+            "insight": f"Top emails average {int(avg_top_words)} words vs {int(sum(a.get('email_word_count', 0) for a in bottom_performers) / len(bottom_performers)) if bottom_performers else 0} for lower performers",
+            "icon": "📏"
+        })
+    
+    # Analyze personalization patterns
+    top_personalization = [a.get("personalization_score", 0) for a in top_performers]
+    avg_top_personal = sum(top_personalization) / len(top_personalization) if top_personalization else 0
+    
+    if avg_top_personal >= 6:
+        winning_patterns.append({
+            "pattern": "High personalization correlates with success",
+            "metric": f"Avg: {avg_top_personal:.1f}/10",
+            "insight": "Your top emails have personalization scores of 6+ out of 10",
+            "icon": "👤"
+        })
+    
+    # Analyze CTA patterns  
+    top_cta = [a.get("cta_score", 0) for a in top_performers]
+    avg_top_cta = sum(top_cta) / len(top_cta) if top_cta else 0
+    
+    if avg_top_cta >= 7:
+        winning_patterns.append({
+            "pattern": "Strong CTAs drive results",
+            "metric": f"Avg: {avg_top_cta:.1f}/10",
+            "insight": "Your winning emails have clear, specific calls-to-action",
+            "icon": "🎯"
+        })
+    
+    # Analyze readability patterns
+    top_readability = [a.get("readability_score", 0) for a in top_performers if a.get("readability_score")]
+    if top_readability:
+        avg_top_read = sum(top_readability) / len(top_readability)
+        if avg_top_read >= 60:
+            winning_patterns.append({
+                "pattern": "Easy-to-read emails perform better",
+                "metric": f"Avg readability: {int(avg_top_read)}",
+                "insight": "Your best emails score 60+ on readability (easy to understand)",
+                "icon": "📖"
+            })
+    
+    # Generate follow-up recommendations based on patterns
+    follow_up_recommendations = []
+    
+    # Based on average scores
+    all_scores = [a.get("analysis_score", 0) for a in analyses]
+    avg_score = sum(all_scores) / len(all_scores) if all_scores else 0
+    
+    if avg_score < 60:
+        follow_up_recommendations.append({
+            "title": "Focus on Value Proposition",
+            "description": "Your emails could benefit from clearer benefits. Lead with what's in it for the recipient."
+        })
+    
+    if avg_top_personal < 5:
+        follow_up_recommendations.append({
+            "title": "Increase Personalization",
+            "description": "Reference specific company news, achievements, or challenges to stand out from generic outreach."
+        })
+    
+    if avg_top_cta < 6:
+        follow_up_recommendations.append({
+            "title": "Strengthen Your CTA",
+            "description": "Try specific time slots like 'Tuesday at 2pm' instead of vague asks like 'let me know'."
+        })
+    
+    if avg_top_words > 120:
+        follow_up_recommendations.append({
+            "title": "Shorten Your Emails",
+            "description": "Your best results come from shorter emails. Aim for 60-100 words."
+        })
+    
+    # Add general recommendations
+    follow_up_recommendations.append({
+        "title": "Test Subject Line Variants",
+        "description": "A/B test question-based vs. statement-based subject lines to find what resonates."
+    })
+    
+    # Top performing elements
+    top_performing_elements = {
+        "avg_score": int(sum(a.get("analysis_score", 0) for a in top_performers) / len(top_performers)) if top_performers else 0,
+        "avg_response_rate": round(sum(a.get("estimated_response_rate", 0) for a in top_performers) / len(top_performers), 1) if top_performers else 0,
+        "avg_word_count": int(avg_top_words),
+        "avg_personalization": round(avg_top_personal, 1),
+        "avg_cta_score": round(avg_top_cta, 1),
+        "sample_count": len(top_performers)
+    }
+    
+    return WinningPatternsResponse(
+        winning_patterns=winning_patterns[:5],  # Max 5 patterns
+        follow_up_recommendations=follow_up_recommendations[:4],  # Max 4 recommendations
+        top_performing_elements=top_performing_elements
+    )
+
 @api_router.get("/analysis/history")
 async def get_analysis_history(
     page: int = 1, 
