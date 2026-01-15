@@ -488,6 +488,122 @@ const Performance = () => {
                 )}
               </div>
 
+              {/* Winning Patterns Section - Pro Feature */}
+              {patterns && (
+                <div className="grid lg:grid-cols-2 gap-6 mt-6">
+                  {/* Winning Patterns */}
+                  <div className="bg-zinc-900/50 border border-zinc-800 p-6">
+                    <div className="flex items-center gap-2 mb-6">
+                      <Award className="w-4 h-4 text-[#d4af37]" />
+                      <h3 className="text-sm font-medium">Winning Patterns</h3>
+                      <span className="px-2 py-0.5 text-[10px] bg-[#d4af37]/20 text-[#d4af37] rounded font-mono">PRO</span>
+                    </div>
+                    
+                    {patterns.winning_patterns?.length > 0 ? (
+                      <div className="space-y-4">
+                        {patterns.winning_patterns.map((pattern, i) => (
+                          <motion.div 
+                            key={i}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="bg-zinc-800/50 border border-zinc-700/50 p-4"
+                          >
+                            <div className="flex items-start gap-3">
+                              <span className="text-2xl">{pattern.icon}</span>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-sm font-medium">{pattern.pattern}</span>
+                                  <span className="text-xs font-mono text-[#d4af37]">{pattern.metric}</span>
+                                </div>
+                                <p className="text-xs text-zinc-500">{pattern.insight}</p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Sparkles className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
+                        <p className="text-sm text-zinc-500">Analyze more emails to discover patterns</p>
+                        <p className="text-xs text-zinc-600 mt-1">Need at least 3 analyses</p>
+                      </div>
+                    )}
+                    
+                    {patterns.top_performing_elements?.sample_count > 0 && (
+                      <div className="mt-4 pt-4 border-t border-zinc-800">
+                        <p className="text-xs text-zinc-500 mb-2">Your Top Performers ({patterns.top_performing_elements.sample_count} emails)</p>
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div>
+                            <span className="text-lg font-mono font-bold text-[#d4af37]">{patterns.top_performing_elements.avg_score}</span>
+                            <p className="text-[10px] text-zinc-500">Avg Score</p>
+                          </div>
+                          <div>
+                            <span className="text-lg font-mono font-bold text-cyan-400">{patterns.top_performing_elements.avg_response_rate}%</span>
+                            <p className="text-[10px] text-zinc-500">Avg Response</p>
+                          </div>
+                          <div>
+                            <span className="text-lg font-mono font-bold text-emerald-400">{patterns.top_performing_elements.avg_word_count}</span>
+                            <p className="text-[10px] text-zinc-500">Avg Words</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Follow-up Recommendations */}
+                  <div className="bg-zinc-900/50 border border-zinc-800 p-6">
+                    <div className="flex items-center gap-2 mb-6">
+                      <Lightbulb className="w-4 h-4 text-amber-400" />
+                      <h3 className="text-sm font-medium">Follow-up Recommendations</h3>
+                      <span className="px-2 py-0.5 text-[10px] bg-amber-500/20 text-amber-300 rounded font-mono">PRO</span>
+                    </div>
+                    
+                    {patterns.follow_up_recommendations?.length > 0 ? (
+                      <div className="space-y-4">
+                        {patterns.follow_up_recommendations.map((rec, i) => (
+                          <motion.div 
+                            key={i}
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="p-4 border-l-2 border-amber-500/50 bg-amber-500/5"
+                          >
+                            <h4 className="text-sm font-medium mb-1">{rec.title}</h4>
+                            <p className="text-xs text-zinc-400">{rec.description}</p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Lightbulb className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
+                        <p className="text-sm text-zinc-500">Recommendations will appear here</p>
+                        <p className="text-xs text-zinc-600 mt-1">Based on your analysis history</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {patternsLoading && (
+                <div className="grid lg:grid-cols-2 gap-6 mt-6">
+                  <div className="bg-zinc-900/50 border border-zinc-800 p-6 animate-pulse">
+                    <div className="h-4 w-32 bg-zinc-800 rounded mb-6" />
+                    <div className="space-y-4">
+                      <div className="h-20 bg-zinc-800 rounded" />
+                      <div className="h-20 bg-zinc-800 rounded" />
+                    </div>
+                  </div>
+                  <div className="bg-zinc-900/50 border border-zinc-800 p-6 animate-pulse">
+                    <div className="h-4 w-40 bg-zinc-800 rounded mb-6" />
+                    <div className="space-y-4">
+                      <div className="h-16 bg-zinc-800 rounded" />
+                      <div className="h-16 bg-zinc-800 rounded" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Recent Analyses Table */}
               <div className="bg-zinc-900/50 border border-zinc-800 p-6 mt-6">
                 <h3 className="text-sm font-medium mb-4">Recent Analyses</h3>
