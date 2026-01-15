@@ -34,7 +34,8 @@ const History = () => {
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
 
-  const isPro = user?.subscription_tier === "pro" || user?.subscription_tier === "agency";
+  const isPro = user?.subscription_tier === "pro" || user?.subscription_tier === "agency" || user?.subscription_tier === "growth_agency";
+  const isStarter = isPro || user?.subscription_tier === "starter";
 
   useEffect(() => {
     fetchAnalyses();
