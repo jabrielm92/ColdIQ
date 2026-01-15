@@ -434,6 +434,21 @@ class AnalysisResponse(BaseModel):
     personalization_score: int
     cta_score: int
     value_proposition_clarity: int
+    # Starter+ metrics (server-side, guaranteed)
+    readability_score: Optional[int] = None
+    readability_level: Optional[str] = None
+    spam_keywords: Optional[List[str]] = None
+    spam_risk_score: Optional[int] = None
+    subject_line_analysis: Optional[Dict[str, Any]] = None
+    cta_analysis: Optional[Dict[str, Any]] = None
+    fix_suggestions: Optional[List[Dict[str, str]]] = None
+    inbox_placement_score: Optional[int] = None
+    # Pro+ metrics (from AI, may be null)
+    alternative_subjects: Optional[List[str]] = None
+    emotional_tone: Optional[Dict[str, Any]] = None
+    personalization_analysis: Optional[Dict[str, Any]] = None
+    industry_benchmark: Optional[Dict[str, Any]] = None
+    ab_test_suggestions: Optional[List[Dict[str, Any]]] = None
     user_feedback: Optional[str] = None
     created_at: str
 
