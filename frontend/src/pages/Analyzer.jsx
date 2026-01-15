@@ -8,11 +8,23 @@ import { useAuth, API } from "@/App";
 import axios from "axios";
 import { 
   Mail, Zap, Copy, Check, ArrowRight, RefreshCw, 
-  ThumbsUp, ThumbsDown, Sparkles, AlertCircle, Target, MessageSquare
+  ThumbsUp, ThumbsDown, Sparkles, AlertCircle, Target, MessageSquare,
+  ChevronDown, ChevronUp
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
+import {
+  SpamKeywordsCard,
+  ReadabilityCard,
+  SubjectLineAnalysisCard,
+  CTAAnalysisCard,
+  SubjectVariantsCard,
+  ABTestSuggestionsCard,
+  InboxPlacementCard,
+  EmotionalToneCard,
+  IndustryBenchmarkCard
+} from "@/components/AnalysisMetrics";
 
 const Analyzer = () => {
   const [subject, setSubject] = useState("");
@@ -22,8 +34,17 @@ const Analyzer = () => {
   const [analysis, setAnalysis] = useState(null);
   const [copied, setCopied] = useState({ subject: false, body: false });
   const [showOptimized, setShowOptimized] = useState(true);
+  const [showAdvancedMetrics, setShowAdvancedMetrics] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Get user's tier features
+  const userTier = user?.subscription_tier || "free";
+  const features = user?.features || {};
+  
+  // Feature access checks
+  const hasStarterFeatures = ["starter", "pro", "agency", "growth_agency"].includes(userTier);
+  const hasProFeatures = ["pro", "agency", "growth_agency"].includes(userTier);
 
   const handleAnalyze = async (e) => {
     e.preventDefault();
@@ -91,7 +112,7 @@ const Analyzer = () => {
   return (
     <DashboardLayout>
       <div className="p-6 lg:p-8" data-testid="analyzer-page">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-10">
             <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-3">Email Analysis</p>
@@ -101,9 +122,9 @@ const Analyzer = () => {
             <p className="text-zinc-500">Paste your cold email to get AI-powered feedback and optimization</p>
           </div>
           
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Input Section */}
-            <div className="space-y-6">
+          <div className="grid lg:grid-cols-5 gap-8">
+            {/* Input Section - 2 columns */}
+            <div className="lg:col-span-2 space-y-6">
               <form onSubmit={handleAnalyze} className="space-y-5" data-testid="analyzer-form">
                 <div className="space-y-2">
                   <Label htmlFor="subject" className="text-zinc-300">Subject Line</Label>
@@ -181,10 +202,25 @@ const Analyzer = () => {
                   )}
                 </div>
               </form>
+              
+              {/* Tier Info */}
+              {!loading && !analysis && (
+                <div className="p-4 bg-zinc-900/30 border border-zinc-800">
+                  <p className="text-xs text-zinc-500 mb-2">Your plan: <span className="text-[#d4af37] capitalize">{userTier}</span></p>
+                  <p className="text-xs text-zinc-600">
+                    {hasProFeatures 
+                      ? "Full analysis with AI rewrites, variants, and benchmarks"
+                      : hasStarterFeatures
+                        ? "Full analysis with spam detection and readability scoring"
+                        : "Basic analysis included. Upgrade for advanced insights."
+                    }
+                  </p>
+                </div>
+              )}
             </div>
             
-            {/* Results Section */}
-            <div className="space-y-6">
+            {/* Results Section - 3 columns */}
+            <div className="lg:col-span-3 space-y-6">
               <AnimatePresence mode="wait">
                 {loading ? (
                   <motion.div
@@ -207,8 +243,8 @@ const Analyzer = () => {
                     data-testid="analysis-results"
                   >
                     {/* Score Card */}
-                    <div className={`${getScoreBgColor(analysis.analysis_score)} border p-8`}>
-                      <div className="flex items-center justify-between mb-6">
+                    <div className={`${getScoreBgColor(analysis.analysis_score)} border p-6`}>
+                      <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xs font-mono tracking-widest uppercase text-zinc-500">Overall Score</h3>
                         <div className="flex gap-2">
                           <button 
@@ -261,8 +297,89 @@ const Analyzer = () => {
                       </div>
                     </div>
                     
+                    {/* Advanced Metrics Toggle */}
+                    <button
+                      onClick={() => setShowAdvancedMetrics(!showAdvancedMetrics)}
+                      className="w-full flex items-center justify-between p-3 bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors"
+                    >
+                      <span className="text-sm font-medium">
+                        Advanced Metrics
+                        {!hasStarterFeatures && <span className="ml-2 text-xs text-[#d4af37]">(Upgrade to unlock)</span>}
+                      </span>
+                      {showAdvancedMetrics ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                    
+                    {showAdvancedMetrics && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-4"
+                      >
+                        {/* Starter+ Metrics Row */}
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <SpamKeywordsCard 
+                            spamKeywords={analysis.spam_keywords}
+                            spamRiskScore={analysis.spam_risk_score}
+                            tierHasAccess={hasStarterFeatures}
+                          />
+                          <ReadabilityCard 
+                            readabilityScore={analysis.readability_score}
+                            readabilityLevel={analysis.readability_level}
+                            tierHasAccess={hasStarterFeatures}
+                          />
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <SubjectLineAnalysisCard 
+                            subjectAnalysis={analysis.subject_line_analysis}
+                            tierHasAccess={hasStarterFeatures}
+                          />
+                          <CTAAnalysisCard 
+                            ctaAnalysis={analysis.cta_analysis}
+                            tierHasAccess={hasStarterFeatures}
+                          />
+                        </div>
+                        
+                        {/* Pro+ Metrics */}
+                        <div className="pt-4 border-t border-zinc-800">
+                          <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-4">Pro Features</p>
+                          
+                          <SubjectVariantsCard 
+                            variants={analysis.alternative_subjects}
+                            onCopy={(text) => copyToClipboard(text, 'subject')}
+                            tierHasAccess={hasProFeatures}
+                          />
+                          
+                          <div className="grid md:grid-cols-2 gap-4 mt-4">
+                            <InboxPlacementCard 
+                              score={analysis.inbox_placement_score}
+                              tierHasAccess={hasProFeatures}
+                            />
+                            <EmotionalToneCard 
+                              emotionalTone={analysis.emotional_tone}
+                              tierHasAccess={hasProFeatures}
+                            />
+                          </div>
+                          
+                          <div className="grid md:grid-cols-2 gap-4 mt-4">
+                            <IndustryBenchmarkCard 
+                              benchmark={analysis.industry_benchmark}
+                              userOpenRate={analysis.estimated_open_rate}
+                              userResponseRate={analysis.estimated_response_rate}
+                              tierHasAccess={hasProFeatures}
+                            />
+                            <ABTestSuggestionsCard 
+                              suggestions={analysis.ab_test_suggestions}
+                              tierHasAccess={hasProFeatures}
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                    
                     {/* Key Insight */}
-                    <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4">
+                    <div className="bg-indigo-500/10 border border-indigo-500/20 p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Zap className="w-4 h-4 text-indigo-400" />
                         <span className="text-sm font-medium text-indigo-400">Key Insight</span>
@@ -272,7 +389,7 @@ const Analyzer = () => {
                     
                     {/* Strengths & Weaknesses */}
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+                      <div className="bg-zinc-900/50 border border-zinc-800 p-4">
                         <h4 className="font-medium mb-3 flex items-center gap-2">
                           <Check className="w-4 h-4 text-emerald-400" />
                           Strengths
@@ -287,7 +404,7 @@ const Analyzer = () => {
                         </ul>
                       </div>
                       
-                      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+                      <div className="bg-zinc-900/50 border border-zinc-800 p-4">
                         <h4 className="font-medium mb-3 flex items-center gap-2">
                           <AlertCircle className="w-4 h-4 text-amber-400" />
                           Areas to Improve
@@ -304,7 +421,7 @@ const Analyzer = () => {
                     </div>
                     
                     {/* Improvements */}
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+                    <div className="bg-zinc-900/50 border border-zinc-800 p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
                         <Target className="w-4 h-4 text-cyan-400" />
                         Specific Improvements
@@ -320,7 +437,7 @@ const Analyzer = () => {
                     </div>
                     
                     {/* Optimized Version */}
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+                    <div className="bg-zinc-900/50 border border-zinc-800 overflow-hidden">
                       <div className="flex items-center justify-between p-4 border-b border-zinc-800">
                         <h4 className="font-medium flex items-center gap-2">
                           <Sparkles className="w-4 h-4 text-violet-400" />
@@ -359,7 +476,7 @@ const Analyzer = () => {
                               {copied.subject ? 'Copied' : 'Copy'}
                             </button>
                           </div>
-                          <p className="bg-zinc-800/50 rounded-lg p-3 text-sm" style={{ fontFamily: 'JetBrains Mono' }} data-testid="optimized-subject">
+                          <p className="bg-zinc-800/50 p-3 text-sm" style={{ fontFamily: 'JetBrains Mono' }} data-testid="optimized-subject">
                             {showOptimized ? analysis.rewritten_subject : subject}
                           </p>
                         </div>
@@ -376,7 +493,7 @@ const Analyzer = () => {
                               {copied.body ? 'Copied' : 'Copy'}
                             </button>
                           </div>
-                          <div className="bg-zinc-800/50 rounded-lg p-3 text-sm whitespace-pre-wrap" style={{ fontFamily: 'JetBrains Mono' }} data-testid="optimized-body">
+                          <div className="bg-zinc-800/50 p-3 text-sm whitespace-pre-wrap" style={{ fontFamily: 'JetBrains Mono' }} data-testid="optimized-body">
                             {showOptimized ? analysis.rewritten_body : body}
                           </div>
                         </div>
@@ -388,9 +505,9 @@ const Analyzer = () => {
                     key="empty"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-8 flex flex-col items-center justify-center min-h-[400px] text-center"
+                    className="bg-zinc-900/50 border border-zinc-800 p-8 flex flex-col items-center justify-center min-h-[400px] text-center"
                   >
-                    <div className="w-16 h-16 rounded-2xl bg-zinc-800 flex items-center justify-center mb-4">
+                    <div className="w-16 h-16 bg-zinc-800 flex items-center justify-center mb-4">
                       <MessageSquare className="w-8 h-8 text-zinc-500" />
                     </div>
                     <h3 className="font-semibold text-lg mb-2" style={{ fontFamily: 'Manrope' }}>Ready to Analyze</h3>
