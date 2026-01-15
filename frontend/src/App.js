@@ -25,6 +25,8 @@ import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
 import SmsOptIn from "@/pages/SmsOptIn";
 import Contact from "@/pages/Contact";
+import Performance from "@/pages/Performance";
+import SequenceAnalyzer from "@/pages/SequenceAnalyzer";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
