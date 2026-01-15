@@ -1,5 +1,5 @@
 // ColdIQ Chrome Extension - Content Script for Gmail
-const API_URL = 'https://cold-email-pro-6.preview.emergentagent.com/api';
+const API_URL = 'https://cold-email-ai-2.preview.emergentagent.com/api';
 
 // Debounce helper
 function debounce(func, wait) {
@@ -146,7 +146,7 @@ function renderAnalysisResult(panel, analysis) {
       </div>
     ` : ''}
     
-    <a href="https://cold-email-pro-6.preview.emergentagent.com/history" target="_blank" class="coldiq-cta">
+    <a href="https://cold-email-ai-2.preview.emergentagent.com/history" target="_blank" class="coldiq-cta">
       View Full Analysis →
     </a>
   `;
@@ -169,7 +169,7 @@ function renderError(panel, message) {
   content.innerHTML = `
     <div class="coldiq-error">
       <p>${message}</p>
-      <a href="https://cold-email-pro-6.preview.emergentagent.com/login" target="_blank" class="coldiq-cta">
+      <a href="https://cold-email-ai-2.preview.emergentagent.com/login" target="_blank" class="coldiq-cta">
         Log in to ColdIQ
       </a>
     </div>

@@ -46,7 +46,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'analyze-selection' && info.selectionText) {
     // Open popup or send to analyzer
     chrome.tabs.create({
-      url: `https://cold-email-pro-6.preview.emergentagent.com/analyze?prefill=${encodeURIComponent(info.selectionText)}`
+      url: `https://cold-email-ai-2.preview.emergentagent.com/analyze?prefill=${encodeURIComponent(info.selectionText)}`
     });
   }
 });

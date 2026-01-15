@@ -95,5 +95,5 @@ To modify the extension:
 
 ## Support
 
-- Website: https://cold-email-pro-6.preview.emergentagent.com
+- Website: https://cold-email-ai-2.preview.emergentagent.com
 - Email: support@coldiq.com
