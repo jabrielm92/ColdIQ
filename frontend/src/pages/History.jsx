@@ -6,7 +6,9 @@ import { useAuth, API } from "@/App";
 import axios from "axios";
 import { 
   Search, Trash2, ChevronLeft, ChevronRight, 
-  Copy, Check, Mail, Download, Lock, ArrowRight
+  Copy, Check, Mail, Download, Lock, ArrowRight,
+  AlertTriangle, BookOpen, MousePointer, Sparkles, Target, 
+  TrendingUp, BarChart3, Lightbulb, Zap, CheckCircle
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
