@@ -139,13 +139,23 @@ Located at `/app/chrome-extension/`
 
 ## Next Tasks (Backlog)
 
+### P0 - Immediate
+1. **Frontend Analysis Display** - Show new metrics (readability, spam risk, A/B suggestions) in analysis results UI
+
 ### P1 - Upcoming
 1. **Integrate Real AWS SNS** - Once production approval is received, swap mock with real SMS
+2. **Sequence Analysis UI** - Allow users to analyze multi-email sequences
 
-### P2 - Upcoming
-1. **Publish Chrome Extension** - Test in developer mode, then submit to Chrome Web Store
+### P2 - Chrome Extension
+1. Test extension locally with developer mode
+2. Publish Chrome Extension to Web Store
 
-### P3 - Future Enhancements
+### P3 - Growth Agency Features
+1. Multi-client workspace UI
+2. White-label report generator
+3. Approval workflow system
+
+### P4 - Future Enhancements
 1. A/B testing suggestions feature
 2. More template categories (Follow-up sequences, LinkedIn outreach)
 3. PWA setup for mobile install
