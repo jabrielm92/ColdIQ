@@ -3,7 +3,7 @@ import { useAuth, API } from "@/App";
 import axios from "axios";
 import { 
   TrendingUp, Calendar, BarChart3, Target, ArrowUp, ArrowDown, 
-  Minus, ChevronLeft, ChevronRight, Lock
+  Minus, ChevronLeft, ChevronRight, Lock, Sparkles, Lightbulb, Award
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -19,13 +19,30 @@ const Performance = () => {
   const [history, setHistory] = useState([]);
   const [timeRange, setTimeRange] = useState("30"); // days
   const [stats, setStats] = useState(null);
+  const [patterns, setPatterns] = useState(null);
+  const [patternsLoading, setPatternsLoading] = useState(false);
 
   const userTier = user?.subscription_tier || "free";
   const hasProFeatures = ["pro", "agency", "growth_agency"].includes(userTier);
 
   useEffect(() => {
     fetchHistory();
+    if (hasProFeatures) {
+      fetchPatterns();
+    }
   }, [timeRange]);
+
+  const fetchPatterns = async () => {
+    setPatternsLoading(true);
+    try {
+      const res = await axios.get(`${API}/analysis/patterns`);
+      setPatterns(res.data);
+    } catch (err) {
+      console.error("Failed to fetch patterns", err);
+    } finally {
+      setPatternsLoading(false);
+    }
+  };
 
   const fetchHistory = async () => {
     setLoading(true);
