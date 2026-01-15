@@ -1,99 +1,149 @@
 # ColdIQ Chrome Extension
 
-Analyze and optimize your cold emails directly in Gmail with AI-powered insights.
+AI-powered cold email analyzer that works directly inside Gmail.
 
 ## Features
 
-- **In-Gmail Analysis**: Click the ColdIQ button in any Gmail compose window to analyze your email
-- **Instant Scoring**: Get a 0-100 score with predicted open and response rates
-- **Strengths & Weaknesses**: See what's working and what needs improvement
-- **AI Rewrites**: Get an optimized version of your email ready to copy
-- **Context Menu**: Right-click any selected text to analyze it with ColdIQ
+- **Analyze emails in Gmail**: Click the ColdIQ button in any compose window to get instant AI analysis
+- **Score & Metrics**: See your email's effectiveness score, predicted open rate, and response rate
+- **AI Rewrites**: Get optimized subject lines and email body suggestions
+- **One-Click Apply**: Apply the optimized content directly to your email with one click
+- **Copy to Clipboard**: Easily copy optimized content
+- **Context Menu**: Right-click on selected text to analyze it
 
-## Installation
+## Installation (Developer Mode)
 
-### From Chrome Web Store (Recommended)
-*Coming soon*
+### Step 1: Download the Extension
+The extension files are located in `/app/chrome-extension/`:
+```
+chrome-extension/
+├── manifest.json       # Extension configuration
+├── background.js       # Service worker
+├── content.js         # Gmail injection script
+├── content.css        # Styles for Gmail
+├── popup.html         # Extension popup UI
+├── popup.js           # Popup functionality
+├── popup.css          # Popup styles
+└── icons/             # Extension icons
+```
 
-### Manual Installation (Developer Mode)
+### Step 2: Load in Chrome
+1. Open Chrome and go to `chrome://extensions/`
+2. Enable **Developer mode** (toggle in top-right corner)
+3. Click **Load unpacked**
+4. Select the `chrome-extension` folder
+5. The ColdIQ icon should appear in your extensions bar
 
-1. Download or clone this folder
-2. Open Chrome and navigate to `chrome://extensions`
-3. Enable "Developer mode" in the top right
-4. Click "Load unpacked"
-5. Select the `chrome-extension` folder
-6. The ColdIQ icon should appear in your browser toolbar
+### Step 3: Pin the Extension
+1. Click the puzzle piece icon in Chrome toolbar
+2. Find ColdIQ and click the pin icon
 
 ## Usage
 
 ### Login
-1. Click the ColdIQ icon in your browser toolbar
-2. Enter your ColdIQ credentials
-3. You'll see your usage stats and tier
+1. Click the ColdIQ extension icon
+2. Enter your ColdIQ account credentials
+3. You'll see your usage stats and tier information
 
-### Analyzing Emails
-1. Open Gmail and compose a new email
-2. Write your cold email (subject and body)
-3. Click the gold "Analyze" button in the compose toolbar
-4. View your score, insights, and optimized version
-5. Click "Copy" to use the optimized subject or body
+### Analyze an Email
+1. Open Gmail (https://mail.google.com)
+2. Click **Compose** or reply to an email
+3. Write your cold email
+4. Click the gold **Analyze** button in the compose toolbar
+5. View your analysis in the side panel
+6. Click **Apply to Email** to use the optimized version
 
-### Quick Analyze
+### Context Menu
 1. Select any text on a webpage
 2. Right-click and choose "Analyze with ColdIQ"
-3. Opens the full analyzer with your text pre-filled
+3. Opens the full ColdIQ analyzer with the selected text
+
+## API Integration
+
+The extension connects to the ColdIQ API at:
+```
+https://cold-email-ai-2.preview.emergentagent.com/api
+```
+
+### Endpoints Used
+- `POST /auth/login` - User authentication
+- `GET /auth/me` - Get user info
+- `GET /user/usage` - Get usage stats
+- `POST /analysis/analyze` - Analyze email
+
+## Development
+
+### Testing Changes
+1. Make changes to the source files
+2. Go to `chrome://extensions/`
+3. Click the refresh icon on the ColdIQ extension
+4. Reload Gmail to test content script changes
+
+### Debugging
+- **Popup**: Right-click extension icon → Inspect popup
+- **Content Script**: Open Gmail → F12 → Console (look for "ColdIQ" messages)
+- **Background**: chrome://extensions/ → ColdIQ → "Service worker" link
+
+### Known Gmail Selectors
+Gmail's DOM structure can change. The extension uses multiple fallback selectors:
+- Compose dialog: `div.nH.Hd[role="dialog"]`
+- Inline compose: `div.nH.if`
+- Subject input: `input[name="subjectbox"]`
+- Body: Multiple selectors including `div[aria-label="Message Body"]`
+
+## Troubleshooting
+
+### Button Not Appearing
+1. Refresh Gmail
+2. Try opening a new compose window
+3. Check Chrome console for errors
+4. Reload the extension
+
+### Analysis Not Working
+1. Check if you're logged in (click extension icon)
+2. Verify you haven't exceeded your monthly limit
+3. Ensure the email body has content
+
+### "Please log in" Error
+1. Click the extension icon
+2. Log out and log back in
+3. Your session may have expired
 
 ## File Structure
 
 ```
 chrome-extension/
-├── manifest.json      # Extension configuration
-├── popup.html         # Extension popup UI
-├── popup.css          # Popup styles
-├── popup.js           # Popup logic
-├── content.js         # Gmail integration
-├── content.css        # Gmail injection styles
-├── background.js      # Service worker
-└── icons/
-    ├── icon16.png
-    ├── icon48.png
-    └── icon128.png
+├── manifest.json          # Manifest V3 configuration
+├── background.js          # Service worker for message handling
+├── content.js            # Injected into Gmail pages
+├── content.css           # Styles for Gmail overlay
+├── popup.html            # Extension popup HTML
+├── popup.js              # Popup logic
+├── popup.css             # Popup styles
+├── icons/
+│   ├── icon16.png       # Toolbar icon
+│   ├── icon48.png       # Extension management icon
+│   └── icon128.png      # Chrome Web Store icon
+└── README.md             # This file
 ```
-
-## API Endpoints Used
-
-- `POST /api/auth/login` - User authentication
-- `GET /api/auth/me` - Fetch user data
-- `GET /api/user/usage` - Fetch usage stats
-- `POST /api/analysis/analyze` - Analyze email
 
 ## Permissions
 
-- `activeTab`: Access the current tab for Gmail integration
+- `activeTab`: Access current tab to inject content
 - `storage`: Store authentication token locally
-- `host_permissions`: Access mail.google.com for content script injection
+- `https://mail.google.com/*`: Access Gmail pages
 
-## Troubleshooting
+## Version History
 
-**Button not appearing in Gmail?**
-- Refresh Gmail after installing the extension
-- Make sure you're using the compose window (not reply)
-- Try opening a new compose window
-
-**Analysis failing?**
-- Check you're logged in via the popup
-- Verify your subscription has remaining analyses
-- Check console for error messages
-
-## Development
-
-To modify the extension:
-1. Make changes to the source files
-2. Go to `chrome://extensions`
-3. Click the refresh icon on the ColdIQ extension
-4. Test your changes
+### v1.0.0
+- Initial release
+- Gmail compose integration
+- AI-powered analysis
+- One-click apply feature
+- Context menu support
 
 ## Support
 
+For issues or feature requests:
+- Email: support@coldiq.io
 - Website: https://cold-email-ai-2.preview.emergentagent.com
-- Email: support@coldiq.com
