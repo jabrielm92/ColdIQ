@@ -35,41 +35,15 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - Pro: $79/mo or $758.40/yr ($63.20/mo)
 - Agency: $199/mo or $1,910.40/yr ($159.20/mo)
 
-### Templates Library - EXPANDED (January 2025)
-17 pre-built high-converting templates across 7 industries:
-
-**General Templates (5)**
-1. The Personalized Opener (78 avg score)
-2. The Problem-Agitate-Solve (75 avg score)
-3. The Social Proof Hook (82 avg score)
-4. The Direct Ask (71 avg score)
-5. The Permission-Based (68 avg score)
-
-**SaaS Templates (2)**
-6. Product-Led Growth (81 avg score)
-7. Competitive Displacement (76 avg score)
-
-**E-commerce Templates (2)**
-8. BFCM Prep (79 avg score)
-9. Cart Abandonment (77 avg score)
-
-**Healthcare Templates (2)**
-10. Compliance First (74 avg score)
-11. Patient Outcomes (80 avg score)
-
-**Financial Services Templates (2)**
-12. Security Focus (73 avg score)
-13. ROI Driven (78 avg score)
-
-**Agency Templates (2)**
-14. White Label Pitch (75 avg score)
-15. Client Results (77 avg score)
-
-**Real Estate Templates (1)**
-16. Market Data (72 avg score)
-
-**Recruiting Templates (1)**
-17. Talent Shortage (76 avg score)
+### Templates Library - 17 Templates, 7 Industries
+**General (5):** Personalized Opener, Problem-Agitate-Solve, Social Proof Hook, Direct Ask, Permission-Based
+**SaaS (2):** Product-Led Growth, Competitive Displacement
+**E-commerce (2):** BFCM Prep, Cart Abandonment
+**Healthcare (2):** Compliance First, Patient Outcomes
+**Financial Services (2):** Security Focus, ROI Driven
+**Agency (2):** White Label Pitch, Client Results
+**Real Estate (1):** Market Data
+**Recruiting (1):** Talent Shortage
 
 ### Team Features (Agency)
 - Team creation on subscription
@@ -89,6 +63,16 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - ✅ Asymmetric "Tetris Grid" layouts
 - ✅ Split-screen auth pages
 - ✅ **Dark/Light Mode Toggle** - persists preference in localStorage
+- ✅ **Full Mobile Responsiveness** - optimized for 390px+ viewports
+- ✅ **Removed Emergent Branding** - title changed to "ColdIQ | Cold Email Analyzer"
+
+### Mobile Optimizations (January 2025)
+- ✅ Hamburger menu on all public pages
+- ✅ Full-width CTAs on mobile
+- ✅ Stacked pricing cards
+- ✅ Adjusted text sizes (sm/md/lg breakpoints)
+- ✅ Mobile header with logo and theme toggle
+- ✅ No horizontal scroll on any page
 
 ## API Endpoints
 - Auth: signup, login, verify-email, resend-verification, forgot-password, reset-password
@@ -105,10 +89,6 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - AI: Claude via Emergent LLM Key
 - Payments: Stripe
 - Email: Resend
-
-## Bug Fixes Applied
-- ✅ FRONTEND_URL corrected from backend URL to `http://localhost:3000`
-- ✅ React hydration warnings addressed through proper useEffect patterns
 
 ## Next Tasks (Backlog)
 1. **P2** - Chrome Extension for Gmail integration
