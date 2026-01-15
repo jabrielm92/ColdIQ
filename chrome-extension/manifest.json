@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://mail.google.com/*",
-    "https://cold-email-ai-2.preview.emergentagent.com/*"
+    "https://email-mentor.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

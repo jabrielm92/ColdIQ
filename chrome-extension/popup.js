@@ -1,5 +1,5 @@
 // ColdIQ Chrome Extension - Popup Script
-const API_URL = 'https://cold-email-ai-2.preview.emergentagent.com/api';
+const API_URL = 'https://email-mentor.preview.emergentagent.com/api';
 
 // DOM Elements
 const loginSection = document.getElementById('login-section');
