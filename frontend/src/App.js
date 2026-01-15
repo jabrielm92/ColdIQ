@@ -21,6 +21,8 @@ import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import Templates from "@/pages/Templates";
 import TeamAnalytics from "@/pages/TeamAnalytics";
+import Terms from "@/pages/Terms";
+import Privacy from "@/pages/Privacy";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
@@ -36,16 +38,23 @@ export const useTheme = () => {
   return context;
 };
 
-// Theme Provider
+// Theme Provider - fixes hydration by initializing with consistent default
 const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem("coldiq_theme") || "dark";
+  const [theme, setTheme] = useState("dark");
+  const [mounted, setMounted] = useState(false);
+
+  // Load theme from localStorage after mount to avoid hydration mismatch
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("coldiq_theme");
+    if (savedTheme) {
+      setTheme(savedTheme);
     }
-    return "dark";
-  });
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
+    if (!mounted) return;
+    
     const root = document.documentElement;
     if (theme === "light") {
       root.classList.add("light");
@@ -55,7 +64,7 @@ const ThemeProvider = ({ children }) => {
       root.classList.remove("light");
     }
     localStorage.setItem("coldiq_theme", theme);
-  }, [theme]);
+  }, [theme, mounted]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === "dark" ? "light" : "dark");
@@ -196,6 +205,8 @@ function App() {
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
               
               {/* Protected Routes */}
               <Route path="/onboarding" element={
