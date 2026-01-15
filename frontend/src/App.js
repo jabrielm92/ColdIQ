@@ -210,6 +210,7 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/sms-opt-in" element={<SmsOptIn />} />
+              <Route path="/contact" element={<Contact />} />
               
               {/* Protected Routes */}
               <Route path="/onboarding" element={
