@@ -23,6 +23,7 @@ import Templates from "@/pages/Templates";
 import TeamAnalytics from "@/pages/TeamAnalytics";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
+import SmsOptIn from "@/pages/SmsOptIn";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
@@ -207,6 +208,7 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/sms-opt-in" element={<SmsOptIn />} />
               
               {/* Protected Routes */}
               <Route path="/onboarding" element={
