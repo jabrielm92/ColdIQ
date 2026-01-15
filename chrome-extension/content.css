@@ -296,11 +296,92 @@
 /* Error */
 .coldiq-error {
   text-align: center;
-  padding: 20px;
+  padding: 30px 20px;
+}
+
+.coldiq-error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
 }
 
 .coldiq-error p {
   color: #ef4444;
   font-size: 14px;
   margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* Insight */
+.coldiq-insight {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.coldiq-insight-text {
+  font-size: 14px;
+  color: #e5e5e5;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Actions */
+.coldiq-actions {
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.coldiq-apply-btn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 2px solid #d4af37;
+  color: #d4af37;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.coldiq-apply-btn:hover {
+  background: #d4af37;
+  color: #000;
+}
+
+.coldiq-apply-btn.coldiq-applied {
+  background: #a3e635;
+  border-color: #a3e635;
+  color: #000;
+}
+
+/* Copy button states */
+.coldiq-copy-btn.coldiq-copied {
+  border-color: #a3e635;
+  color: #a3e635;
+}
+
+.coldiq-copy-body {
+  top: auto;
+  bottom: 8px;
+}
+
+/* Scrollbar styling */
+.coldiq-panel-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.coldiq-panel-content::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
+.coldiq-panel-content::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+
+.coldiq-panel-content::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
 }
