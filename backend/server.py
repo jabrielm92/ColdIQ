@@ -1152,10 +1152,15 @@ Be specific, actionable, and focus on what makes cold emails convert. For spam k
         logger.error(f"Analysis error: {e}")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
     
+    # Run server-side analysis for guaranteed metrics (Starter+)
+    server_analysis = run_server_side_analysis(data.subject, data.body)
+    
     analysis_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     word_count = len(data.body.split())
     
+    # Merge AI results with server-side analysis
+    # Server-side takes precedence for Starter metrics (guaranteed to be present)
     analysis_doc = {
         "id": analysis_id,
         "user_id": user["id"],
@@ -1175,18 +1180,19 @@ Be specific, actionable, and focus on what makes cold emails convert. For spam k
         "personalization_score": analysis_data.get("personalizationScore", 0),
         "cta_score": analysis_data.get("callToActionStrength", 0),
         "value_proposition_clarity": analysis_data.get("valuePropositionClarity", 0),
-        # Starter+ metrics
-        "readability_score": analysis_data.get("readabilityScore"),
-        "readability_level": analysis_data.get("readabilityLevel"),
-        "spam_keywords": analysis_data.get("spamKeywords", []),
-        "spam_risk_score": analysis_data.get("spamRiskScore"),
-        "subject_line_analysis": analysis_data.get("subjectLineAnalysis"),
-        "cta_analysis": analysis_data.get("ctaAnalysis"),
-        # Pro+ metrics
+        # Starter+ metrics - SERVER-SIDE (guaranteed)
+        "readability_score": server_analysis["readability_score"],
+        "readability_level": server_analysis["readability_level"],
+        "spam_keywords": server_analysis["spam_keywords"],
+        "spam_risk_score": server_analysis["spam_risk_score"],
+        "subject_line_analysis": server_analysis["subject_line_analysis"],
+        "cta_analysis": server_analysis["cta_analysis"],
+        "fix_suggestions": server_analysis["fix_suggestions"],  # NEW: Rule-based suggestions
+        "inbox_placement_score": server_analysis["inbox_placement_score"],
+        # Pro+ metrics - from AI (may be null)
         "alternative_subjects": analysis_data.get("alternativeSubjects", []),
         "emotional_tone": analysis_data.get("emotionalTone"),
         "personalization_analysis": analysis_data.get("personalizationAnalysis"),
-        "inbox_placement_score": analysis_data.get("inboxPlacementScore"),
         "industry_benchmark": analysis_data.get("industryBenchmark"),
         "ab_test_suggestions": analysis_data.get("abTestSuggestions", []),
         "user_feedback": None,
