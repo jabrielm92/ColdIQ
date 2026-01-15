@@ -1745,6 +1745,38 @@ async def get_usage(user: dict = Depends(get_current_user)):
 async def get_user_features(user: dict = Depends(get_current_user)):
     return get_tier_features(user.get("subscription_tier", "free"))
 
+# ================= CONTACT ROUTES =================
+
+class ContactFormRequest(BaseModel):
+    name: str
+    email: EmailStr
+    company: str
+    team_size: Optional[str] = None
+    message: Optional[str] = None
+
+@api_router.post("/contact/growth-agency")
+async def submit_growth_agency_contact(data: ContactFormRequest):
+    """Submit Growth Agency contact form - stores in DB for manual follow-up"""
+    contact_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    contact_doc = {
+        "id": contact_id,
+        "type": "growth_agency_inquiry",
+        "name": data.name,
+        "email": data.email,
+        "company": data.company,
+        "team_size": data.team_size,
+        "message": data.message,
+        "status": "new",
+        "created_at": now
+    }
+    
+    await db.contact_requests.insert_one(contact_doc)
+    logger.info(f"New Growth Agency inquiry from {data.email} at {data.company}")
+    
+    return {"message": "Request submitted successfully", "id": contact_id}
+
 # ================= BILLING ROUTES =================
 
 @api_router.post("/billing/create-checkout-session")
