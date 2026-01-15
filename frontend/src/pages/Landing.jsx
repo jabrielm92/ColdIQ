@@ -1,11 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail, Target, BarChart3, Zap, Sparkles } from "lucide-react";
+import { ArrowRight, Mail, Target, BarChart3, Zap, Sparkles, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const Landing = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
   const features = [
     {
       icon: <Zap className="w-5 h-5" />,
@@ -44,16 +46,17 @@ const Landing = () => {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-theme-subtle glass">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-5 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 bg-[#d4af37] flex items-center justify-center">
-              <Mail className="w-4 h-4 text-black" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#d4af37] flex items-center justify-center">
+              <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black" />
             </div>
-            <span className="text-lg font-semibold tracking-tight font-sans">ColdIQ</span>
+            <span className="text-base sm:text-lg font-semibold tracking-tight font-sans">ColdIQ</span>
           </Link>
           
-          <div className="flex items-center gap-4">
-            <Link to="/pricing" className="text-theme-muted hover:text-theme transition-colors text-sm font-medium tracking-wide uppercase hidden sm:block">
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-4">
+            <Link to="/pricing" className="text-theme-muted hover:text-theme transition-colors text-sm font-medium tracking-wide uppercase">
               Pricing
             </Link>
             <ThemeToggle />
@@ -63,52 +66,80 @@ const Landing = () => {
               </Button>
             </Link>
             <Link to="/signup">
-              <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-6 py-3 h-auto transition-colors" data-testid="nav-signup-btn">
+              <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-4 sm:px-6 py-2.5 sm:py-3 h-auto transition-colors" data-testid="nav-signup-btn">
                 Get Started
               </Button>
             </Link>
           </div>
+
+          {/* Mobile Nav Toggle */}
+          <div className="flex md:hidden items-center gap-2">
+            <ThemeToggle />
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-theme-muted hover:text-theme"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-theme-subtle bg-theme-secondary p-4 space-y-3">
+            <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-theme-muted hover:text-theme text-sm font-medium">
+              Pricing
+            </Link>
+            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-theme-muted hover:text-theme text-sm font-medium">
+              Log in
+            </Link>
+            <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
+              <Button className="w-full bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs py-3 h-auto">
+                Get Started
+              </Button>
+            </Link>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-40 pb-32 px-6 lg:px-12 relative">
+      <section className="pt-28 sm:pt-36 lg:pt-40 pb-16 sm:pb-24 lg:pb-32 px-4 sm:px-6 lg:px-12 relative">
         {/* Hero Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] hero-glow pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] sm:w-[600px] lg:w-[800px] h-[400px] sm:h-[500px] lg:h-[600px] hero-glow pointer-events-none" />
         
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-12 gap-12 items-start">
-            {/* Left Content - Asymmetric */}
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+            {/* Left Content */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="lg:col-span-7"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 border border-theme bg-theme-secondary mb-10">
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 border border-theme bg-theme-secondary mb-6 sm:mb-10">
                 <span className="w-2 h-2 bg-[#a3e635]" />
-                <span className="text-xs font-mono tracking-widest uppercase text-theme-muted">AI-Powered Email Intelligence</span>
+                <span className="text-[10px] sm:text-xs font-mono tracking-widest uppercase text-theme-muted">AI-Powered Email Intelligence</span>
               </div>
               
-              <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl tracking-tight leading-[1.05] mb-8">
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-7xl tracking-tight leading-[1.1] sm:leading-[1.05] mb-6 sm:mb-8">
                 Cold Email.
                 <br />
                 <span className="text-gradient-gold">Perfected.</span>
               </h1>
               
-              <p className="text-lg text-theme-muted leading-relaxed max-w-xl mb-12 font-sans">
+              <p className="text-base sm:text-lg text-theme-muted leading-relaxed max-w-xl mb-8 sm:mb-12 font-sans">
                 Stop guessing. Start closing. ColdIQ analyzes every element of your outreach with ruthless precision — transforming mediocre emails into revenue-generating machines.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/signup">
-                  <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-10 py-5 h-auto transition-all hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]" data-testid="hero-cta-btn">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <Link to="/signup" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-6 sm:px-10 py-4 sm:py-5 h-auto transition-all hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]" data-testid="hero-cta-btn">
                     Analyze Your First Email
-                    <ArrowRight className="w-4 h-4 ml-3" />
+                    <ArrowRight className="w-4 h-4 ml-2 sm:ml-3" />
                   </Button>
                 </Link>
-                <Link to="/pricing">
-                  <Button variant="outline" className="border-theme text-theme-muted hover:border-theme-muted hover:text-theme hover:bg-transparent rounded-none font-bold uppercase tracking-wider text-xs px-10 py-5 h-auto transition-colors" data-testid="hero-pricing-btn">
+                <Link to="/pricing" className="w-full sm:w-auto">
+                  <Button variant="outline" className="w-full sm:w-auto border-theme text-theme-muted hover:border-theme-muted hover:text-theme hover:bg-transparent rounded-none font-bold uppercase tracking-wider text-xs px-6 sm:px-10 py-4 sm:py-5 h-auto transition-colors" data-testid="hero-pricing-btn">
                     View Pricing
                   </Button>
                 </Link>
@@ -120,17 +151,17 @@ const Landing = () => {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-              className="lg:col-span-5 space-y-4"
+              className="lg:col-span-5 grid grid-cols-3 lg:grid-cols-1 gap-2 sm:gap-4"
             >
               {stats.map((stat, i) => (
                 <div 
                   key={i}
-                  className="bg-theme-secondary border border-theme p-8 group hover:border-[#d4af37]/30 transition-colors"
+                  className="bg-theme-secondary border border-theme p-4 sm:p-6 lg:p-8 group hover:border-[#d4af37]/30 transition-colors"
                 >
-                  <div className="font-mono text-5xl font-bold tracking-tight mb-2 group-hover:text-[#d4af37] transition-colors">
+                  <div className="font-mono text-2xl sm:text-3xl lg:text-5xl font-bold tracking-tight mb-1 sm:mb-2 group-hover:text-[#d4af37] transition-colors">
                     {stat.value}
                   </div>
-                  <div className="text-xs font-mono tracking-widest uppercase text-theme-dim">{stat.label}</div>
+                  <div className="text-[9px] sm:text-[10px] lg:text-xs font-mono tracking-widest uppercase text-theme-dim">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -139,21 +170,21 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-32 px-6 lg:px-12 border-t border-theme">
+      <section className="py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-12 border-t border-theme">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="mb-20"
+            className="mb-10 sm:mb-16 lg:mb-20"
           >
-            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-4">Capabilities</p>
-            <h2 className="font-serif text-4xl sm:text-5xl tracking-tight max-w-2xl">
+            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3 sm:mb-4">Capabilities</p>
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight max-w-2xl">
               Everything you need to write emails that convert
             </h2>
           </motion.div>
           
-          <div className="grid md:grid-cols-2 gap-px bg-theme-tertiary">
+          <div className="grid sm:grid-cols-2 gap-px bg-theme-tertiary">
             {features.map((feature, i) => (
               <motion.div
                 key={i}
@@ -161,13 +192,13 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-theme p-10 group hover:bg-theme-secondary transition-colors"
+                className="bg-theme p-6 sm:p-8 lg:p-10 group hover:bg-theme-secondary transition-colors"
               >
-                <div className="w-12 h-12 border border-theme flex items-center justify-center text-[#d4af37] mb-6 group-hover:border-[#d4af37]/50 group-hover:bg-[#d4af37]/5 transition-all">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 border border-theme flex items-center justify-center text-[#d4af37] mb-4 sm:mb-6 group-hover:border-[#d4af37]/50 group-hover:bg-[#d4af37]/5 transition-all">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-sans font-semibold mb-3">{feature.title}</h3>
-                <p className="text-theme-muted leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg sm:text-xl font-sans font-semibold mb-2 sm:mb-3">{feature.title}</h3>
+                <p className="text-sm sm:text-base text-theme-muted leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -175,21 +206,21 @@ const Landing = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-32 px-6 lg:px-12 bg-theme-secondary">
+      <section className="py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-12 bg-theme-secondary">
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="mb-20"
+            className="mb-10 sm:mb-16 lg:mb-20"
           >
-            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-4">Process</p>
-            <h2 className="font-serif text-4xl sm:text-5xl tracking-tight max-w-2xl">
+            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3 sm:mb-4">Process</p>
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight max-w-2xl">
               Three steps to better outreach
             </h2>
           </motion.div>
           
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid sm:grid-cols-3 gap-8 sm:gap-6 lg:gap-12">
             {[
               { step: "01", title: "Paste Your Email", desc: "Enter your subject line and email body. No setup. No complexity." },
               { step: "02", title: "Get AI Analysis", desc: "Claude scores your email, identifies weaknesses, and suggests improvements." },
@@ -202,9 +233,9 @@ const Landing = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15 }}
               >
-                <div className="text-8xl font-serif text-theme-tertiary leading-none mb-6">{item.step}</div>
-                <h3 className="text-xl font-sans font-semibold mb-3">{item.title}</h3>
-                <p className="text-theme-muted">{item.desc}</p>
+                <div className="text-5xl sm:text-6xl lg:text-8xl font-serif text-theme-tertiary leading-none mb-4 sm:mb-6">{item.step}</div>
+                <h3 className="text-lg sm:text-xl font-sans font-semibold mb-2 sm:mb-3">{item.title}</h3>
+                <p className="text-sm sm:text-base text-theme-muted">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -212,29 +243,29 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 px-6 lg:px-12 border-t border-theme">
+      <section className="py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-12 border-t border-theme">
         <div className="max-w-4xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="border border-theme p-12 lg:p-16 relative overflow-hidden bg-theme-secondary"
+            className="border border-theme p-8 sm:p-12 lg:p-16 relative overflow-hidden bg-theme-secondary"
           >
             {/* Subtle Gold Glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#d4af37]/5 blur-3xl" />
+            <div className="absolute top-0 right-0 w-32 sm:w-48 lg:w-64 h-32 sm:h-48 lg:h-64 bg-[#d4af37]/5 blur-3xl" />
             
             <div className="relative z-10">
-              <p className="text-xs font-mono tracking-widest uppercase text-[#d4af37] mb-6">Start Now</p>
-              <h2 className="font-serif text-4xl sm:text-5xl tracking-tight mb-6">
+              <p className="text-xs font-mono tracking-widest uppercase text-[#d4af37] mb-4 sm:mb-6">Start Now</p>
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight mb-4 sm:mb-6">
                 Ready to close more deals?
               </h2>
-              <p className="text-theme-muted mb-10 max-w-xl">
+              <p className="text-sm sm:text-base text-theme-muted mb-8 sm:mb-10 max-w-xl">
                 Join thousands of sales professionals who've stopped guessing and started converting. Your first analysis is free.
               </p>
               <Link to="/signup">
-                <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-10 py-5 h-auto transition-all hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]" data-testid="cta-signup-btn">
+                <Button className="w-full sm:w-auto bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 sm:px-10 py-4 sm:py-5 h-auto transition-all hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]" data-testid="cta-signup-btn">
                   Start Analyzing for Free
-                  <ArrowRight className="w-4 h-4 ml-3" />
+                  <ArrowRight className="w-4 h-4 ml-2 sm:ml-3" />
                 </Button>
               </Link>
             </div>
@@ -243,15 +274,15 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 lg:px-12 border-t border-theme">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-[#d4af37] flex items-center justify-center">
-              <Mail className="w-3 h-3 text-black" />
+      <footer className="py-8 sm:py-12 px-4 sm:px-6 lg:px-12 border-t border-theme">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-[#d4af37] flex items-center justify-center">
+              <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-black" />
             </div>
-            <span className="font-semibold tracking-tight font-sans">ColdIQ</span>
+            <span className="font-semibold tracking-tight font-sans text-sm sm:text-base">ColdIQ</span>
           </div>
-          <p className="text-theme-dim text-sm font-mono">© 2025 ColdIQ. All rights reserved.</p>
+          <p className="text-theme-dim text-xs sm:text-sm font-mono">© 2025 ColdIQ. All rights reserved.</p>
         </div>
       </footer>
     </div>
