@@ -78,17 +78,21 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 - ✅ **Trust Badges**: "18,500+ Active Users", "2.4M Emails Analyzed", "127% Avg Response Increase"
 - ✅ **Social Proof**: Company names, roles, specific results
 
-### Chrome Extension (Scaffolding Complete)
+### Chrome Extension (Build-Out Complete)
 Located at `/app/chrome-extension/`
-- ✅ Manifest v3 configuration
+- ✅ Manifest v3 configuration with contextMenus
 - ✅ Popup with login/dashboard UI
 - ✅ Gmail content script injection
-- ✅ In-compose "Analyze" button
+- ✅ In-compose "Analyze" button with improved selectors
 - ✅ Side panel with analysis results
 - ✅ Copy optimized subject/body
+- ✅ **One-click "Apply to Email"** - replaces compose content
 - ✅ Context menu for quick analysis
 - ✅ Token storage via chrome.storage
 - ✅ Custom icons (16, 48, 128px)
+- ✅ Correct API field mappings
+- ✅ Error handling for auth/limits
+- ✅ Comprehensive README with testing instructions
 
 ### UI/UX - "Midnight Architect" Theme
 - ✅ Metallic Gold (#d4af37) primary color
@@ -127,10 +131,8 @@ Located at `/app/chrome-extension/`
 ### P1 - Upcoming
 1. **Integrate Real AWS SNS** - Once production approval is received, swap mock with real SMS
 
-### P2 - Chrome Extension Build-Out
-1. Implement content script for Gmail injection
-2. Add analysis panel in Gmail compose
-3. Test extension locally with developer mode
+### P2 - Upcoming
+1. **Publish Chrome Extension** - Test in developer mode, then submit to Chrome Web Store
 
 ### P3 - Future Enhancements
 1. A/B testing suggestions feature
