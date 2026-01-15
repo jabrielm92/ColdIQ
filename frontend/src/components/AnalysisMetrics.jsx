@@ -596,6 +596,87 @@ const LockedFeatureCard = ({ title, description, requiredTier, highlight = false
   );
 };
 
+// Fix Suggestions Card (Starter+) - Rule-based, non-AI
+export const FixSuggestionsCard = ({ suggestions = [], tierHasAccess = true }) => {
+  if (!tierHasAccess) {
+    return (
+      <LockedFeatureCard 
+        title="Fix This"
+        description="Get actionable fixes for your email"
+        requiredTier="Starter"
+      />
+    );
+  }
+
+  if (!suggestions || suggestions.length === 0) {
+    return (
+      <div className="bg-emerald-500/10 border border-emerald-500/20 p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <CheckCircle className="w-4 h-4 text-emerald-400" />
+          <span className="text-sm font-medium text-emerald-400">Looking Good!</span>
+        </div>
+        <p className="text-zinc-400 text-sm">No critical issues found. Your email follows best practices.</p>
+      </div>
+    );
+  }
+
+  const priorityColors = {
+    high: { bg: "bg-red-500/10", border: "border-red-500/30", text: "text-red-400", badge: "bg-red-500/20" },
+    medium: { bg: "bg-amber-500/10", border: "border-amber-500/30", text: "text-amber-400", badge: "bg-amber-500/20" },
+    low: { bg: "bg-blue-500/10", border: "border-blue-500/30", text: "text-blue-400", badge: "bg-blue-500/20" }
+  };
+
+  const typeIcons = {
+    subject: "📧",
+    spam: "⚠️",
+    readability: "📖",
+    length: "📏",
+    cta: "🎯"
+  };
+
+  return (
+    <div className="bg-zinc-900/50 border border-zinc-800 p-4">
+      <div className="flex items-center gap-2 mb-4">
+        <Target className="w-4 h-4 text-amber-400" />
+        <span className="text-sm font-medium">Fix This</span>
+        <span className="px-2 py-0.5 text-[10px] bg-amber-500/20 text-amber-300 rounded font-mono">
+          {suggestions.length} {suggestions.length === 1 ? 'issue' : 'issues'}
+        </span>
+      </div>
+      
+      <div className="space-y-3">
+        {suggestions.map((suggestion, i) => {
+          const colors = priorityColors[suggestion.priority] || priorityColors.medium;
+          const icon = typeIcons[suggestion.type] || "💡";
+          
+          return (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className={`${colors.bg} ${colors.border} border p-3`}
+            >
+              <div className="flex items-start gap-3">
+                <span className="text-lg flex-shrink-0">{icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-sm font-medium ${colors.text}`}>{suggestion.issue}</span>
+                    <span className={`${colors.badge} ${colors.text} text-[10px] px-1.5 py-0.5 rounded uppercase font-mono`}>
+                      {suggestion.priority}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-400">{suggestion.fix}</p>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 export default {
   SpamKeywordsCard,
   ReadabilityCard,
@@ -605,5 +686,6 @@ export default {
   ABTestSuggestionsCard,
   InboxPlacementCard,
   EmotionalToneCard,
-  IndustryBenchmarkCard
+  IndustryBenchmarkCard,
+  FixSuggestionsCard
 };
