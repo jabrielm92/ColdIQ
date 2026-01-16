@@ -2310,7 +2310,7 @@ async def generate_report(data: ReportGenerate, user: dict = Depends(require_tie
     }
     
     await db.reports.insert_one(report_doc)
-    del report_doc["_id"] if "_id" in report_doc else None
+    report_doc.pop("_id", None)
     return report_doc
 
 # ================= CAMPAIGNS (Agency) =================
