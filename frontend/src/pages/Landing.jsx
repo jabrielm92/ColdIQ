@@ -417,7 +417,7 @@ const Landing = () => {
                       <span className="font-mono text-[#d4af37]">82</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-300 truncate max-w-[140px]">"Saw your recent {{trigger}}"</span>
+                      <span className="text-zinc-300 truncate max-w-[140px]">"Saw your recent {'{{trigger}}'}"</span>
                       <span className="font-mono text-[#d4af37]">78</span>
                     </div>
                   </div>
