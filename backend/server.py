@@ -361,7 +361,145 @@ SYSTEM_TEMPLATES = [
         "body": "Hi {{first_name}},\n\nI noticed {{company}} has had {{role}} positions open for {{duration}}. The market for {{skill}} talent is brutal right now.\n\nWe've helped {{similar_company}} fill similar roles in {{timeframe}} through {{approach}}.\n\nWorth a quick chat?\n\nBest,\n{{your_name}}",
         "category": "Pain Point",
         "industry": "Recruiting",
-        "avg_score": 76
+        "avg_score": 76,
+        "tier": "free"
+    },
+    # PRO TEMPLATES - Advanced strategies
+    {
+        "name": "PRO: Multi-Touch Sequence Opener",
+        "subject": "{{first_name}}, thought of you when I saw this",
+        "body": "Hi {{first_name}},\n\nI came across {{trigger}} and immediately thought of {{company}}.\n\nWe specialize in helping {{industry}} companies {{outcome}} - typically seeing {{metric}} improvement in {{timeframe}}.\n\nI have a few ideas specific to {{company}} I'd love to share.\n\nBest,\n{{your_name}}\n\nP.S. I'll follow up next week with a case study from {{similar_company}}.",
+        "category": "Sequence",
+        "industry": "General",
+        "avg_score": 84,
+        "tier": "pro"
+    },
+    {
+        "name": "PRO: The Challenger Approach",
+        "subject": "Most {{role}}s get this wrong, {{first_name}}",
+        "body": "Hi {{first_name}},\n\nMost {{role}}s I talk to are focused on {{common_approach}}. The data shows that's actually hurting results.\n\n{{contrarian_insight}}\n\nWe've helped {{count}} companies pivot their approach and see {{result}}.\n\nWorth 10 minutes to challenge some assumptions?\n\nBest,\n{{your_name}}",
+        "category": "Challenger",
+        "industry": "General",
+        "avg_score": 81,
+        "tier": "pro"
+    },
+    {
+        "name": "PRO: Executive-Level Outreach",
+        "subject": "Board-level priority for {{company}}?",
+        "body": "{{first_name}},\n\n{{executive_trigger}} caught my attention. Based on {{company}}'s {{strategic_initiative}}, I suspect {{topic}} is a board-level priority.\n\nWe've helped {{similar_exec}} at {{peer_company}} navigate this - resulting in {{outcome}}.\n\nWorth a brief conversation?\n\n{{your_name}}",
+        "category": "Executive",
+        "industry": "General",
+        "avg_score": 79,
+        "tier": "pro"
+    },
+    {
+        "name": "PRO: Video Placeholder Email",
+        "subject": "Made you a quick video, {{first_name}}",
+        "body": "Hi {{first_name}},\n\nI recorded a 90-second video specifically for you about {{topic}} at {{company}}.\n\n[VIDEO THUMBNAIL PLACEHOLDER]\n\nIn it, I cover:\n• {{point_1}}\n• {{point_2}}\n• A specific idea for {{company}}\n\nWorth 90 seconds?\n\nBest,\n{{your_name}}",
+        "category": "Video",
+        "industry": "General",
+        "avg_score": 86,
+        "tier": "pro"
+    },
+    {
+        "name": "PRO: Account-Based Warm Up",
+        "subject": "Research on {{company}}'s {{initiative}}",
+        "body": "Hi {{first_name}},\n\nI've been researching {{company}}'s approach to {{initiative}} - really interesting stuff.\n\nI put together a brief analysis comparing your approach to {{peer_1}}, {{peer_2}}, and {{peer_3}}. Some findings might surprise you.\n\nHappy to share it - just reply 'send it' and I'll drop it in.\n\nBest,\n{{your_name}}",
+        "category": "ABM",
+        "industry": "General",
+        "avg_score": 83,
+        "tier": "pro"
+    },
+    {
+        "name": "PRO: Post-Event Follow-up",
+        "subject": "Great meeting you at {{event}}, {{first_name}}",
+        "body": "Hi {{first_name}},\n\nReally enjoyed our conversation at {{event}} about {{topic}}.\n\nYou mentioned {{pain_point}} - I've been thinking about it and have a couple ideas:\n\n1. {{idea_1}}\n2. {{idea_2}}\n\nWould any of these be worth exploring further? Happy to jump on a quick call.\n\nBest,\n{{your_name}}",
+        "category": "Event",
+        "industry": "General",
+        "avg_score": 88,
+        "tier": "pro"
+    },
+    {
+        "name": "PRO: Referral Request",
+        "subject": "Quick favor, {{first_name}}?",
+        "body": "Hi {{first_name}},\n\nHope you're well! I'm reaching out to a few people I respect in {{industry}}.\n\nWe've been getting great results with {{solution}} and I'm looking to connect with {{target_profile}}.\n\nDo you know anyone who might be struggling with {{pain_point}}? Happy to send something their way in return.\n\nThanks!\n{{your_name}}",
+        "category": "Referral",
+        "industry": "General",
+        "avg_score": 80,
+        "tier": "pro"
+    },
+    # AGENCY TEMPLATES - Advanced multi-client strategies
+    {
+        "name": "AGENCY: Client Onboarding Sequence",
+        "subject": "Welcome to {{agency}} - let's get started",
+        "body": "Hi {{client_name}},\n\nWelcome aboard! We're excited to start working together.\n\nHere's what happens next:\n\n1. Strategy call (scheduled for {{date}})\n2. Audit of your current {{focus_area}}\n3. Custom roadmap delivery within {{timeframe}}\n\nIn the meantime, could you share access to {{required_tools}}?\n\nTalk soon,\n{{your_name}}\n{{agency}}",
+        "category": "Onboarding",
+        "industry": "Agency",
+        "avg_score": 85,
+        "tier": "agency"
+    },
+    {
+        "name": "AGENCY: Monthly Report Teaser",
+        "subject": "{{month}} results are in - {{highlight_metric}}",
+        "body": "Hi {{client_name}},\n\n{{month}}'s results just came in. Highlight: {{highlight_metric}}.\n\nFull report attached, but here's the TL;DR:\n\n✅ {{win_1}}\n✅ {{win_2}}\n📈 {{key_insight}}\n\nI've also included recommendations for next month on page 3.\n\nLet's schedule a quick call to discuss the {{priority_item}}.\n\nBest,\n{{your_name}}",
+        "category": "Reporting",
+        "industry": "Agency",
+        "avg_score": 82,
+        "tier": "agency"
+    },
+    {
+        "name": "AGENCY: Upsell Introduction",
+        "subject": "{{first_name}}, noticed something in your data",
+        "body": "Hi {{first_name}},\n\nWhile reviewing {{company}}'s performance, I noticed {{observation}}.\n\nThis usually indicates an opportunity for {{complementary_service}}. For context, our clients who add this typically see {{result}}.\n\n{{similar_client}} did this last quarter and {{outcome}}.\n\nWant me to put together a quick proposal?\n\nBest,\n{{your_name}}",
+        "category": "Upsell",
+        "industry": "Agency",
+        "avg_score": 79,
+        "tier": "agency"
+    },
+    {
+        "name": "AGENCY: Contract Renewal Nudge",
+        "subject": "Your {{contract_type}} renewal + a proposal",
+        "body": "Hi {{first_name}},\n\nYour {{contract_type}} is up for renewal next month. Before we discuss terms, I wanted to share some numbers:\n\n📊 Year-to-date: {{ytd_results}}\n📈 vs. last year: {{yoy_comparison}}\n💰 Estimated value delivered: {{value}}\n\nI've also drafted a proposal for Year 2 that includes {{enhancement}}.\n\nLet's find 30 minutes to discuss?\n\nBest,\n{{your_name}}",
+        "category": "Renewal",
+        "industry": "Agency",
+        "avg_score": 81,
+        "tier": "agency"
+    },
+    {
+        "name": "AGENCY: Multi-Stakeholder Alignment",
+        "subject": "Getting {{team}} aligned on {{project}}",
+        "body": "Hi {{first_name}},\n\nAs we kick off {{project}}, I want to make sure we have alignment across {{company}}'s stakeholders.\n\nI've drafted a brief deck covering:\n• Goals & KPIs\n• Timeline & milestones\n• Roles & responsibilities\n• Communication cadence\n\nCould you loop in {{stakeholder_names}} for a 30-min alignment call this week?\n\nBest,\n{{your_name}}",
+        "category": "Kickoff",
+        "industry": "Agency",
+        "avg_score": 77,
+        "tier": "agency"
+    },
+    {
+        "name": "AGENCY: Competitor Intelligence",
+        "subject": "{{competitor}} just made a move - thoughts",
+        "body": "Hi {{first_name}},\n\nHeads up: {{competitor}} just {{competitor_action}}.\n\nMy take:\n• {{analysis_point_1}}\n• {{analysis_point_2}}\n• Potential impact on {{company}}: {{impact}}\n\nI have a few ideas on how to respond. Want to jump on a call today or tomorrow?\n\nBest,\n{{your_name}}",
+        "category": "Intelligence",
+        "industry": "Agency",
+        "avg_score": 84,
+        "tier": "agency"
+    },
+    {
+        "name": "AGENCY: QBR Scheduling",
+        "subject": "Q{{quarter}} Review - {{company}}",
+        "body": "Hi {{first_name}},\n\nIt's that time again! Let's schedule our Q{{quarter}} business review.\n\nAgenda will cover:\n1. Performance vs. goals\n2. What worked / what didn't\n3. Q{{next_quarter}} strategy & priorities\n4. Budget discussion\n\nPlease bring: {{attendees}}\nTime needed: 60 minutes\n\nWhat works better - early or late next week?\n\nBest,\n{{your_name}}",
+        "category": "QBR",
+        "industry": "Agency",
+        "avg_score": 76,
+        "tier": "agency"
+    },
+    {
+        "name": "AGENCY: Crisis Communication",
+        "subject": "URGENT: {{issue}} - action plan",
+        "body": "Hi {{first_name}},\n\nI wanted to address {{issue}} immediately.\n\nHere's what we know:\n• {{fact_1}}\n• {{fact_2}}\n\nActions we've taken:\n• {{action_1}}\n• {{action_2}}\n\nNext steps:\n• {{next_step}} (by {{deadline}})\n\nI'm available for a call anytime today. Let's connect ASAP.\n\n{{your_name}}",
+        "category": "Crisis",
+        "industry": "Agency",
+        "avg_score": 73,
+        "tier": "agency"
     }
 ]
 
