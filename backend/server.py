@@ -1617,7 +1617,6 @@ Return JSON only (no markdown):
             email_scores=analysis_data.get("emailScores", []),
             recommendations=analysis_data.get("recommendations", [])
         )
-        )
         
     except json.JSONDecodeError as e:
         logger.error(f"Sequence analysis JSON parse error: {e}")
