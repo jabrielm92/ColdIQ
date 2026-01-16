@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://email-mentor.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://coldiq-dashboard.preview.emergentagent.com').rstrip('/')
 
 class TestHealthAndBasicEndpoints:
     """Basic health and connectivity tests"""
@@ -115,7 +115,7 @@ class TestBillingEndpoints:
             headers=headers,
             json={
                 "plan_tier": "starter_monthly",
-                "origin_url": "https://email-mentor.preview.emergentagent.com"
+                "origin_url": "https://coldiq-dashboard.preview.emergentagent.com"
             }
         )
         # Should return checkout URL or error (Stripe test mode)
@@ -129,7 +129,7 @@ class TestBillingEndpoints:
             headers=headers,
             json={
                 "plan_tier": "pro_annual",
-                "origin_url": "https://email-mentor.preview.emergentagent.com"
+                "origin_url": "https://coldiq-dashboard.preview.emergentagent.com"
             }
         )
         assert response.status_code in [200, 400, 500], f"Unexpected status: {response.status_code}"
@@ -142,7 +142,7 @@ class TestBillingEndpoints:
             headers=headers,
             json={
                 "plan_tier": "growth_agency_monthly",
-                "origin_url": "https://email-mentor.preview.emergentagent.com"
+                "origin_url": "https://coldiq-dashboard.preview.emergentagent.com"
             }
         )
         assert response.status_code in [200, 400, 500], f"Unexpected status: {response.status_code}"
@@ -153,7 +153,7 @@ class TestBillingEndpoints:
         response = requests.post(f"{BASE_URL}/api/billing/create-checkout-session", 
             json={
                 "plan_tier": "starter_monthly",
-                "origin_url": "https://email-mentor.preview.emergentagent.com"
+                "origin_url": "https://coldiq-dashboard.preview.emergentagent.com"
             }
         )
         assert response.status_code in [401, 403], "Checkout should require authentication"

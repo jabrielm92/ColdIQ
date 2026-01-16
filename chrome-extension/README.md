@@ -62,7 +62,7 @@ chrome-extension/
 
 The extension connects to the ColdIQ API at:
 ```
-https://email-mentor.preview.emergentagent.com/api
+https://coldiq-dashboard.preview.emergentagent.com/api
 ```
 
 ### Endpoints Used
@@ -146,4 +146,4 @@ chrome-extension/
 
 For issues or feature requests:
 - Email: support@coldiq.io
-- Website: https://email-mentor.preview.emergentagent.com
+- Website: https://coldiq-dashboard.preview.emergentagent.com

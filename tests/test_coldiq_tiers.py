@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://email-mentor.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://coldiq-dashboard.preview.emergentagent.com')
 
 # Test credentials for each tier
 TEST_ACCOUNTS = {
