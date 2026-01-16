@@ -2523,7 +2523,7 @@ async def stripe_webhook(request: Request):
     body = await request.body()
     signature = request.headers.get("Stripe-Signature")
     
-    api_key = os.environ.get('STRIPE_API_KEY')
+    api_key = os.environ.get('STRIPE_SECRET_KEY')
     if not api_key:
         return {"status": "error", "message": "Stripe not configured"}
     
@@ -2546,10 +2546,11 @@ async def stripe_webhook(request: Request):
             if user_id:
                 update_data = {
                     "subscription_tier": plan_tier,
-                    "subscription_status": "active"
+                    "subscription_status": "active",
+                    "stripe_customer_id": webhook_response.customer_id if hasattr(webhook_response, 'customer_id') else None
                 }
                 
-                if plan_tier == "agency":
+                if plan_tier in ["agency", "growth_agency"]:
                     user = await db.users.find_one({"id": user_id})
                     if user and not user.get("team_id"):
                         team_id = str(uuid.uuid4())
@@ -2563,6 +2564,7 @@ async def stripe_webhook(request: Request):
                         update_data["team_role"] = "owner"
                 
                 await db.users.update_one({"id": user_id}, {"$set": update_data})
+                logger.info(f"✅ Subscription activated: {user_id} -> {plan_tier}")
         
         return {"status": "success"}
     except Exception as e:
