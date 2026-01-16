@@ -223,6 +223,18 @@ function App() {
               <Route path="/sequence" element={
                 <OnboardingRoute><SequenceAnalyzer /></OnboardingRoute>
               } />
+              <Route path="/clients" element={
+                <OnboardingRoute><Clients /></OnboardingRoute>
+              } />
+              <Route path="/reports" element={
+                <OnboardingRoute><Reports /></OnboardingRoute>
+              } />
+              <Route path="/api-access" element={
+                <OnboardingRoute><ApiAccess /></OnboardingRoute>
+              } />
+              <Route path="/campaigns" element={
+                <OnboardingRoute><Campaigns /></OnboardingRoute>
+              } />
               
               {/* Protected Routes */}
               <Route path="/onboarding" element={
