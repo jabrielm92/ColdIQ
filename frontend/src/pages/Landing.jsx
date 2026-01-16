@@ -31,10 +31,6 @@ const Landing = () => {
     }
   };
 
-const Landing = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
-
   const features = [
     {
       icon: <Zap className="w-5 h-5" />,
