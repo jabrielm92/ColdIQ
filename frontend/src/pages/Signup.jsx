@@ -55,8 +55,8 @@ const Signup = () => {
     }
   };
 
-  const handlePhoneVerified = () => {
-    toast.success("Phone verified! Let's set up your profile.");
+  const handleEmailVerified = () => {
+    toast.success("Email verified! Let's set up your profile.");
     navigate("/onboarding");
   };
 
