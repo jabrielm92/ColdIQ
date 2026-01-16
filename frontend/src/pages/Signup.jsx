@@ -9,7 +9,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import EmailOTPVerification from "@/components/EmailOTPVerification";
 
 const Signup = () => {
-  const [step, setStep] = useState("signup"); // "signup" | "phone"
+  const [step, setStep] = useState("signup"); // "signup" | "verify"
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
