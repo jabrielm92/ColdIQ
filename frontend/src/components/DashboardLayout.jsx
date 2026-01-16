@@ -82,6 +82,9 @@ const DashboardLayout = ({ children }) => {
   };
 
   const tier = tierConfig[user?.subscription_tier] || tierConfig.free;
+  
+  // Admin check
+  const isAdmin = user?.email === "jabriel@arisolutionsinc.com";
 
   return (
     <div className="min-h-screen bg-theme flex transition-colors duration-300">
