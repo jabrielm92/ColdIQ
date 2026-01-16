@@ -65,15 +65,7 @@ const Signup = () => {
   const handleEmailVerified = async () => {
     toast.success("Email verified!");
     
-    // Now set the user in auth context after verification
-    try {
-      const userRes = await axios.get(`${API}/auth/me`);
-      updateUser(userRes.data);
-    } catch (err) {
-      console.error("Failed to fetch user after verification");
-    }
-    
-    // If paid plan, redirect to Stripe
+    // If paid plan, redirect to Stripe FIRST (don't set user yet to avoid flash)
     if (selectedPlan !== "free") {
       try {
         const priceKey = `${selectedPlan}_${billingCycle}`;
@@ -89,6 +81,14 @@ const Signup = () => {
       } catch (err) {
         toast.error("Payment setup failed. You can upgrade later from settings.");
       }
+    }
+    
+    // Free plan - set user and go to onboarding
+    try {
+      const userRes = await axios.get(`${API}/auth/me`);
+      updateUser(userRes.data);
+    } catch (err) {
+      console.error("Failed to fetch user after verification");
     }
     
     // Free plan or payment failed - go to onboarding
