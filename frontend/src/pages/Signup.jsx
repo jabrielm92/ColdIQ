@@ -141,7 +141,20 @@ const Signup = () => {
                 </div>
                 
                 <h1 className="font-serif text-3xl sm:text-4xl tracking-tight mb-2 sm:mb-3">Create your account</h1>
-                <p className="text-theme-muted text-sm sm:text-base">Start writing cold emails that convert</p>
+                <p className="text-theme-muted text-sm sm:text-base">
+                  {selectedPlan !== "free" 
+                    ? `Sign up for ${planLabels[selectedPlan]} (${billingCycle})` 
+                    : "Start writing cold emails that convert"}
+                </p>
+                
+                {/* Plan badge */}
+                {selectedPlan !== "free" && (
+                  <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-[#d4af37]/10 border border-[#d4af37]/30 rounded">
+                    <span className="text-xs font-mono text-[#d4af37]">
+                      {planLabels[selectedPlan].toUpperCase()} PLAN
+                    </span>
+                  </div>
+                )}
                 
                 {/* Progress indicator */}
                 <div className="flex items-center gap-2 mt-6">
