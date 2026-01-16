@@ -719,6 +719,7 @@ const History = () => {
                         </div>
                       </div>
                     )}
+                  </>
                   ) : (
                     <div className="relative">
                       <div className="grid md:grid-cols-2 gap-4 blur-sm opacity-50 pointer-events-none">
