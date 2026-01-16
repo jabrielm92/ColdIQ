@@ -21,7 +21,11 @@ const Pricing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
 
-  const plans = [
+  const userTier = user?.subscription_tier || null;
+  const tierOrder = ["free", "starter", "pro", "growth_agency", "agency"];
+  const userTierIndex = userTier ? tierOrder.indexOf(userTier === "agency" ? "growth_agency" : userTier) : -1;
+
+  const allPlans = [
     {
       id: "free",
       name: "Free",
