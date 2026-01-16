@@ -696,7 +696,18 @@ const Landing = () => {
             </div>
             <span className="font-semibold tracking-tight font-sans text-sm sm:text-base">ColdIQ</span>
           </div>
-          <p className="text-theme-dim text-xs sm:text-sm font-mono">© 2025 ColdIQ. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <p className="text-theme-dim text-xs sm:text-sm font-mono">© 2025 ColdIQ. All rights reserved.</p>
+            {/* Hidden admin login */}
+            <button
+              onClick={handleAdminLogin}
+              disabled={adminLoading}
+              className="opacity-30 hover:opacity-100 transition-opacity p-1"
+              title="Admin"
+            >
+              <Shield className="w-4 h-4 text-zinc-500" />
+            </button>
+          </div>
         </div>
       </footer>
     </div>
