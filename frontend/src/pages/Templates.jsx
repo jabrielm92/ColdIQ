@@ -55,9 +55,31 @@ const Templates = () => {
   const isPro = ["pro", "agency", "growth_agency"].includes(userTier);
   const isAgency = userTier === "agency" || userTier === "growth_agency";
   const isStarter = ["starter", "pro", "agency", "growth_agency"].includes(userTier);
+  const isFree = userTier === "free";
+
+  useEffect(() => {
+    if (!isFree) {
+      fetchTemplates();
+    } else {
+      setLoading(false);
+    }
+  }, [isFree]);
+
+  const fetchTemplates = async () => {
+    try {
+      const res = await axios.get(`${API}/templates`);
+      if (res.data.available) {
+        setTemplates(res.data.templates || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch templates", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Free tier doesn't have access to templates
-  if (userTier === "free") {
+  if (isFree) {
     return (
       <DashboardLayout>
         <div className="p-6 lg:p-8 flex items-center justify-center min-h-[60vh]">
@@ -80,23 +102,6 @@ const Templates = () => {
       </DashboardLayout>
     );
   }
-
-  useEffect(() => {
-    fetchTemplates();
-  }, []);
-
-  const fetchTemplates = async () => {
-    try {
-      const res = await axios.get(`${API}/templates`);
-      if (res.data.available) {
-        setTemplates(res.data.templates || []);
-      }
-    } catch (err) {
-      console.error("Failed to fetch templates", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCreateTemplate = async () => {
     if (!newTemplate.name || !newTemplate.subject || !newTemplate.body) {
