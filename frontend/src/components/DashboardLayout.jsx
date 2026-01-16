@@ -248,9 +248,22 @@ const DashboardLayout = ({ children }) => {
                 </Link>
               );
             })}
+            
+            {/* Admin Dashboard Button - Mobile - Only for admin */}
+            {isAdmin && (
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 mt-4 rounded-none"
+                onClick={() => window.location.href = "/admin"}
+              >
+                <Shield className="w-4 h-4 mr-3" />
+                Admin Dashboard
+              </Button>
+            )}
+            
             <Button 
               variant="ghost" 
-              className="w-full justify-start text-theme-muted hover:text-theme mt-4 rounded-none"
+              className="w-full justify-start text-theme-muted hover:text-theme mt-2 rounded-none"
               onClick={handleLogout}
             >
               <LogOut className="w-4 h-4 mr-3" />
