@@ -13,6 +13,30 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 
 ## Completed Features (January 2026)
 
+### P2/P3 Features - NEW (January 16, 2026)
+- ✅ **Report PDF Download** (`/api/reports/{id}/pdf`)
+  - HTML-based PDF generation with ColdIQ branding
+  - Includes all metrics: total analyses, avg score, response rate, best score
+  - Summary section with recommendations
+  
+- ✅ **AI Template Generation** (`/api/templates/generate`)
+  - Pro+ users can describe template requirements in natural language
+  - AI generates name, subject, body, and category
+  - Templates automatically added to user's library
+  - Supports industry and tone customization
+  
+- ✅ **Expanded Template Library**
+  - Added 7 PRO templates (Multi-Touch Sequence, Challenger, Executive, Video, ABM, Post-Event, Referral)
+  - Added 8 AGENCY templates (Client Onboarding, Monthly Report, Upsell, Renewal, Multi-Stakeholder, Competitor Intelligence, QBR, Crisis)
+  - Templates show tier badges (PRO/AGENCY)
+  - Locked templates show blurred preview with "Unlock with [Tier]" CTA
+  
+- ✅ **Mobile View Fix** for Analyzer page
+  - Fixed overflow/stretch issues on mobile after analysis
+  - Responsive score display (column on mobile, row on desktop)
+  - Added overflow-hidden containers
+  - Improved spacing and text sizing
+
 ### Growth Agency Tier - NEW (January 16, 2026)
 - ✅ **Multi-Client Workspaces** (`/clients`)
   - Add/delete clients with name, industry, contact email
