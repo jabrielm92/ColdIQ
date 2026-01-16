@@ -1110,7 +1110,7 @@ async def send_otp_email(email: str, otp: str, name: str):
     """
     
     resend.Emails.send({
-        "from": "ColdIQ <noreply@coldiq.com>",
+        "from": f"ColdIQ <{SENDER_EMAIL}>",
         "to": [email],
         "subject": f"Your ColdIQ verification code: {otp}",
         "html": html_content
