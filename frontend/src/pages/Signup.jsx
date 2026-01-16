@@ -65,6 +65,14 @@ const Signup = () => {
   const handleEmailVerified = async () => {
     toast.success("Email verified!");
     
+    // Now set the user in auth context after verification
+    try {
+      const userRes = await axios.get(`${API}/auth/me`);
+      updateUser(userRes.data);
+    } catch (err) {
+      console.error("Failed to fetch user after verification");
+    }
+    
     // If paid plan, redirect to Stripe
     if (selectedPlan !== "free") {
       try {
