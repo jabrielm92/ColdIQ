@@ -186,8 +186,14 @@ const Admin = () => {
               <h1 className="text-xl font-bold">Admin Dashboard</h1>
             </div>
           </div>
-          <div className="text-sm text-zinc-400">
-            Logged in as <span className="text-amber-400">{user?.email}</span>
+          <div className="text-sm text-zinc-400 flex items-center gap-4">
+            <span>Logged in as <span className="text-amber-400">{user?.email}</span></span>
+            <button 
+              onClick={() => { localStorage.removeItem("coldiq_token"); window.location.href = "/"; }}
+              className="text-zinc-500 hover:text-red-400 transition-colors"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>
