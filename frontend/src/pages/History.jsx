@@ -33,6 +33,7 @@ const History = () => {
   const [exporting, setExporting] = useState(false);
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const isPro = user?.subscription_tier === "pro" || user?.subscription_tier === "agency" || user?.subscription_tier === "growth_agency";
   const isStarter = isPro || user?.subscription_tier === "starter";
