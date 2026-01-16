@@ -186,6 +186,18 @@ const Pricing = () => {
       return;
     }
     
+    // Check if email is verified before allowing upgrade
+    if (!user.email_verified && planId !== "free") {
+      toast.error("Please verify your email before upgrading", {
+        description: "Check your inbox for the verification code",
+        action: {
+          label: "Verify Now",
+          onClick: () => navigate("/settings")
+        }
+      });
+      return;
+    }
+    
     if (planId === "free") return;
     
     const priceKey = `${planId}_${isAnnual ? "annual" : "monthly"}`;
@@ -201,7 +213,8 @@ const Pricing = () => {
         window.location.href = res.data.url;
       }
     } catch (err) {
-      toast.error("Failed to create checkout session");
+      const message = err.response?.data?.detail || "Failed to create checkout session";
+      toast.error(message);
     } finally {
       setLoading(null);
     }
