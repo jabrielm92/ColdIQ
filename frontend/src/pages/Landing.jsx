@@ -269,7 +269,7 @@ const Landing = () => {
               The Numbers Don't Lie
             </h2>
             <p className="text-theme-muted max-w-2xl mx-auto">
-              Based on 2.4 million emails analyzed. ColdIQ users consistently outperform industry benchmarks.
+              Based on 125,000+ emails analyzed. ColdIQ users consistently outperform industry benchmarks.
             </p>
           </div>
           
