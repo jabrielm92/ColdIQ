@@ -1868,6 +1868,91 @@ async def create_template(data: TemplateCreate, user: dict = Depends(require_tie
     await db.templates.insert_one(template_doc)
     return template_doc
 
+class AITemplateRequest(BaseModel):
+    description: str
+    industry: Optional[str] = "General"
+    tone: Optional[str] = "professional"
+
+@api_router.post("/templates/generate")
+async def generate_ai_template(data: AITemplateRequest, user: dict = Depends(require_tier("pro"))):
+    """Generate a custom email template using AI based on user description"""
+    
+    prompt = f"""Generate a cold email template based on this description:
+"{data.description}"
+
+Industry: {data.industry}
+Tone: {data.tone}
+
+Return a JSON object with these exact fields:
+{{
+    "name": "A descriptive name for this template",
+    "subject": "The email subject line (use {{{{variable}}}} placeholders)",
+    "body": "The email body (use {{{{variable}}}} placeholders for personalization)",
+    "category": "One of: Outreach, Pain Point, Case Study, Direct, Follow-up, Referral"
+}}
+
+Make it:
+- Concise (under 100 words for body)
+- Highly personalized with placeholders
+- Have a clear, low-friction CTA
+- Professional but conversational
+
+Return ONLY valid JSON, no other text."""
+
+    try:
+        from emergentintegrations.llm.anthropic import chat
+        
+        response = await chat(
+            api_key=os.environ.get('EMERGENT_LLM_KEY'),
+            prompt=prompt,
+            model="claude-sonnet-4-20250514",
+            temperature=0.7
+        )
+        
+        # Parse the AI response
+        import json
+        try:
+            # Clean up the response
+            response_text = response.strip()
+            if response_text.startswith("```json"):
+                response_text = response_text[7:]
+            if response_text.startswith("```"):
+                response_text = response_text[3:]
+            if response_text.endswith("```"):
+                response_text = response_text[:-3]
+            
+            template_data = json.loads(response_text.strip())
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=500, detail="Failed to parse AI response")
+        
+        # Create the template
+        template_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc).isoformat()
+        
+        template_doc = {
+            "id": template_id,
+            "user_id": user["id"],
+            "team_id": None,
+            "name": template_data.get("name", "AI Generated Template"),
+            "subject": template_data.get("subject", ""),
+            "body": template_data.get("body", ""),
+            "category": template_data.get("category", "Outreach"),
+            "industry": data.industry,
+            "is_shared": False,
+            "is_system": False,
+            "is_ai_generated": True,
+            "created_at": now
+        }
+        
+        await db.templates.insert_one(template_doc)
+        template_doc.pop("_id", None)
+        
+        return template_doc
+        
+    except Exception as e:
+        logger.error(f"AI template generation failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Template generation failed: {str(e)}")
+
 @api_router.delete("/templates/{template_id}")
 async def delete_template(template_id: str, user: dict = Depends(require_tier("pro"))):
     result = await db.templates.delete_one({"id": template_id, "user_id": user["id"], "is_system": False})
