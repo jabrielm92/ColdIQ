@@ -830,17 +830,8 @@ async def signup(data: UserSignup):
     
     await db.users.insert_one(user_doc)
     
-    # Create email verification token
-    verification_token = create_verification_token(user_id, "email_verification")
-    await db.verification_tokens.insert_one(verification_token)
-    
-    # Send verification email
-    verify_url = f"{FRONTEND_URL}/verify-email?token={verification_token['token']}"
-    await send_email_notification(
-        data.email,
-        "Verify your ColdIQ account",
-        f"Hi {data.full_name},\n\nWelcome to ColdIQ! Please verify your email by clicking the link below:\n\n{verify_url}\n\nThis link expires in 24 hours.\n\nBest,\nThe ColdIQ Team"
-    )
+    # Note: Email verification is now handled via OTP flow after signup
+    # The frontend will trigger /auth/email-otp/send endpoint
     
     token = create_jwt_token(user_id, data.email)
     
