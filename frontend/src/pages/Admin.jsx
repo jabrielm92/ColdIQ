@@ -606,7 +606,7 @@ const Admin = () => {
                     {showUserDetail.payments.map(p => (
                       <div key={p.id} className="text-xs bg-zinc-800 p-2 rounded flex justify-between">
                         <span>{p.plan_tier}</span>
-                        <span className="font-mono">${(p.amount / 100).toFixed(2)}</span>
+                        <span className="font-mono">${p.amount?.toFixed(2) || '0.00'}</span>
                         <span className={p.payment_status === "paid" ? "text-emerald-400" : "text-amber-400"}>
                           {p.payment_status}
                         </span>
