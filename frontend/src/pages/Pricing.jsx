@@ -125,6 +125,14 @@ const Pricing = () => {
     }
   ];
 
+  // Filter plans - if user is logged in, only show plans above their current tier
+  const plans = user 
+    ? allPlans.filter(plan => {
+        const planIndex = tierOrder.indexOf(plan.id);
+        return planIndex > userTierIndex;
+      })
+    : allPlans;
+
   // Feature comparison data
   const comparisonCategories = [
     {
