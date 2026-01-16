@@ -477,7 +477,7 @@ const Landing = () => {
                 Your Next Cold Email Could Be Your Best
               </h2>
               <p className="text-sm sm:text-base text-theme-muted mb-8 sm:mb-10 max-w-xl mx-auto">
-                Join 18,500+ sales professionals who've stopped guessing and started converting. Your first 3 analyses are completely free.
+                Join 2,400+ sales professionals who've stopped guessing and started converting. Your first 3 analyses are completely free.
               </p>
               <Link to="/signup">
                 <Button className="w-full sm:w-auto bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 sm:px-10 py-4 sm:py-5 h-auto transition-all hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]" data-testid="cta-signup-btn">
