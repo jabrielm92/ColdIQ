@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth, API } from "@/App";
 import axios from "axios";
 import { 
-  FileText, Plus, Copy, Check, Lock, ArrowRight, Trash2, Search, Sparkles
+  FileText, Plus, Copy, Check, Lock, ArrowRight, Trash2, Search, Sparkles, Wand2, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -36,6 +36,8 @@ const Templates = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [copied, setCopied] = useState(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showAIDialog, setShowAIDialog] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [newTemplate, setNewTemplate] = useState({
     name: "",
     subject: "",
@@ -43,8 +45,15 @@ const Templates = () => {
     category: "Outreach",
     is_shared: false
   });
+  const [aiRequest, setAiRequest] = useState({
+    description: "",
+    industry: "General",
+    tone: "professional"
+  });
 
-  const isPro = user?.subscription_tier === "pro" || user?.subscription_tier === "agency";
+  const userTier = user?.subscription_tier || "free";
+  const isPro = ["pro", "agency", "growth_agency"].includes(userTier);
+  const isAgency = userTier === "agency" || userTier === "growth_agency";
 
   useEffect(() => {
     fetchTemplates();
@@ -80,6 +89,26 @@ const Templates = () => {
     }
   };
 
+  const handleGenerateAI = async () => {
+    if (!aiRequest.description.trim()) {
+      toast.error("Please describe what kind of template you need");
+      return;
+    }
+
+    setGenerating(true);
+    try {
+      const res = await axios.post(`${API}/templates/generate`, aiRequest);
+      setTemplates([res.data, ...templates]);
+      setShowAIDialog(false);
+      setAiRequest({ description: "", industry: "General", tone: "professional" });
+      toast.success("AI template created and added to your library!");
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Failed to generate template");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   const handleDeleteTemplate = async (id) => {
     try {
       await axios.delete(`${API}/templates/${id}`);
@@ -102,6 +131,7 @@ const Templates = () => {
   const industries = ["all", ...new Set(templates.map(t => t.industry).filter(Boolean))];
   const categories = ["all", ...new Set(templates.map(t => t.category).filter(Boolean))];
 
+  // Filter and sort templates - show locked ones too
   const filteredTemplates = templates.filter(t => {
     const matchesSearch = 
       t.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -111,101 +141,164 @@ const Templates = () => {
     return matchesSearch && matchesIndustry && matchesCategory;
   });
 
-  // Locked state for non-Pro users
-  if (!isPro) {
-    return (
-      <DashboardLayout>
-        <div className="p-6 lg:p-10" data-testid="templates-page">
-          <div className="max-w-2xl mx-auto text-center py-16">
-            <div className="w-20 h-20 border border-theme flex items-center justify-center mx-auto mb-6">
-              <Lock className="w-10 h-10 text-theme-dim" />
-            </div>
-            <h1 className="font-serif text-3xl tracking-tight mb-3">
-              Unlock Email Templates
-            </h1>
-            <p className="text-theme-muted mb-6 max-w-md mx-auto">
-              Upgrade to Pro or Agency to access 17+ high-converting email templates across multiple industries.
-            </p>
-            
-            <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-8 text-left">
-              {[
-                "17+ proven templates",
-                "Industry-specific",
-                "Customizable fields",
-                "Save your own"
-              ].map((feature, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-theme-muted">
-                  <div className="w-1.5 h-1.5 bg-[#d4af37]" />
-                  {feature}
-                </div>
-              ))}
-            </div>
-            
-            <Link to="/pricing">
-              <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-4 h-auto">
-                Upgrade to Pro
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  // Check if template is accessible based on tier
+  const isTemplateAccessible = (template) => {
+    const tier = template.tier || "free";
+    if (tier === "free") return true;
+    if (tier === "pro" && isPro) return true;
+    if (tier === "agency" && isAgency) return true;
+    if (!template.is_system) return true; // User's own templates
+    return false;
+  };
 
   return (
     <DashboardLayout>
       <div className="p-6 lg:p-10" data-testid="templates-page">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
             <div>
-              <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3">Templates</p>
-              <h1 className="font-serif text-4xl tracking-tight mb-2">
-                Email Templates
-              </h1>
-              <p className="text-theme-muted">17 high-converting templates across 7 industries</p>
+              <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-3">Email Library</p>
+              <h1 className="font-serif text-4xl tracking-tight">Templates</h1>
             </div>
             
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-theme-dim" />
-                <input
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search templates..."
-                  className="pl-10 w-full md:w-64 bg-transparent border-b border-theme focus:border-[#d4af37] text-theme px-3 py-3 outline-none transition-colors placeholder:text-theme-dim font-mono text-sm"
-                />
-              </div>
-              
-              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+            <div className="flex gap-2">
+              {/* AI Generate Button */}
+              <Dialog open={showAIDialog} onOpenChange={setShowAIDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-6 py-3 h-auto" data-testid="create-template-btn">
-                    <Plus className="w-4 h-4 mr-2" />
-                    New
+                  <Button 
+                    variant="outline" 
+                    className="border-violet-500/30 text-violet-400 hover:bg-violet-500/10 rounded-none"
+                    disabled={!isPro}
+                  >
+                    <Wand2 className="w-4 h-4 mr-2" />
+                    AI Generate
+                    {!isPro && <Lock className="w-3 h-3 ml-2" />}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-lg bg-theme-secondary border-theme">
+                <DialogContent className="bg-zinc-900 border-zinc-800">
                   <DialogHeader>
-                    <DialogTitle className="font-serif text-2xl">Create Template</DialogTitle>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-violet-400" />
+                      Generate Template with AI
+                    </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <Label className="text-xs font-mono tracking-widest uppercase text-theme-muted">Template Name</Label>
-                      <input
-                        value={newTemplate.name}
-                        onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
-                        placeholder="e.g., SaaS Outreach"
-                        className="w-full bg-transparent border-b border-theme focus:border-[#d4af37] text-theme py-3 outline-none transition-colors placeholder:text-theme-dim"
+                    <div>
+                      <Label>Describe your template</Label>
+                      <Textarea
+                        value={aiRequest.description}
+                        onChange={(e) => setAiRequest({...aiRequest, description: e.target.value})}
+                        placeholder="e.g., A follow-up email for prospects who downloaded our whitepaper but haven't responded to initial outreach..."
+                        className="bg-zinc-800 border-zinc-700 mt-1 min-h-[100px]"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs font-mono tracking-widest uppercase text-theme-muted">Category</Label>
-                      <Select 
-                        value={newTemplate.category}
-                        onValueChange={(v) => setNewTemplate({ ...newTemplate, category: v })}
-                      >
-                        <SelectTrigger className="bg-theme-tertiary border-theme rounded-none">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Industry</Label>
+                        <Select value={aiRequest.industry} onValueChange={(v) => setAiRequest({...aiRequest, industry: v})}>
+                          <SelectTrigger className="bg-zinc-800 border-zinc-700 mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="General">General</SelectItem>
+                            <SelectItem value="SaaS">SaaS</SelectItem>
+                            <SelectItem value="E-commerce">E-commerce</SelectItem>
+                            <SelectItem value="Healthcare">Healthcare</SelectItem>
+                            <SelectItem value="Financial Services">Financial Services</SelectItem>
+                            <SelectItem value="Agency">Agency</SelectItem>
+                            <SelectItem value="Real Estate">Real Estate</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Tone</Label>
+                        <Select value={aiRequest.tone} onValueChange={(v) => setAiRequest({...aiRequest, tone: v})}>
+                          <SelectTrigger className="bg-zinc-800 border-zinc-700 mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="professional">Professional</SelectItem>
+                            <SelectItem value="casual">Casual</SelectItem>
+                            <SelectItem value="friendly">Friendly</SelectItem>
+                            <SelectItem value="urgent">Urgent</SelectItem>
+                            <SelectItem value="consultative">Consultative</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={handleGenerateAI} 
+                      disabled={generating}
+                      className="w-full bg-violet-600 hover:bg-violet-700 rounded-none"
+                    >
+                      {generating ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Generate Template
+                        </>
+                      )}
+                    </Button>
+                    <p className="text-xs text-zinc-500 text-center">
+                      Template will be added to your personal library
+                    </p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* Manual Create Button */}
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button 
+                    className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs"
+                    disabled={!isPro}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create
+                    {!isPro && <Lock className="w-3 h-3 ml-2" />}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-zinc-900 border-zinc-800">
+                  <DialogHeader>
+                    <DialogTitle>Create Template</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div>
+                      <Label>Template Name</Label>
+                      <Input 
+                        value={newTemplate.name}
+                        onChange={(e) => setNewTemplate({...newTemplate, name: e.target.value})}
+                        placeholder="My Cold Email Template"
+                        className="bg-zinc-800 border-zinc-700 mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label>Subject Line</Label>
+                      <Input 
+                        value={newTemplate.subject}
+                        onChange={(e) => setNewTemplate({...newTemplate, subject: e.target.value})}
+                        placeholder="Quick question about {'{{company}}'}"
+                        className="bg-zinc-800 border-zinc-700 mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label>Email Body</Label>
+                      <Textarea
+                        value={newTemplate.body}
+                        onChange={(e) => setNewTemplate({...newTemplate, body: e.target.value})}
+                        placeholder="Hi {'{{first_name}}'},\n\n..."
+                        className="bg-zinc-800 border-zinc-700 mt-1 min-h-[150px]"
+                      />
+                    </div>
+                    <div>
+                      <Label>Category</Label>
+                      <Select value={newTemplate.category} onValueChange={(v) => setNewTemplate({...newTemplate, category: v})}>
+                        <SelectTrigger className="bg-zinc-800 border-zinc-700 mt-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -213,33 +306,11 @@ const Templates = () => {
                           <SelectItem value="Follow-up">Follow-up</SelectItem>
                           <SelectItem value="Pain Point">Pain Point</SelectItem>
                           <SelectItem value="Case Study">Case Study</SelectItem>
-                          <SelectItem value="Direct">Direct</SelectItem>
-                          <SelectItem value="Other">Other</SelectItem>
+                          <SelectItem value="Referral">Referral</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs font-mono tracking-widest uppercase text-theme-muted">Subject Line</Label>
-                      <input
-                        value={newTemplate.subject}
-                        onChange={(e) => setNewTemplate({ ...newTemplate, subject: e.target.value })}
-                        placeholder="Use {{variables}} for personalization"
-                        className="w-full bg-transparent border-b border-theme focus:border-[#d4af37] text-theme py-3 outline-none transition-colors placeholder:text-theme-dim"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs font-mono tracking-widest uppercase text-theme-muted">Email Body</Label>
-                      <Textarea
-                        value={newTemplate.body}
-                        onChange={(e) => setNewTemplate({ ...newTemplate, body: e.target.value })}
-                        placeholder="Hi {{first_name}},&#10;&#10;..."
-                        className="bg-theme-tertiary border-theme min-h-[150px] rounded-none"
-                      />
-                    </div>
-                    <Button 
-                      onClick={handleCreateTemplate}
-                      className="w-full bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs py-4 h-auto"
-                    >
+                    <Button onClick={handleCreateTemplate} className="w-full bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none">
                       Create Template
                     </Button>
                   </div>
@@ -247,120 +318,158 @@ const Templates = () => {
               </Dialog>
             </div>
           </div>
-          
-          {/* Industry Filter */}
-          <div className="mb-4">
-            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3">Industry</p>
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {industries.map((ind) => (
-                <button
-                  key={ind}
-                  onClick={() => setSelectedIndustry(ind)}
-                  className={`px-4 py-2 text-xs font-mono tracking-wide uppercase transition-all whitespace-nowrap ${
-                    selectedIndustry === ind 
-                      ? 'bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/30' 
-                      : 'border border-theme text-theme-muted hover:border-theme-muted'
-                  }`}
-                >
-                  {ind === "all" ? "All Industries" : ind}
-                </button>
-              ))}
+
+          {/* Filters */}
+          <div className="flex flex-col md:flex-row gap-4 mb-8">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+              <Input
+                placeholder="Search templates..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-zinc-900/50 border-zinc-800 rounded-none"
+              />
             </div>
+            <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
+              <SelectTrigger className="w-full md:w-[180px] bg-zinc-900/50 border-zinc-800 rounded-none">
+                <SelectValue placeholder="Industry" />
+              </SelectTrigger>
+              <SelectContent>
+                {industries.map(ind => (
+                  <SelectItem key={ind} value={ind}>{ind === "all" ? "All Industries" : ind}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full md:w-[180px] bg-zinc-900/50 border-zinc-800 rounded-none">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map(cat => (
+                  <SelectItem key={cat} value={cat}>{cat === "all" ? "All Categories" : cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          
-          {/* Category Filter */}
-          <div className="mb-8">
-            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3">Category</p>
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 text-xs font-mono tracking-wide uppercase transition-all whitespace-nowrap ${
-                    selectedCategory === cat 
-                      ? 'bg-[#a3e635]/10 text-[#a3e635] border border-[#a3e635]/30' 
-                      : 'border border-theme text-theme-muted hover:border-theme-muted'
-                  }`}
-                >
-                  {cat === "all" ? "All Categories" : cat}
-                </button>
-              ))}
-            </div>
-          </div>
-          
+
           {/* Templates Grid */}
           {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1,2,3,4,5,6].map(i => (
+                <div key={i} className="bg-zinc-900/50 border border-zinc-800 p-6 animate-pulse">
+                  <div className="h-4 w-32 bg-zinc-800 rounded mb-4" />
+                  <div className="h-3 w-full bg-zinc-800 rounded mb-2" />
+                  <div className="h-3 w-2/3 bg-zinc-800 rounded" />
+                </div>
+              ))}
             </div>
           ) : filteredTemplates.length === 0 ? (
-            <div className="text-center py-16 border border-theme">
-              <FileText className="w-12 h-12 text-theme-dim mx-auto mb-4" />
-              <p className="text-theme-muted">No templates found</p>
+            <div className="text-center py-16 bg-zinc-900/30 border border-zinc-800">
+              <FileText className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
+              <p className="text-zinc-400 mb-2">No templates found</p>
+              <p className="text-sm text-zinc-600">Try adjusting your filters or create a new template</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-theme-tertiary">
-              {filteredTemplates.map((template) => (
-                <motion.div
-                  key={template.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-theme p-6 hover:bg-theme-secondary transition-colors group"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {template.is_system && (
-                        <div className="w-6 h-6 bg-[#d4af37]/10 flex items-center justify-center">
-                          <Sparkles className="w-3 h-3 text-[#d4af37]" />
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredTemplates.map((template, i) => {
+                const accessible = isTemplateAccessible(template);
+                const tierLabel = template.tier === "pro" ? "PRO" : template.tier === "agency" ? "AGENCY" : null;
+                
+                return (
+                  <motion.div
+                    key={template.id || i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    className={`bg-zinc-900/50 border border-zinc-800 p-6 hover:border-zinc-700 transition-colors group ${
+                      !accessible ? 'opacity-60' : ''
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-medium text-sm truncate">{template.name}</h3>
+                          {tierLabel && (
+                            <span className={`px-1.5 py-0.5 text-[9px] font-mono ${
+                              tierLabel === "PRO" ? "bg-[#d4af37]/20 text-[#d4af37]" : "bg-violet-500/20 text-violet-400"
+                            }`}>
+                              {tierLabel}
+                            </span>
+                          )}
+                          {template.is_ai_generated && (
+                            <span className="px-1.5 py-0.5 text-[9px] bg-violet-500/20 text-violet-400 font-mono">AI</span>
+                          )}
                         </div>
-                      )}
-                      {template.industry && (
-                        <span className="text-xs px-2 py-1 bg-theme-tertiary text-theme-muted font-mono">
-                          {template.industry}
-                        </span>
-                      )}
-                      <span className="text-xs px-2 py-1 bg-theme-tertiary text-theme-muted font-mono">
-                        {template.category}
-                      </span>
+                        <div className="flex items-center gap-2 text-xs text-zinc-500">
+                          {template.industry && <span>{template.industry}</span>}
+                          {template.category && (
+                            <>
+                              <span>•</span>
+                              <span>{template.category}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {!accessible && <Lock className="w-4 h-4 text-zinc-600" />}
                     </div>
+                    
+                    <div className={`mb-4 ${!accessible ? 'blur-sm select-none' : ''}`}>
+                      <p className="text-xs text-zinc-400 mb-1">Subject:</p>
+                      <p className="text-sm font-mono truncate">{template.subject}</p>
+                    </div>
+                    
+                    <div className={`mb-4 ${!accessible ? 'blur-sm select-none' : ''}`}>
+                      <p className="text-xs text-zinc-400 mb-1">Preview:</p>
+                      <p className="text-xs text-zinc-500 line-clamp-2">{template.body}</p>
+                    </div>
+                    
                     {template.avg_score && (
-                      <span className="text-xs text-[#a3e635] font-mono font-bold">
-                        {template.avg_score}
-                      </span>
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="text-xs text-zinc-500">Avg Score:</span>
+                        <span className={`text-xs font-mono font-bold ${
+                          template.avg_score >= 80 ? 'text-emerald-400' :
+                          template.avg_score >= 70 ? 'text-[#d4af37]' :
+                          'text-zinc-400'
+                        }`}>{template.avg_score}</span>
+                      </div>
                     )}
-                  </div>
-                  
-                  <h3 className="font-sans font-semibold mb-3">{template.name}</h3>
-                  <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-1">Subject</p>
-                  <p className="text-sm text-theme-muted mb-4 truncate">{template.subject}</p>
-                  <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-1">Preview</p>
-                  <p className="text-xs text-theme-dim line-clamp-3">{template.body}</p>
-                  
-                  <div className="flex items-center gap-2 mt-6 pt-4 border-t border-theme">
-                    <Button
-                      size="sm"
-                      onClick={() => copyToClipboard(template)}
-                      className="flex-1 bg-theme-tertiary hover:bg-[#d4af37]/10 hover:text-[#d4af37] text-theme-muted rounded-none text-xs font-mono uppercase tracking-wide"
-                    >
-                      {copied === template.id ? (
-                        <><Check className="w-3 h-3 mr-1" /> Copied</>
-                      ) : (
-                        <><Copy className="w-3 h-3 mr-1" /> Copy</>
-                      )}
-                    </Button>
-                    {!template.is_system && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDeleteTemplate(template.id)}
-                        className="text-red-500 hover:bg-red-500/10 rounded-none"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                    
+                    {accessible ? (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(template)}
+                          className="flex-1 border-zinc-700 hover:bg-zinc-800 rounded-none text-xs"
+                        >
+                          {copied === template.id ? (
+                            <><Check className="w-3 h-3 mr-1" /> Copied</>
+                          ) : (
+                            <><Copy className="w-3 h-3 mr-1" /> Copy</>
+                          )}
+                        </Button>
+                        {!template.is_system && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteTemplate(template.id)}
+                            className="px-2 text-zinc-500 hover:text-red-400"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </div>
+                    ) : (
+                      <Link to="/pricing">
+                        <Button variant="outline" size="sm" className="w-full border-zinc-700 rounded-none text-xs">
+                          <Lock className="w-3 h-3 mr-1" />
+                          Unlock with {tierLabel}
+                        </Button>
+                      </Link>
                     )}
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>
