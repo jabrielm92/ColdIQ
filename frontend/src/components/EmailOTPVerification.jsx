@@ -9,9 +9,10 @@ import { API } from "@/App";
 const EmailOTPVerification = ({ onVerified, onSkip, token, userEmail }) => {
   const [email, setEmail] = useState(userEmail || "");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [step, setStep] = useState("email"); // "email" | "otp"
+  const [step, setStep] = useState(userEmail ? "otp" : "email"); // Start at OTP step if email is provided
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
+  const [initialSendDone, setInitialSendDone] = useState(false);
   const inputRefs = useRef([]);
 
   // Countdown timer for resend
@@ -21,6 +22,35 @@ const EmailOTPVerification = ({ onVerified, onSkip, token, userEmail }) => {
       return () => clearTimeout(timer);
     }
   }, [resendTimer]);
+
+  // Auto-send OTP on mount when email is provided from signup
+  useEffect(() => {
+    if (userEmail && token && !initialSendDone) {
+      setInitialSendDone(true);
+      handleAutoSendOtp();
+    }
+  }, [userEmail, token]);
+
+  const handleAutoSendOtp = async () => {
+    setLoading(true);
+    try {
+      await axios.post(`${API}/auth/email-otp/send`, {
+        email: userEmail.trim()
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setResendTimer(60);
+      toast.success("Verification code sent to your email!");
+    } catch (err) {
+      const message = err.response?.data?.detail || "Failed to send verification code";
+      toast.error(message);
+      // Fall back to email input if auto-send fails
+      setStep("email");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSendOtp = async () => {
     if (!email || !email.includes("@")) {
