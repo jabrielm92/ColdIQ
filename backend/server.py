@@ -2192,6 +2192,201 @@ async def stripe_webhook(request: Request):
         logger.error(f"Webhook error: {e}")
         return {"status": "error", "message": str(e)}
 
+# ================= CLIENTS (Agency) =================
+
+@api_router.get("/clients")
+async def get_clients(user: dict = Depends(require_tier("agency"))):
+    clients = await db.clients.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Get stats for each client
+    for client in clients:
+        analyses = await db.analyses.find(
+            {"client_id": client["id"]},
+            {"analysis_score": 1, "estimated_response_rate": 1}
+        ).to_list(1000)
+        
+        client["analyses_count"] = len(analyses)
+        client["avg_score"] = round(sum(a.get("analysis_score", 0) for a in analyses) / len(analyses), 1) if analyses else 0
+        client["avg_response"] = round(sum(a.get("estimated_response_rate", 0) for a in analyses) / len(analyses), 1) if analyses else 0
+    
+    return {"clients": clients}
+
+class ClientCreate(BaseModel):
+    name: str
+    industry: Optional[str] = None
+    contact_email: Optional[str] = None
+
+@api_router.post("/clients")
+async def create_client(data: ClientCreate, user: dict = Depends(require_tier("agency"))):
+    client_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    client_doc = {
+        "id": client_id,
+        "user_id": user["id"],
+        "name": data.name,
+        "industry": data.industry,
+        "contact_email": data.contact_email,
+        "created_at": now
+    }
+    
+    await db.clients.insert_one(client_doc)
+    del client_doc["_id"] if "_id" in client_doc else None
+    return client_doc
+
+@api_router.delete("/clients/{client_id}")
+async def delete_client(client_id: str, user: dict = Depends(require_tier("agency"))):
+    result = await db.clients.delete_one({"id": client_id, "user_id": user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    # Also delete client's analyses
+    await db.analyses.delete_many({"client_id": client_id})
+    return {"message": "Client deleted"}
+
+# ================= REPORTS (Agency) =================
+
+@api_router.get("/reports")
+async def get_reports(user: dict = Depends(require_tier("agency"))):
+    reports = await db.reports.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    
+    return {"reports": reports}
+
+class ReportGenerate(BaseModel):
+    client_id: Optional[str] = None
+    report_type: str = "monthly_summary"
+
+@api_router.post("/reports/generate")
+async def generate_report(data: ReportGenerate, user: dict = Depends(require_tier("agency"))):
+    report_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Get analyses for the report
+    query = {"user_id": user["id"]}
+    if data.client_id:
+        query["client_id"] = data.client_id
+        client = await db.clients.find_one({"id": data.client_id, "user_id": user["id"]})
+        client_name = client["name"] if client else "Unknown Client"
+    else:
+        client_name = None
+    
+    # Get last 30 days of analyses
+    thirty_days_ago = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+    query["created_at"] = {"$gte": thirty_days_ago}
+    
+    analyses = await db.analyses.find(query, {"_id": 0}).to_list(1000)
+    
+    if not analyses:
+        raise HTTPException(status_code=400, detail="No analyses found for this period")
+    
+    # Calculate report metrics
+    total = len(analyses)
+    avg_score = round(sum(a.get("analysis_score", 0) for a in analyses) / total, 1)
+    avg_response = round(sum(a.get("estimated_response_rate", 0) for a in analyses) / total, 2)
+    best_score = max(a.get("analysis_score", 0) for a in analyses)
+    
+    report_doc = {
+        "id": report_id,
+        "user_id": user["id"],
+        "client_id": data.client_id,
+        "client_name": client_name,
+        "report_type": data.report_type,
+        "title": f"Monthly Summary - {datetime.now().strftime('%B %Y')}",
+        "metrics": {
+            "total_analyses": total,
+            "avg_score": avg_score,
+            "avg_response_rate": avg_response,
+            "best_score": best_score
+        },
+        "period_start": thirty_days_ago,
+        "period_end": now,
+        "created_at": now
+    }
+    
+    await db.reports.insert_one(report_doc)
+    del report_doc["_id"] if "_id" in report_doc else None
+    return report_doc
+
+# ================= CAMPAIGNS (Agency) =================
+
+@api_router.get("/campaigns")
+async def get_campaigns(user: dict = Depends(require_tier("agency"))):
+    campaigns = await db.campaigns.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).to_list(100)
+    
+    return {"campaigns": campaigns}
+
+class CampaignCreate(BaseModel):
+    name: str
+    client_id: Optional[str] = None
+
+@api_router.post("/campaigns")
+async def create_campaign(data: CampaignCreate, user: dict = Depends(require_tier("agency"))):
+    campaign_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    client_name = None
+    if data.client_id:
+        client = await db.clients.find_one({"id": data.client_id})
+        client_name = client["name"] if client else None
+    
+    campaign_doc = {
+        "id": campaign_id,
+        "user_id": user["id"],
+        "client_id": data.client_id,
+        "client_name": client_name,
+        "name": data.name,
+        "email_count": 0,
+        "avg_score": 0,
+        "response_rate": 0,
+        "created_at": now
+    }
+    
+    await db.campaigns.insert_one(campaign_doc)
+    del campaign_doc["_id"] if "_id" in campaign_doc else None
+    return campaign_doc
+
+# ================= API KEY (Agency) =================
+
+@api_router.get("/api-key")
+async def get_api_key(user: dict = Depends(require_tier("agency"))):
+    key_doc = await db.api_keys.find_one(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    )
+    
+    if not key_doc:
+        raise HTTPException(status_code=404, detail="No API key found")
+    
+    return {"api_key": key_doc.get("key")}
+
+@api_router.post("/api-key/generate")
+async def generate_api_key(user: dict = Depends(require_tier("agency"))):
+    # Delete existing key
+    await db.api_keys.delete_many({"user_id": user["id"]})
+    
+    # Generate new key
+    key = f"coldiq_{secrets.token_urlsafe(32)}"
+    key_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    await db.api_keys.insert_one({
+        "id": key_id,
+        "user_id": user["id"],
+        "key": key,
+        "created_at": now
+    })
+    
+    return {"api_key": key}
+
 # ================= HEALTH CHECK =================
 
 @api_router.get("/")
