@@ -2351,7 +2351,7 @@ async def create_campaign(data: CampaignCreate, user: dict = Depends(require_tie
     }
     
     await db.campaigns.insert_one(campaign_doc)
-    del campaign_doc["_id"] if "_id" in campaign_doc else None
+    campaign_doc.pop("_id", None)
     return campaign_doc
 
 # ================= API KEY (Agency) =================
