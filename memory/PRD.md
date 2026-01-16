@@ -11,7 +11,42 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 | Pro | pro@test.com | Test1234! |
 | Agency | agency@test.com | Test1234! |
 
-## Completed Features (January 2025)
+## Completed Features (January 2026)
+
+### Growth Agency Tier - NEW (January 16, 2026)
+- ✅ **Multi-Client Workspaces** (`/clients`)
+  - Add/delete clients with name, industry, contact email
+  - Per-client analysis stats (analyses count, avg score, avg response)
+  - "Analyze for [Client]" quick action
+  - Backend: `/api/clients` CRUD endpoints
+  
+- ✅ **Campaign Analytics** (`/campaigns`)
+  - Top Subject Lines leaderboard with scores and % change
+  - Top CTAs leaderboard with response rates
+  - Campaign-level stats (email count, avg score, response rate)
+  - Backend: `/api/campaigns` endpoints
+  
+- ✅ **White-Label Reports** (`/reports`)
+  - Generate monthly summary reports
+  - Report templates: Monthly Summary, Performance Report, Campaign Analysis
+  - Metrics: total analyses, avg score, avg response rate, best score
+  - Backend: `/api/reports`, `/api/reports/generate` endpoints
+  
+- ✅ **API Access** (`/api-access`)
+  - Generate/regenerate API keys
+  - API endpoint documentation
+  - Webhooks (coming soon placeholder)
+  - Backend: `/api/api-key`, `/api/api-key/generate` endpoints
+
+### Sidebar Update - ALL Features Visible (January 16, 2026)
+- ✅ **Every tier sees all features** in sidebar
+- ✅ **Locked features** show:
+  - Lock icon
+  - Grayed out/dimmed text
+  - Tier badge (PRO/AGENCY)
+  - Toast notification on click: "[Feature] requires [Tier] plan" with Upgrade action
+- ✅ **Upgrade CTA** in sidebar for non-Agency users
+- ✅ Navigation order: Dashboard, Analyze, History, Templates, Insights, Sequences (PRO), Performance (PRO), Clients (AGENCY), Campaigns (AGENCY), Reports (AGENCY), Team (AGENCY), API (AGENCY), Settings
 
 ### Landing Page Updates (January 16, 2026)
 - ✅ **Realistic Stats** - Changed from exaggerated to realistic numbers:
