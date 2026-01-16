@@ -282,7 +282,7 @@ function App() {
                 <OnboardingRoute><Settings /></OnboardingRoute>
               } />
               <Route path="/billing/success" element={
-                <OnboardingRoute><BillingSuccess /></OnboardingRoute>
+                <ProtectedRoute><BillingSuccess /></ProtectedRoute>
               } />
               <Route path="/templates" element={
                 <OnboardingRoute><Templates /></OnboardingRoute>
