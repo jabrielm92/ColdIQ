@@ -209,7 +209,7 @@ const Signup = () => {
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                   ) : (
-                    "Continue to Phone Verification"
+                    "Continue to Email Verification"
                   )}
                 </Button>
               </form>
