@@ -2383,6 +2383,10 @@ async def submit_growth_agency_contact(data: ContactFormRequest):
 
 @api_router.post("/billing/create-checkout-session")
 async def create_checkout_session(data: CheckoutRequest, request: Request, user: dict = Depends(get_current_user)):
+    # Require email verification before checkout
+    if not user.get("email_verified", False):
+        raise HTTPException(status_code=403, detail="Please verify your email before upgrading")
+    
     if data.plan_tier not in SUBSCRIPTION_PRICES:
         raise HTTPException(status_code=400, detail="Invalid plan tier")
     
