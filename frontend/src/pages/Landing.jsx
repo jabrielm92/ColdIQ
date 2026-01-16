@@ -15,20 +15,8 @@ const Landing = () => {
   const navigate = useNavigate();
 
   const handleAdminLogin = async () => {
-    setAdminLoading(true);
-    try {
-      const res = await axios.post(`${API}/auth/login`, {
-        email: "jabriel@arisolutionsinc.com",
-        password: "Finao028!"
-      });
-      localStorage.setItem("coldiq_token", res.data.token);
-      toast.success("Admin login successful");
-      // Hard redirect to admin dashboard to bypass auth routing
-      window.location.href = "/admin";
-    } catch (err) {
-      toast.error("Admin login failed");
-      setAdminLoading(false);
-    }
+    // Navigate to login page - admin enters credentials manually
+    navigate("/login");
   };
 
   const features = [
