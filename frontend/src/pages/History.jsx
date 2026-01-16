@@ -450,11 +450,14 @@ const History = () => {
                   </ul>
                 </div>
                 
-                {/* Starter+ Metrics */}
-                {isStarter && (
-                  <div className="border-t border-zinc-800 pt-6">
-                    <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-4">Starter+ Metrics</p>
-                    
+                {/* Starter+ Metrics - Show to all, locked for free tier */}
+                <div className="border-t border-zinc-800 pt-6">
+                  <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-4">
+                    Starter+ Metrics
+                    {!isStarter && <span className="ml-2 text-amber-400">(Upgrade to unlock)</span>}
+                  </p>
+                  
+                  {isStarter ? (
                     <div className="grid md:grid-cols-2 gap-4">
                       {/* Readability */}
                       {selectedAnalysis.readability_score !== null && selectedAnalysis.readability_score !== undefined && (
@@ -544,44 +547,72 @@ const History = () => {
                         </div>
                       )}
                     </div>
-                    
-                    {/* Fix Suggestions */}
-                    {selectedAnalysis.fix_suggestions?.length > 0 && (
-                      <div className="mt-4 bg-zinc-800/50 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Target className="w-4 h-4 text-amber-400" />
-                          <span className="text-sm font-medium">Fix This ({selectedAnalysis.fix_suggestions.length} issues)</span>
+                  ) : (
+                    <div className="relative">
+                      <div className="grid md:grid-cols-2 gap-4 blur-sm opacity-50 pointer-events-none">
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <BookOpen className="w-4 h-4 text-cyan-400" />
+                            <span className="text-sm font-medium">Readability</span>
+                          </div>
+                          <span className="text-2xl font-mono font-bold text-zinc-500">72</span>
                         </div>
-                        <div className="space-y-2">
-                          {selectedAnalysis.fix_suggestions.map((sug, i) => (
-                            <div key={i} className={`p-2 rounded border-l-2 ${
-                              sug.priority === 'high' ? 'bg-red-500/10 border-red-500' :
-                              sug.priority === 'medium' ? 'bg-amber-500/10 border-amber-500' :
-                              'bg-blue-500/10 border-blue-500'
-                            }`}>
-                              <div className="flex items-center gap-2">
-                                <span className={`text-xs uppercase font-mono ${
-                                  sug.priority === 'high' ? 'text-red-400' :
-                                  sug.priority === 'medium' ? 'text-amber-400' :
-                                  'text-blue-400'
-                                }`}>{sug.priority}</span>
-                                <span className="text-sm font-medium">{sug.issue}</span>
-                              </div>
-                              <p className="text-xs text-zinc-400 mt-1">{sug.fix}</p>
-                            </div>
-                          ))}
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <AlertTriangle className="w-4 h-4 text-amber-400" />
+                            <span className="text-sm font-medium">Spam Risk</span>
+                          </div>
+                          <span className="text-2xl font-mono font-bold text-zinc-500">15%</span>
                         </div>
                       </div>
-                    )}
-                  </div>
-                )}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Link to="/pricing" className="flex items-center gap-2 px-4 py-2 bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 transition-colors rounded">
+                          <Lock className="w-4 h-4" />
+                          <span className="font-medium">Upgrade to Starter</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Fix Suggestions - only show if starter+ and has data */}
+                  {isStarter && selectedAnalysis.fix_suggestions?.length > 0 && (
+                    <div className="mt-4 bg-zinc-800/50 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Target className="w-4 h-4 text-amber-400" />
+                        <span className="text-sm font-medium">Fix This ({selectedAnalysis.fix_suggestions.length} issues)</span>
+                      </div>
+                      <div className="space-y-2">
+                        {selectedAnalysis.fix_suggestions.map((sug, i) => (
+                          <div key={i} className={`p-2 rounded border-l-2 ${
+                            sug.priority === 'high' ? 'bg-red-500/10 border-red-500' :
+                            sug.priority === 'medium' ? 'bg-amber-500/10 border-amber-500' :
+                            'bg-blue-500/10 border-blue-500'
+                          }`}>
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xs uppercase font-mono ${
+                                sug.priority === 'high' ? 'text-red-400' :
+                                sug.priority === 'medium' ? 'text-amber-400' :
+                                'text-blue-400'
+                              }`}>{sug.priority}</span>
+                              <span className="text-sm font-medium">{sug.issue}</span>
+                            </div>
+                            <p className="text-xs text-zinc-400 mt-1">{sug.fix}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 
-                {/* Pro+ Metrics */}
-                {isPro && (
-                  <div className="border-t border-zinc-800 pt-6">
-                    <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-4">Pro+ Metrics</p>
-                    
-                    <div className="grid md:grid-cols-2 gap-4">
+                {/* Pro+ Metrics - Show to all, locked for non-pro tiers */}
+                <div className="border-t border-zinc-800 pt-6">
+                  <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-4">
+                    Pro+ Metrics
+                    {!isPro && <span className="ml-2 text-cyan-400">(Upgrade to unlock)</span>}
+                  </p>
+                  
+                  {isPro ? (
                       {/* Inbox Placement */}
                       {selectedAnalysis.inbox_placement_score !== null && selectedAnalysis.inbox_placement_score !== undefined && (
                         <div className="bg-zinc-800/50 rounded-lg p-4">
