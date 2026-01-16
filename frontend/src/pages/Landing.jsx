@@ -39,10 +39,10 @@ const Landing = () => {
   ];
 
   const dataPoints = [
-    { before: "12%", after: "31%", metric: "Response Rate", improvement: "+158%" },
-    { before: "23%", after: "47%", metric: "Open Rate", improvement: "+104%" },
-    { before: "45", after: "78", metric: "Avg Score", improvement: "+73%" },
-    { before: "4.2", after: "1.8", metric: "Days to Reply", improvement: "-57%" }
+    { before: "2.1%", after: "3.5%", metric: "Response Rate", improvement: "+67%" },
+    { before: "18%", after: "32%", metric: "Open Rate", improvement: "+78%" },
+    { before: "45", after: "71", metric: "Avg Score", improvement: "+58%" },
+    { before: "5.2", after: "2.8", metric: "Days to Reply", improvement: "-46%" }
   ];
 
   const testimonials = [
