@@ -234,7 +234,9 @@ function App() {
               <Route path="/" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
               <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
               <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
-              <Route path="/pricing" element={<PublicOnlyRoute><Pricing /></PublicOnlyRoute>} />
+              
+              {/* Pricing - accessible to everyone (logged in users can upgrade) */}
+              <Route path="/pricing" element={<Pricing />} />
               
               {/* Public Routes */}
               <Route path="/verify-email" element={<VerifyEmail />} />
