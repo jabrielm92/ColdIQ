@@ -718,8 +718,48 @@ const History = () => {
                         </div>
                       </div>
                     )}
-                  </div>
-                )}
+                  ) : (
+                    <div className="relative">
+                      <div className="grid md:grid-cols-2 gap-4 blur-sm opacity-50 pointer-events-none">
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <TrendingUp className="w-4 h-4 text-cyan-400" />
+                            <span className="text-sm font-medium">Inbox Placement</span>
+                          </div>
+                          <span className="text-2xl font-mono font-bold text-zinc-500">85%</span>
+                        </div>
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <BarChart3 className="w-4 h-4 text-pink-400" />
+                            <span className="text-sm font-medium">Emotional Tone</span>
+                          </div>
+                          <span className="text-lg font-bold text-zinc-500">Professional</span>
+                        </div>
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Lightbulb className="w-4 h-4 text-amber-400" />
+                            <span className="text-sm font-medium">A/B Test Ideas</span>
+                          </div>
+                          <span className="text-sm text-zinc-500">3 suggestions</span>
+                        </div>
+                        <div className="bg-zinc-800/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Sparkles className="w-4 h-4 text-violet-400" />
+                            <span className="text-sm font-medium">AI Subject Variants</span>
+                          </div>
+                          <span className="text-sm text-zinc-500">5 alternatives</span>
+                        </div>
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Link to="/pricing" className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/30 transition-colors rounded">
+                          <Lock className="w-4 h-4" />
+                          <span className="font-medium">Upgrade to Pro</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 
                 {/* Optimized Version */}
                 <div className="space-y-2">
