@@ -5,7 +5,7 @@ import { useAuth } from "@/App";
 import {
   Mail, LayoutDashboard, History, BarChart3, Settings, LogOut,
   Plus, Menu, X, FileText, Users, TrendingUp, Layers, Lock,
-  Building2, FileBarChart, Code, Target
+  Building2, FileBarChart, Code, Target, Shield
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { toast } from "sonner";
