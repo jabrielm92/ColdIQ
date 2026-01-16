@@ -13,6 +13,17 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 
 ## Completed Features (January 2026)
 
+### Email OTP Verification - NEW (January 16, 2026)
+- ✅ **Replaced Phone OTP with Email OTP** using Resend
+  - `/api/auth/email-otp/send` - Sends 6-digit OTP via Resend
+  - `/api/auth/email-otp/verify` - Verifies OTP and marks email as verified
+  - Rate limiting: 3 OTPs per email per hour
+  - OTP expires in 10 minutes
+  - Max 5 verification attempts per OTP
+  - Beautiful HTML email template with ColdIQ branding
+- ✅ **New EmailOTPVerification component** replaces PhoneVerification
+- ✅ **Signup flow updated** to use email verification
+
 ### P2/P3 Features - NEW (January 16, 2026)
 - ✅ **Report PDF Download** (`/api/reports/{id}/pdf`)
   - HTML-based PDF generation with ColdIQ branding
