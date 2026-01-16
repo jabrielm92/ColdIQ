@@ -198,6 +198,29 @@ const OnboardingRoute = ({ children }) => {
   return children;
 };
 
+// Public Only Route - redirects logged-in users to dashboard
+const PublicOnlyRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-theme flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+  
+  if (user && user.onboarding_completed) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  if (user && !user.onboarding_completed) {
+    return <Navigate to="/onboarding" replace />;
+  }
+  
+  return children;
+};
+
 function App() {
   return (
     <ThemeProvider>
@@ -205,11 +228,13 @@ function App() {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
+              {/* Public Only Routes - redirect logged-in users */}
+              <Route path="/" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
+              <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+              <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
+              <Route path="/pricing" element={<PublicOnlyRoute><Pricing /></PublicOnlyRoute>} />
+              
               {/* Public Routes */}
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/pricing" element={<Pricing />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
