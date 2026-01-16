@@ -23,10 +23,10 @@ const Landing = () => {
       });
       localStorage.setItem("coldiq_token", res.data.token);
       toast.success("Admin login successful");
-      navigate("/admin");
+      // Hard redirect to admin dashboard to bypass auth routing
+      window.location.href = "/admin";
     } catch (err) {
       toast.error("Admin login failed");
-    } finally {
       setAdminLoading(false);
     }
   };
