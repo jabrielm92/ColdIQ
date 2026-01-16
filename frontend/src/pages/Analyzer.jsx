@@ -265,11 +265,11 @@ const Analyzer = () => {
                         </div>
                       </div>
                       
-                      <div className="flex items-end gap-6">
-                        <div className={`text-6xl font-bold ${getScoreColor(analysis.analysis_score)}`} style={{ fontFamily: 'JetBrains Mono' }} data-testid="analysis-score">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 sm:gap-6">
+                        <div className={`text-5xl sm:text-6xl font-bold ${getScoreColor(analysis.analysis_score)}`} style={{ fontFamily: 'JetBrains Mono' }} data-testid="analysis-score">
                           {analysis.analysis_score}
                         </div>
-                        <div className="flex-1 grid grid-cols-2 gap-4 pb-2">
+                        <div className="flex-1 grid grid-cols-2 gap-4 pb-2 w-full">
                           <div>
                             <p className="text-xs text-zinc-500 mb-1">Est. Response Rate</p>
                             <p className="font-semibold text-cyan-400" style={{ fontFamily: 'JetBrains Mono' }}>{analysis.estimated_response_rate}%</p>
