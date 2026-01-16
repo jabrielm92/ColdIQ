@@ -1013,7 +1013,169 @@ async def reset_password(data: PasswordResetConfirm):
     
     return {"message": "Password reset successfully"}
 
-# ================= PHONE VERIFICATION ROUTES =================
+# ================= EMAIL OTP VERIFICATION ROUTES =================
+
+class EmailOTPRequest(BaseModel):
+    email: str
+
+class EmailOTPVerifyRequest(BaseModel):
+    email: str
+    otp: str
+
+def generate_email_otp() -> str:
+    """Generate a 6-digit OTP"""
+    return ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+
+@api_router.post("/auth/email-otp/send")
+async def send_email_otp(data: EmailOTPRequest, user: dict = Depends(get_current_user)):
+    """Send OTP to email for verification"""
+    email = data.email.strip().lower()
+    
+    # Validate email format
+    if not email or "@" not in email:
+        raise HTTPException(status_code=400, detail="Invalid email address")
+    
+    # Check rate limiting (max 3 OTPs per email per hour)
+    one_hour_ago = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+    recent_otps = await db.email_otps.count_documents({
+        "email": email,
+        "created_at": {"$gte": one_hour_ago}
+    })
+    
+    if recent_otps >= 3:
+        raise HTTPException(
+            status_code=429, 
+            detail="Too many verification attempts. Please try again in 1 hour."
+        )
+    
+    # Generate OTP
+    otp = generate_email_otp()
+    
+    # Store OTP with 10-minute expiration
+    otp_doc = {
+        "id": str(uuid.uuid4()),
+        "email": email,
+        "user_id": user["id"],
+        "otp_hash": hash_password(otp),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat(),
+        "attempts": 0,
+        "used": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.email_otps.insert_one(otp_doc)
+    
+    # Send OTP via Resend
+    try:
+        await send_otp_email(email, otp, user.get("full_name", "User"))
+        logger.info(f"📧 Email OTP sent to: {email}")
+    except Exception as e:
+        logger.error(f"Failed to send OTP email: {e}")
+        raise HTTPException(status_code=500, detail="Failed to send verification email")
+    
+    return {
+        "message": "Verification code sent",
+        "email": email,
+        "expires_in_seconds": 600
+    }
+
+async def send_otp_email(email: str, otp: str, name: str):
+    """Send OTP verification email using Resend"""
+    import resend
+    resend.api_key = os.environ.get("RESEND_API_KEY")
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; background: #0a0a0a; color: #e5e5e5; padding: 40px; }}
+            .container {{ max-width: 500px; margin: 0 auto; background: #18181b; padding: 40px; border: 1px solid #27272a; }}
+            .header {{ text-align: center; margin-bottom: 30px; }}
+            .logo {{ font-size: 24px; font-weight: bold; color: #d4af37; }}
+            .otp-box {{ background: #27272a; border: 2px solid #d4af37; padding: 20px; text-align: center; margin: 30px 0; }}
+            .otp-code {{ font-size: 32px; font-family: monospace; letter-spacing: 8px; color: #d4af37; font-weight: bold; }}
+            .message {{ color: #a1a1aa; font-size: 14px; line-height: 1.6; }}
+            .footer {{ text-align: center; margin-top: 30px; color: #71717a; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">ColdIQ</div>
+            </div>
+            <p class="message">Hi {name},</p>
+            <p class="message">Here's your verification code:</p>
+            <div class="otp-box">
+                <div class="otp-code">{otp}</div>
+            </div>
+            <p class="message">This code expires in 10 minutes.</p>
+            <p class="message">If you didn't request this code, you can safely ignore this email.</p>
+            <div class="footer">
+                &copy; 2026 ColdIQ. All rights reserved.
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    resend.Emails.send({
+        "from": "ColdIQ <noreply@coldiq.com>",
+        "to": [email],
+        "subject": f"Your ColdIQ verification code: {otp}",
+        "html": html_content
+    })
+
+@api_router.post("/auth/email-otp/verify")
+async def verify_email_otp(data: EmailOTPVerifyRequest, user: dict = Depends(get_current_user)):
+    """Verify email OTP and mark email as verified"""
+    email = data.email.strip().lower()
+    
+    # Find valid OTP
+    now = datetime.now(timezone.utc).isoformat()
+    otp_doc = await db.email_otps.find_one({
+        "email": email,
+        "user_id": user["id"],
+        "used": False,
+        "expires_at": {"$gt": now}
+    }, sort=[("created_at", -1)])
+    
+    if not otp_doc:
+        raise HTTPException(status_code=400, detail="No valid verification code found. Please request a new one.")
+    
+    # Check max attempts
+    if otp_doc.get("attempts", 0) >= 5:
+        await db.email_otps.update_one(
+            {"id": otp_doc["id"]},
+            {"$set": {"used": True}}
+        )
+        raise HTTPException(status_code=400, detail="Too many incorrect attempts. Please request a new code.")
+    
+    # Verify OTP
+    if not verify_password(data.otp, otp_doc["otp_hash"]):
+        await db.email_otps.update_one(
+            {"id": otp_doc["id"]},
+            {"$inc": {"attempts": 1}}
+        )
+        raise HTTPException(status_code=400, detail="Invalid verification code")
+    
+    # Mark OTP as used
+    await db.email_otps.update_one(
+        {"id": otp_doc["id"]},
+        {"$set": {"used": True}}
+    )
+    
+    # Update user's email verification status
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "email_verified": True,
+            "email_verified_at": now
+        }}
+    )
+    
+    return {"message": "Email verified successfully", "email": email}
+
+# ================= PHONE VERIFICATION ROUTES (LEGACY - DISABLED) =================
 
 class PhoneVerificationRequest(BaseModel):
     phone_number: str
