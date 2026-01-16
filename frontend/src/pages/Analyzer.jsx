@@ -112,21 +112,21 @@ const Analyzer = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-6 lg:p-8" data-testid="analyzer-page">
+      <div className="p-4 sm:p-6 lg:p-8 overflow-x-hidden" data-testid="analyzer-page">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-10">
-            <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-3">Email Analysis</p>
-            <h1 className="font-serif text-4xl tracking-tight mb-2">
+          <div className="mb-6 sm:mb-10">
+            <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-2 sm:mb-3">Email Analysis</p>
+            <h1 className="font-serif text-2xl sm:text-4xl tracking-tight mb-2">
               Analyze Your Email
             </h1>
-            <p className="text-zinc-500">Paste your cold email to get AI-powered feedback and optimization</p>
+            <p className="text-sm sm:text-base text-zinc-500">Paste your cold email to get AI-powered feedback and optimization</p>
           </div>
           
-          <div className="grid lg:grid-cols-5 gap-8">
+          <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
             {/* Input Section - 2 columns */}
-            <div className="lg:col-span-2 space-y-6">
-              <form onSubmit={handleAnalyze} className="space-y-5" data-testid="analyzer-form">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+              <form onSubmit={handleAnalyze} className="space-y-4 sm:space-y-5" data-testid="analyzer-form">
                 <div className="space-y-2">
                   <Label htmlFor="subject" className="text-zinc-300">Subject Line</Label>
                   <Input
