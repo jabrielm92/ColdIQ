@@ -13,6 +13,29 @@ AI-powered cold email analyzer SaaS with tier-specific features, email verificat
 
 ## Completed Features (January 2025)
 
+### Landing Page Updates (January 16, 2026)
+- ✅ **Realistic Stats** - Changed from exaggerated to realistic numbers:
+  - Response Increase: 127% → 47%
+  - Emails Analyzed: 2.4M → 125K+
+  - Active Users: 18,500+ → 2,400+
+- ✅ **Data Points Section** - Updated to realistic before/after metrics:
+  - Response Rate: 2.1% → 3.5% (+67%)
+  - Open Rate: 18% → 32% (+78%)
+  - Avg Score: 45 → 71 (+58%)
+  - Days to Reply: 5.2 → 2.8 (-46%)
+- ✅ **Product Screenshots Section** - Added "See It In Action" / "AI Analysis in Seconds" section above Testimonials with 3 interactive mockups:
+  1. Analysis Score mockup (score 78, response rate 4.2%, key insight)
+  2. Deep Metrics mockup (readability, spam risk, subject line, CTA analysis)
+  3. AI Rewrite mockup (optimized subject and body with Copy/View Original buttons)
+
+### Tier-Based Feature Visibility (January 16, 2026)
+- ✅ **All Features Shown with Locks** - Every tier shows all features, with locked ones displaying:
+  - Lock icon
+  - Feature description
+  - "Unlock with [Tier] →" CTA linking to pricing
+- ✅ **Starter User View**: Unlocked Starter features + Locked Pro features
+- ✅ **Free User View**: Locked Starter features + Locked Pro features
+
 ### Phase 1: Pricing & Tier Expansion (NEW)
 - ✅ **Pricing Page Redesign** - New marketing copy ("Cold emails shouldn't be guesswork")
 - ✅ **Renamed Agency → Growth Agency** - Better positioning
