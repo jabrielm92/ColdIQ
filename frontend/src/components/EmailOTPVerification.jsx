@@ -12,7 +12,7 @@ const EmailOTPVerification = ({ onVerified, onSkip, token, userEmail }) => {
   const [step, setStep] = useState(userEmail ? "otp" : "email"); // Start at OTP step if email is provided
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
-  const [initialSendDone, setInitialSendDone] = useState(false);
+  const initialSendDone = useRef(false);
   const inputRefs = useRef([]);
 
   // Countdown timer for resend
@@ -25,8 +25,8 @@ const EmailOTPVerification = ({ onVerified, onSkip, token, userEmail }) => {
 
   // Auto-send OTP on mount when email is provided from signup
   useEffect(() => {
-    if (userEmail && token && !initialSendDone) {
-      setInitialSendDone(true);
+    if (userEmail && token && !initialSendDone.current) {
+      initialSendDone.current = true;
       handleAutoSendOtp();
     }
   }, [userEmail, token]);
