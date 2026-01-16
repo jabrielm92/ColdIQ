@@ -33,9 +33,9 @@ const Landing = () => {
   ];
 
   const stats = [
-    { value: "127%", label: "Avg Response Increase", icon: <TrendingUp className="w-4 h-4" /> },
-    { value: "2.4M", label: "Emails Analyzed", icon: <Mail className="w-4 h-4" /> },
-    { value: "18,500+", label: "Active Users", icon: <Users className="w-4 h-4" /> }
+    { value: "47%", label: "Avg Response Increase", icon: <TrendingUp className="w-4 h-4" /> },
+    { value: "125K+", label: "Emails Analyzed", icon: <Mail className="w-4 h-4" /> },
+    { value: "2,400+", label: "Active Users", icon: <Users className="w-4 h-4" /> }
   ];
 
   const dataPoints = [
