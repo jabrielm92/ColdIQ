@@ -182,24 +182,15 @@ const Pricing = () => {
     }
     
     if (!user) {
-      navigate("/signup");
+      // Pass selected tier to signup page
+      navigate(`/signup?plan=${planId}&billing=${isAnnual ? 'annual' : 'monthly'}`);
       return;
     }
     
-    // Check if email is verified before allowing upgrade
-    if (!user.email_verified && planId !== "free") {
-      toast.error("Please verify your email before upgrading", {
-        description: "Check your inbox for the verification code",
-        action: {
-          label: "Verify Now",
-          onClick: () => navigate("/settings")
-        }
-      });
-      return;
-    }
-    
+    // Free tier - no payment needed
     if (planId === "free") return;
     
+    // Existing user upgrading - go to Stripe
     const priceKey = `${planId}_${isAnnual ? "annual" : "monthly"}`;
     
     setLoading(planId);
