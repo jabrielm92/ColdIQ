@@ -1,14 +1,19 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/App";
+import { useAuth, API } from "@/App";
 import { Mail, ArrowLeft, Eye, EyeOff, Check } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
 import EmailOTPVerification from "@/components/EmailOTPVerification";
+import axios from "axios";
 
 const Signup = () => {
+  const [searchParams] = useSearchParams();
+  const selectedPlan = searchParams.get("plan") || "free";
+  const billingCycle = searchParams.get("billing") || "monthly";
+  
   const [step, setStep] = useState("signup"); // "signup" | "verify"
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -18,6 +23,8 @@ const Signup = () => {
   const [token, setToken] = useState(null);
   const { signup } = useAuth();
   const navigate = useNavigate();
+
+  const planLabels = { free: "Free", starter: "Starter", pro: "Pro" };
 
   const passwordChecks = [
     { label: "At least 8 characters", valid: password.length >= 8 },
@@ -55,8 +62,28 @@ const Signup = () => {
     }
   };
 
-  const handleEmailVerified = () => {
-    toast.success("Email verified! Let's set up your profile.");
+  const handleEmailVerified = async () => {
+    toast.success("Email verified!");
+    
+    // If paid plan, redirect to Stripe
+    if (selectedPlan !== "free") {
+      try {
+        const priceKey = `${selectedPlan}_${billingCycle}`;
+        const res = await axios.post(`${API}/billing/create-checkout-session`, {
+          plan_tier: priceKey,
+          origin_url: window.location.origin
+        });
+        
+        if (res.data.url) {
+          window.location.href = res.data.url;
+          return;
+        }
+      } catch (err) {
+        toast.error("Payment setup failed. You can upgrade later from settings.");
+      }
+    }
+    
+    // Free plan or payment failed - go to onboarding
     navigate("/onboarding");
   };
 
