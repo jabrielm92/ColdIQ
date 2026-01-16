@@ -31,6 +31,7 @@ import Clients from "@/pages/Clients";
 import Reports from "@/pages/Reports";
 import ApiAccess from "@/pages/ApiAccess";
 import Campaigns from "@/pages/Campaigns";
+import Admin from "@/pages/Admin";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
