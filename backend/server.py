@@ -2867,6 +2867,256 @@ async def generate_api_key(user: dict = Depends(require_tier("agency"))):
 
 # ================= HEALTH CHECK =================
 
+# ================= ADMIN ROUTES =================
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(user: dict = Depends(require_admin)):
+    """Get overall platform statistics"""
+    total_users = await db.users.count_documents({})
+    verified_users = await db.users.count_documents({"email_verified": True})
+    total_analyses = await db.analyses.count_documents({})
+    total_templates = await db.templates.count_documents({})
+    
+    # Subscription breakdown
+    free_users = await db.users.count_documents({"subscription_tier": "free"})
+    starter_users = await db.users.count_documents({"subscription_tier": "starter"})
+    pro_users = await db.users.count_documents({"subscription_tier": "pro"})
+    agency_users = await db.users.count_documents({"$or": [{"subscription_tier": "agency"}, {"subscription_tier": "growth_agency"}]})
+    
+    # Recent activity (last 7 days)
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    new_users_week = await db.users.count_documents({"created_at": {"$gte": week_ago}})
+    new_analyses_week = await db.analyses.count_documents({"created_at": {"$gte": week_ago}})
+    
+    # Payment stats
+    total_payments = await db.payment_transactions.count_documents({"payment_status": "paid"})
+    pending_payments = await db.payment_transactions.count_documents({"payment_status": "pending"})
+    
+    return {
+        "users": {
+            "total": total_users,
+            "verified": verified_users,
+            "new_this_week": new_users_week
+        },
+        "subscriptions": {
+            "free": free_users,
+            "starter": starter_users,
+            "pro": pro_users,
+            "agency": agency_users
+        },
+        "analyses": {
+            "total": total_analyses,
+            "new_this_week": new_analyses_week
+        },
+        "templates": total_templates,
+        "payments": {
+            "completed": total_payments,
+            "pending": pending_payments
+        }
+    }
+
+@api_router.get("/admin/users")
+async def get_admin_users(
+    page: int = 1,
+    limit: int = 20,
+    search: str = None,
+    tier: str = None,
+    user: dict = Depends(require_admin)
+):
+    """Get all users with pagination and filtering"""
+    query = {}
+    if search:
+        query["$or"] = [
+            {"email": {"$regex": search, "$options": "i"}},
+            {"full_name": {"$regex": search, "$options": "i"}}
+        ]
+    if tier:
+        query["subscription_tier"] = tier
+    
+    skip = (page - 1) * limit
+    total = await db.users.count_documents(query)
+    
+    users = await db.users.find(
+        query,
+        {"_id": 0, "password_hash": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Add analysis count for each user
+    for u in users:
+        u["analyses_count"] = await db.analyses.count_documents({"user_id": u["id"]})
+    
+    return {
+        "users": users,
+        "total": total,
+        "page": page,
+        "pages": (total + limit - 1) // limit
+    }
+
+@api_router.get("/admin/users/{user_id}")
+async def get_admin_user_detail(user_id: str, user: dict = Depends(require_admin)):
+    """Get detailed user information"""
+    target_user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Get user's analyses
+    analyses = await db.analyses.find(
+        {"user_id": user_id},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    
+    # Get user's payments
+    payments = await db.payment_transactions.find(
+        {"user_id": user_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(20)
+    
+    return {
+        "user": target_user,
+        "recent_analyses": analyses,
+        "payments": payments
+    }
+
+class AdminUserUpdate(BaseModel):
+    subscription_tier: Optional[str] = None
+    email_verified: Optional[bool] = None
+    full_name: Optional[str] = None
+
+@api_router.patch("/admin/users/{user_id}")
+async def update_admin_user(user_id: str, data: AdminUserUpdate, user: dict = Depends(require_admin)):
+    """Update user details (admin only)"""
+    update_data = {k: v for k, v in data.dict().items() if v is not None}
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    updated_user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    return {"message": "User updated", "user": updated_user}
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_admin_user(user_id: str, user: dict = Depends(require_admin)):
+    """Delete a user and their data"""
+    target_user = await db.users.find_one({"id": user_id})
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Don't allow deleting admin users
+    if target_user.get("email") in ADMIN_EMAILS:
+        raise HTTPException(status_code=403, detail="Cannot delete admin users")
+    
+    # Delete user's data
+    await db.analyses.delete_many({"user_id": user_id})
+    await db.templates.delete_many({"user_id": user_id})
+    await db.verification_tokens.delete_many({"user_id": user_id})
+    await db.email_otps.delete_many({"user_id": user_id})
+    await db.payment_transactions.delete_many({"user_id": user_id})
+    await db.users.delete_one({"id": user_id})
+    
+    return {"message": "User and associated data deleted"}
+
+class AdminUserCreate(BaseModel):
+    email: str
+    password: str
+    full_name: str
+    subscription_tier: str = "free"
+    email_verified: bool = True
+
+@api_router.post("/admin/users")
+async def create_admin_user(data: AdminUserCreate, user: dict = Depends(require_admin)):
+    """Create a new user (admin only)"""
+    existing = await db.users.find_one({"email": data.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    user_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    new_user = {
+        "id": user_id,
+        "email": data.email,
+        "password_hash": hash_password(data.password),
+        "full_name": data.full_name,
+        "role": None,
+        "target_industry": None,
+        "monthly_email_volume": None,
+        "subscription_tier": data.subscription_tier,
+        "subscription_status": "active",
+        "stripe_customer_id": None,
+        "analyses_used_this_month": 0,
+        "total_analyses": 0,
+        "created_at": now,
+        "onboarding_completed": False,
+        "team_id": None,
+        "email_verified": data.email_verified,
+        "phone_number": None,
+        "phone_verified": False,
+        "phone_verified_at": None
+    }
+    
+    await db.users.insert_one(new_user)
+    del new_user["password_hash"]
+    if "_id" in new_user:
+        del new_user["_id"]
+    
+    return {"message": "User created", "user": new_user}
+
+@api_router.get("/admin/payments")
+async def get_admin_payments(
+    page: int = 1,
+    limit: int = 20,
+    status: str = None,
+    user: dict = Depends(require_admin)
+):
+    """Get all payment transactions"""
+    query = {}
+    if status:
+        query["payment_status"] = status
+    
+    skip = (page - 1) * limit
+    total = await db.payment_transactions.count_documents(query)
+    
+    payments = await db.payment_transactions.find(
+        query,
+        {"_id": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Add user info to each payment
+    for payment in payments:
+        payment_user = await db.users.find_one(
+            {"id": payment.get("user_id")},
+            {"email": 1, "full_name": 1}
+        )
+        if payment_user:
+            payment["user_email"] = payment_user.get("email")
+            payment["user_name"] = payment_user.get("full_name")
+    
+    return {
+        "payments": payments,
+        "total": total,
+        "page": page,
+        "pages": (total + limit - 1) // limit
+    }
+
+@api_router.get("/admin/db-info")
+async def get_admin_db_info(user: dict = Depends(require_admin)):
+    """Get database collection statistics"""
+    collections = ["users", "analyses", "templates", "payment_transactions", "verification_tokens", "email_otps", "clients", "campaigns", "reports", "api_keys"]
+    
+    stats = {}
+    for coll_name in collections:
+        coll = db[coll_name]
+        count = await coll.count_documents({})
+        stats[coll_name] = count
+    
+    return {"collections": stats}
+
 @api_router.get("/")
 async def root():
     return {"message": "ColdIQ API", "version": "1.0.0"}
