@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/App";
 import {
   Mail, LayoutDashboard, History, BarChart3, Settings, LogOut,
-  Plus, Menu, X, FileText, Users, TrendingUp, Layers
+  Plus, Menu, X, FileText, Users, TrendingUp, Layers, Lock,
+  Building2, FileBarChart, Code, Target
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import { toast } from "sonner";
 
 const DashboardLayout = ({ children }) => {
   const { user, logout } = useAuth();
@@ -20,23 +22,54 @@ const DashboardLayout = ({ children }) => {
   };
 
   const userTier = user?.subscription_tier || "free";
-  const isAgency = userTier === "agency" || userTier === "growth_agency";
+  const isStarter = ["starter", "pro", "agency", "growth_agency"].includes(userTier);
   const isPro = ["pro", "agency", "growth_agency"].includes(userTier);
+  const isAgency = userTier === "agency" || userTier === "growth_agency";
 
+  // All nav items - shown to everyone, access controlled by tier
   const navItems = [
-    { path: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-    { path: "/analyze", label: "Analyze", icon: <Plus className="w-5 h-5" /> },
-    { path: "/history", label: "History", icon: <History className="w-5 h-5" /> },
-    { path: "/templates", label: "Templates", icon: <FileText className="w-5 h-5" /> },
+    // Core features - available to all
+    { path: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, tier: "free" },
+    { path: "/analyze", label: "Analyze", icon: <Plus className="w-5 h-5" />, tier: "free" },
+    { path: "/history", label: "History", icon: <History className="w-5 h-5" />, tier: "free" },
+    { path: "/templates", label: "Templates", icon: <FileText className="w-5 h-5" />, tier: "free" },
+    { path: "/insights", label: "Insights", icon: <BarChart3 className="w-5 h-5" />, tier: "starter" },
+    
     // Pro features
-    ...(isPro ? [
-      { path: "/sequence", label: "Sequences", icon: <Layers className="w-5 h-5" />, badge: "PRO" },
-      { path: "/performance", label: "Performance", icon: <TrendingUp className="w-5 h-5" />, badge: "PRO" }
-    ] : []),
-    { path: "/insights", label: "Insights", icon: <BarChart3 className="w-5 h-5" /> },
-    ...(isAgency ? [{ path: "/team-analytics", label: "Team", icon: <Users className="w-5 h-5" /> }] : []),
-    { path: "/settings", label: "Settings", icon: <Settings className="w-5 h-5" /> }
+    { path: "/sequence", label: "Sequences", icon: <Layers className="w-5 h-5" />, tier: "pro", badge: "PRO" },
+    { path: "/performance", label: "Performance", icon: <TrendingUp className="w-5 h-5" />, tier: "pro", badge: "PRO" },
+    
+    // Agency features
+    { path: "/clients", label: "Clients", icon: <Building2 className="w-5 h-5" />, tier: "agency", badge: "AGENCY" },
+    { path: "/campaigns", label: "Campaigns", icon: <Target className="w-5 h-5" />, tier: "agency", badge: "AGENCY" },
+    { path: "/reports", label: "Reports", icon: <FileBarChart className="w-5 h-5" />, tier: "agency", badge: "AGENCY" },
+    { path: "/team-analytics", label: "Team", icon: <Users className="w-5 h-5" />, tier: "agency", badge: "AGENCY" },
+    { path: "/api-access", label: "API", icon: <Code className="w-5 h-5" />, tier: "agency", badge: "AGENCY" },
+    
+    // Settings - available to all
+    { path: "/settings", label: "Settings", icon: <Settings className="w-5 h-5" />, tier: "free" }
   ];
+
+  const hasAccess = (itemTier) => {
+    if (itemTier === "free") return true;
+    if (itemTier === "starter") return isStarter;
+    if (itemTier === "pro") return isPro;
+    if (itemTier === "agency") return isAgency;
+    return false;
+  };
+
+  const handleNavClick = (e, item) => {
+    if (!hasAccess(item.tier)) {
+      e.preventDefault();
+      const tierLabels = { starter: "Starter", pro: "Pro", agency: "Growth Agency" };
+      toast.error(`${item.label} requires ${tierLabels[item.tier]} plan`, {
+        action: {
+          label: "Upgrade",
+          onClick: () => navigate("/pricing")
+        }
+      });
+    }
+  };
 
   const isActive = (path) => location.pathname === path;
 
@@ -66,28 +99,56 @@ const DashboardLayout = ({ children }) => {
         </div>
         
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 transition-all font-medium text-sm ${
-                isActive(item.path) 
-                  ? 'bg-[#d4af37]/10 text-[#d4af37] border-l-2 border-[#d4af37]' 
-                  : 'text-theme-muted hover:text-theme hover:bg-theme-tertiary border-l-2 border-transparent'
-              }`}
-              data-testid={`nav-${item.label.toLowerCase()}`}
-            >
-              {item.icon}
-              <span className="flex-1">{item.label}</span>
-              {item.badge && (
-                <span className="px-1.5 py-0.5 text-[9px] bg-[#d4af37]/20 text-[#d4af37] font-mono">
-                  {item.badge}
-                </span>
-              )}
-            </Link>
-          ))}
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {navItems.map((item) => {
+            const locked = !hasAccess(item.tier);
+            return (
+              <Link
+                key={item.path}
+                to={locked ? "#" : item.path}
+                onClick={(e) => handleNavClick(e, item)}
+                className={`flex items-center gap-3 px-4 py-3 transition-all font-medium text-sm relative ${
+                  locked 
+                    ? 'text-zinc-600 hover:text-zinc-500 cursor-not-allowed opacity-60'
+                    : isActive(item.path) 
+                      ? 'bg-[#d4af37]/10 text-[#d4af37] border-l-2 border-[#d4af37]' 
+                      : 'text-theme-muted hover:text-theme hover:bg-theme-tertiary border-l-2 border-transparent'
+                }`}
+                data-testid={`nav-${item.label.toLowerCase()}`}
+              >
+                {item.icon}
+                <span className="flex-1">{item.label}</span>
+                {locked && <Lock className="w-3.5 h-3.5 text-zinc-600" />}
+                {item.badge && !locked && (
+                  <span className={`px-1.5 py-0.5 text-[9px] font-mono ${
+                    item.badge === "PRO" ? "bg-[#d4af37]/20 text-[#d4af37]" : "bg-violet-500/20 text-violet-400"
+                  }`}>
+                    {item.badge}
+                  </span>
+                )}
+                {item.badge && locked && (
+                  <span className="px-1.5 py-0.5 text-[9px] bg-zinc-800 text-zinc-500 font-mono">
+                    {item.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
+        
+        {/* Upgrade CTA for non-Agency users */}
+        {!isAgency && (
+          <div className="p-4 border-t border-theme">
+            <Link to="/pricing">
+              <div className="p-3 bg-gradient-to-r from-[#d4af37]/10 to-violet-500/10 border border-[#d4af37]/20 hover:border-[#d4af37]/40 transition-colors">
+                <p className="text-xs font-medium text-[#d4af37] mb-1">Unlock All Features</p>
+                <p className="text-[10px] text-zinc-500">
+                  {isPro ? "Upgrade to Agency for client management" : isPro ? "Get Pro for sequences & performance" : "Upgrade for advanced analysis"}
+                </p>
+              </div>
+            </Link>
+          </div>
+        )}
         
         {/* User Section */}
         <div className="p-4 border-t border-theme">
@@ -138,22 +199,39 @@ const DashboardLayout = ({ children }) => {
         
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="p-4 space-y-1 border-t border-theme bg-theme-secondary">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 transition-all ${
-                  isActive(item.path) 
-                    ? 'bg-[#d4af37]/10 text-[#d4af37]' 
-                    : 'text-theme-muted hover:text-theme'
-                }`}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </Link>
-            ))}
+          <div className="p-4 space-y-1 border-t border-theme bg-theme-secondary max-h-[70vh] overflow-y-auto">
+            {navItems.map((item) => {
+              const locked = !hasAccess(item.tier);
+              return (
+                <Link
+                  key={item.path}
+                  to={locked ? "#" : item.path}
+                  onClick={(e) => {
+                    handleNavClick(e, item);
+                    if (!locked) setMobileMenuOpen(false);
+                  }}
+                  className={`flex items-center gap-3 px-4 py-3 transition-all ${
+                    locked 
+                      ? 'text-zinc-600 opacity-60'
+                      : isActive(item.path) 
+                        ? 'bg-[#d4af37]/10 text-[#d4af37]' 
+                        : 'text-theme-muted hover:text-theme'
+                  }`}
+                >
+                  {item.icon}
+                  <span className="flex-1">{item.label}</span>
+                  {locked && <Lock className="w-3.5 h-3.5" />}
+                  {item.badge && (
+                    <span className={`px-1.5 py-0.5 text-[9px] font-mono ${
+                      locked ? "bg-zinc-800 text-zinc-500" : 
+                      item.badge === "PRO" ? "bg-[#d4af37]/20 text-[#d4af37]" : "bg-violet-500/20 text-violet-400"
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
             <Button 
               variant="ghost" 
               className="w-full justify-start text-theme-muted hover:text-theme mt-4 rounded-none"
