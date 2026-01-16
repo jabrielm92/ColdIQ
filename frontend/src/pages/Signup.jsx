@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/App";
-import { Mail, ArrowLeft, Eye, EyeOff, Check, Phone } from "lucide-react";
+import { Mail, ArrowLeft, Eye, EyeOff, Check } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
-import PhoneVerification from "@/components/PhoneVerification";
+import EmailOTPVerification from "@/components/EmailOTPVerification";
 
 const Signup = () => {
   const [step, setStep] = useState("signup"); // "signup" | "phone"
