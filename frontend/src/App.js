@@ -27,6 +27,10 @@ import SmsOptIn from "@/pages/SmsOptIn";
 import Contact from "@/pages/Contact";
 import Performance from "@/pages/Performance";
 import SequenceAnalyzer from "@/pages/SequenceAnalyzer";
+import Clients from "@/pages/Clients";
+import Reports from "@/pages/Reports";
+import ApiAccess from "@/pages/ApiAccess";
+import Campaigns from "@/pages/Campaigns";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
