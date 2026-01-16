@@ -1589,17 +1589,20 @@ Return JSON only (no markdown):
 }}"""
 
     try:
-        chat = LlmChat(
-            api_key=api_key,
-            session_id=f"sequence_{user['id']}_{uuid.uuid4()}",
-            system_message="You are ColdIQ, an expert cold email sequence analyzer. Always respond with valid JSON only."
+        # Use OpenAI GPT-4o-mini
+        from openai import AsyncOpenAI
+        client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        
+        completion = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are ColdIQ, an expert cold email sequence analyzer. Always respond with valid JSON only."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3
         )
-        chat.with_model("anthropic", "claude-sonnet-4-5-20250929")
         
-        user_message = UserMessage(text=prompt)
-        response = await chat.send_message(user_message)
-        
-        response_text = response.strip()
+        response_text = completion.choices[0].message.content.strip()
         if response_text.startswith("```"):
             response_text = response_text.split("```")[1]
             if response_text.startswith("json"):
@@ -1613,6 +1616,7 @@ Return JSON only (no markdown):
             issues=analysis_data.get("issues", []),
             email_scores=analysis_data.get("emailScores", []),
             recommendations=analysis_data.get("recommendations", [])
+        )
         )
         
     except json.JSONDecodeError as e:
