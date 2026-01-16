@@ -54,6 +54,32 @@ const Templates = () => {
   const userTier = user?.subscription_tier || "free";
   const isPro = ["pro", "agency", "growth_agency"].includes(userTier);
   const isAgency = userTier === "agency" || userTier === "growth_agency";
+  const isStarter = ["starter", "pro", "agency", "growth_agency"].includes(userTier);
+
+  // Free tier doesn't have access to templates
+  if (userTier === "free") {
+    return (
+      <DashboardLayout>
+        <div className="p-6 lg:p-8 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-20 h-20 bg-zinc-800 flex items-center justify-center mx-auto mb-6">
+              <Lock className="w-10 h-10 text-zinc-600" />
+            </div>
+            <h1 className="font-serif text-3xl mb-4">Email Templates</h1>
+            <p className="text-zinc-500 max-w-md mx-auto mb-8">
+              Access our library of proven cold email templates and create your own. Start writing emails that convert.
+            </p>
+            <Link to="/pricing">
+              <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-4 h-auto">
+                Upgrade to Access Templates
+              </Button>
+            </Link>
+            <p className="text-xs text-zinc-600 mt-4">Available on Starter plan and above</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   useEffect(() => {
     fetchTemplates();
