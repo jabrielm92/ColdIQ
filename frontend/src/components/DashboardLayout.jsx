@@ -121,7 +121,9 @@ const DashboardLayout = ({ children }) => {
                 {locked && <Lock className="w-3.5 h-3.5 text-zinc-600" />}
                 {item.badge && !locked && (
                   <span className={`px-1.5 py-0.5 text-[9px] font-mono ${
-                    item.badge === "PRO" ? "bg-[#d4af37]/20 text-[#d4af37]" : "bg-violet-500/20 text-violet-400"
+                    item.badge === "STARTER" ? "bg-[#a3e635]/20 text-[#a3e635]" :
+                    item.badge === "PRO" ? "bg-[#d4af37]/20 text-[#d4af37]" : 
+                    "bg-violet-500/20 text-violet-400"
                   }`}>
                     {item.badge}
                   </span>
