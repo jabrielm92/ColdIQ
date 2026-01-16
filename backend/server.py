@@ -2234,7 +2234,7 @@ async def create_client(data: ClientCreate, user: dict = Depends(require_tier("a
     }
     
     await db.clients.insert_one(client_doc)
-    del client_doc["_id"] if "_id" in client_doc else None
+    client_doc.pop("_id", None)
     return client_doc
 
 @api_router.delete("/clients/{client_id}")
