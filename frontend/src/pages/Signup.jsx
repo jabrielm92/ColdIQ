@@ -125,7 +125,7 @@ const Signup = () => {
                   <div className="flex-1 h-px bg-theme-tertiary" />
                   <div className="flex items-center gap-2 opacity-50">
                     <div className="w-8 h-8 border border-theme flex items-center justify-center text-theme-dim text-sm">2</div>
-                    <span className="text-sm text-theme-dim">Phone</span>
+                    <span className="text-sm text-theme-dim">Verify Email</span>
                   </div>
                 </div>
               </div>
