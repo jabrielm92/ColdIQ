@@ -137,7 +137,8 @@ const AuthProvider = ({ children }) => {
   const signup = async (email, password, full_name) => {
     const res = await axios.post(`${API}/auth/signup`, { email, password, full_name });
     localStorage.setItem("coldiq_token", res.data.token);
-    setUser(res.data.user);
+    // Don't set user yet - wait for email verification
+    // setUser(res.data.user);
     return res.data.user;
   };
 
