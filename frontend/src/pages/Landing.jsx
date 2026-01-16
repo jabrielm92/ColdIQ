@@ -200,7 +200,7 @@ const Landing = () => {
               </h1>
               
               <p className="text-base sm:text-lg text-theme-muted leading-relaxed max-w-xl mb-8 sm:mb-10 font-sans">
-                ColdIQ uses Claude AI to analyze your cold emails in seconds. Get a score, actionable fixes, and an optimized rewrite that actually gets responses. <strong className="text-theme">Average users see 127% better response rates.</strong>
+                ColdIQ uses Claude AI to analyze your cold emails in seconds. Get a score, actionable fixes, and an optimized rewrite that actually gets responses. <strong className="text-theme">Average users see 47% better response rates.</strong>
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8">
