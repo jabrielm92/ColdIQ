@@ -39,8 +39,8 @@ const Signup = () => {
       // Get token from localStorage (set by signup)
       const authToken = localStorage.getItem("coldiq_token");
       setToken(authToken);
-      toast.success("Account created! Please verify your phone.");
-      setStep("phone");
+      toast.success("Account created! Please verify your email.");
+      setStep("verify");
     } catch (err) {
       let message = "Failed to create account";
       const detail = err.response?.data?.detail;
