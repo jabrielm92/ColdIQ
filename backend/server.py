@@ -683,6 +683,15 @@ def require_tier(min_tier: str):
         return user
     return check_tier
 
+# Admin emails list
+ADMIN_EMAILS = ["jabriel@arisolutionsinc.com"]
+
+async def require_admin(user: dict = Depends(get_current_user)):
+    """Require user to be an admin"""
+    if user.get("email") not in ADMIN_EMAILS:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
 def generate_verification_token() -> str:
     return secrets.token_urlsafe(32)
 
