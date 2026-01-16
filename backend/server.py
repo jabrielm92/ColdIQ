@@ -1825,25 +1825,17 @@ async def get_insights_dashboard(user: dict = Depends(get_current_user)):
 
 @api_router.get("/templates")
 async def get_templates(user: dict = Depends(get_current_user)):
-    features = get_tier_features(user.get("subscription_tier", "free"))
-    
-    if not features["templates"]:
-        return {
-            "available": False,
-            "required_tier": "pro",
-            "message": "Upgrade to Pro or higher to access email templates"
-        }
-    
+    """Get all templates - shows all to everyone, tier controls access"""
     # Get user's templates and shared team templates
     query = {"$or": [{"user_id": user["id"]}]}
     
     if user.get("team_id"):
         query["$or"].append({"team_id": user["team_id"], "is_shared": True})
     
-    # Also get system templates
+    # Also get system templates (include ALL tiers - let frontend handle locking)
     query["$or"].append({"is_system": True})
     
-    templates = await db.templates.find(query, {"_id": 0}).to_list(100)
+    templates = await db.templates.find(query, {"_id": 0}).to_list(200)
     
     return {"available": True, "templates": templates}
 
