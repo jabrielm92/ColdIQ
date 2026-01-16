@@ -190,7 +190,7 @@ const Landing = () => {
             >
               <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 border border-theme bg-theme-secondary mb-6 sm:mb-8">
                 <span className="w-2 h-2 bg-[#a3e635] animate-pulse" />
-                <span className="text-[10px] sm:text-xs font-mono tracking-widest uppercase text-theme-muted">Trusted by 18,500+ Sales Teams</span>
+                <span className="text-[10px] sm:text-xs font-mono tracking-widest uppercase text-theme-muted">Trusted by 2,400+ Sales Teams</span>
               </div>
               
               <h1 className="font-serif text-4xl sm:text-5xl lg:text-7xl tracking-tight leading-[1.1] sm:leading-[1.05] mb-6 sm:mb-8">
