@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail, Target, BarChart3, Zap, Sparkles, Menu, X, ChevronLeft, ChevronRight, Star, TrendingUp, Users, CheckCircle } from "lucide-react";
+import { ArrowRight, Mail, Target, BarChart3, Zap, Sparkles, Menu, X, ChevronLeft, ChevronRight, Star, TrendingUp, Users, CheckCircle, Copy } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
 
