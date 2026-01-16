@@ -1,7 +1,7 @@
 # ColdIQ - Product Requirements Document
 
 ## Original Problem Statement
-Build a full-stack SaaS platform named "ColdIQ" that uses AI (Anthropic Claude) to analyze cold emails, provide feedback, and track user performance. Multi-tiered subscription model with universal feature visibility.
+Build a full-stack SaaS platform named "ColdIQ" that uses AI to analyze cold emails, provide feedback, and track user performance. Multi-tiered subscription model with universal feature visibility.
 
 ## Tiers & Pricing
 - **Free:** Limited analyses, basic features
@@ -13,7 +13,7 @@ Build a full-stack SaaS platform named "ColdIQ" that uses AI (Anthropic Claude) 
 
 ### Core Features
 - [x] User authentication (JWT-based)
-- [x] Email OTP verification (Resend) - **Fixed Dec 2025**
+- [x] Email OTP verification (Resend) - Fixed duplicate OTP issue
 - [x] Onboarding flow
 - [x] Email analyzer with AI (Claude via Emergent LLM Key)
 - [x] Performance tracking dashboard
@@ -22,11 +22,13 @@ Build a full-stack SaaS platform named "ColdIQ" that uses AI (Anthropic Claude) 
 - [x] Template library with AI generation
 - [x] Stripe payments (test mode configured)
 
-### UI/UX
+### UI/UX & Routing
 - [x] "Midnight Architect" theme with dark mode
 - [x] Universal feature visibility (locked states with upgrade CTAs)
 - [x] Mobile responsive layout
 - [x] Landing page with agency mockups
+- [x] **NEW:** Logged-in users redirected from Landing/Pricing/Login/Signup to Dashboard
+- [x] **NEW:** History modal shows locked features with upgrade prompts (consistent with Analyzer)
 
 ### Agency Features (Scaffolded)
 - [x] Clients page (UI + backend endpoints)
@@ -37,10 +39,12 @@ Build a full-stack SaaS platform named "ColdIQ" that uses AI (Anthropic Claude) 
 ## Recent Bug Fixes (Dec 2025)
 - [x] **P0 Fixed:** Signup sending duplicate emails (old link + new OTP)
 - [x] **P0 Fixed:** Email OTP verification flow not working
+- [x] **P0 Fixed:** Duplicate OTP emails due to React StrictMode (useRef fix)
+- [x] **P0 Fixed:** Checkout allowed before email verification
+- [x] **P2 Fixed:** History modal hiding locked features instead of showing locked state
 
 ## Pending Issues
-- [ ] **P1:** AI model inconsistent JSON responses for Pro analysis
-- [ ] **P2:** History modal hides locked features instead of showing locked state
+- [ ] **P1:** AI model inconsistent JSON responses for Pro analysis (consider switching to OpenAI)
 
 ## In Progress
 - [ ] **P1:** Complete Growth Agency features (functional UI for clients, campaigns, reports, API)
@@ -48,6 +52,7 @@ Build a full-stack SaaS platform named "ColdIQ" that uses AI (Anthropic Claude) 
 ## Future/Backlog
 - [ ] **P2:** Live Amazon SNS phone verification
 - [ ] **P2:** Progressive Web App (PWA)
+- [ ] **P2:** Admin dashboard for viewing users/data
 
 ## Technical Stack
 - **Frontend:** React, Tailwind CSS, Recharts, Framer Motion
@@ -64,3 +69,6 @@ Build a full-stack SaaS platform named "ColdIQ" that uses AI (Anthropic Claude) 
 - Card: 4242 4242 4242 4242
 - Expiry: Any future date
 - CVC: Any 3 digits
+
+## Stripe Webhook URL
+https://coldiq-dashboard.preview.emergentagent.com/api/webhook/stripe
