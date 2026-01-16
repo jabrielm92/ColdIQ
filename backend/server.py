@@ -839,7 +839,7 @@ async def signup(data: UserSignup):
     if "_id" in user_doc:
         del user_doc["_id"]
     
-    return {"token": token, "user": user_doc, "verification_sent": True}
+    return {"token": token, "user": user_doc, "verification_pending": True}
 
 @api_router.post("/auth/login")
 async def login(data: UserLogin):
