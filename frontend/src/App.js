@@ -290,6 +290,9 @@ function App() {
               <Route path="/team-analytics" element={
                 <OnboardingRoute><TeamAnalytics /></OnboardingRoute>
               } />
+              <Route path="/admin" element={
+                <ProtectedRoute><Admin /></ProtectedRoute>
+              } />
             </Routes>
           </BrowserRouter>
           <ToasterWrapper />
