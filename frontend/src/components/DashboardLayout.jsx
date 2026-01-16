@@ -61,13 +61,8 @@ const DashboardLayout = ({ children }) => {
   const handleNavClick = (e, item) => {
     if (!hasAccess(item.tier)) {
       e.preventDefault();
-      const tierLabels = { starter: "Starter", pro: "Pro", agency: "Growth Agency" };
-      toast.error(`${item.label} requires ${tierLabels[item.tier]} plan`, {
-        action: {
-          label: "Upgrade",
-          onClick: () => navigate("/pricing")
-        }
-      });
+      // Directly navigate to pricing for locked features
+      navigate("/pricing");
     }
   };
 
