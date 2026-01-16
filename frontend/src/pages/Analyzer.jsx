@@ -221,7 +221,7 @@ const Analyzer = () => {
             </div>
             
             {/* Results Section - 3 columns */}
-            <div className="lg:col-span-3 space-y-6">
+            <div className="lg:col-span-3 space-y-4 sm:space-y-6 min-w-0 overflow-hidden">
               <AnimatePresence mode="wait">
                 {loading ? (
                   <motion.div
