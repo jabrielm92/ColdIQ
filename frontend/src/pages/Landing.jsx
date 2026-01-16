@@ -413,7 +413,7 @@ const Landing = () => {
                   <p className="text-xs text-zinc-500 mb-2">Top Subject Lines</p>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-300 truncate max-w-[140px]">"Quick question about {{company}}"</span>
+                      <span className="text-zinc-300 truncate max-w-[140px]">"Quick question about {'{{company}}'}"</span>
                       <span className="font-mono text-[#d4af37]">82</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
