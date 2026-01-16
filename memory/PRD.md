@@ -1,74 +1,93 @@
 # ColdIQ - Product Requirements Document
 
 ## Original Problem Statement
-Build a full-stack SaaS platform named "ColdIQ" that uses AI to analyze cold emails, provide feedback, and track user performance. Multi-tiered subscription model with universal feature visibility.
+Build a full-stack SaaS platform named "ColdIQ" that uses AI to analyze cold emails, provide feedback, and track user performance.
 
-## Tiers & Pricing
-- **Free:** Limited analyses, basic features
-- **Starter ($29/mo):** Individual users, basic mistake flagging
-- **Pro ($79/mo):** Advanced AI analysis, sequence analysis, performance tracking  
-- **Growth Agency ($199/mo):** Client management, reports, API access
+## Subscription Tiers
+| Tier | Price | Key Features |
+|------|-------|--------------|
+| Free | $0 | 3 analyses/month, basic feedback |
+| Starter | $29/mo | 50 analyses/month, spam detection, readability, CTA analysis |
+| Pro | $79/mo | Unlimited analyses, AI rewrites, performance tracking, benchmarks |
+| Growth Agency | $199/mo | Everything + client workspaces, API access, white-label reports |
 
-## What's Been Implemented ✅
+## ✅ COMPLETED FEATURES
 
-### Core Features
-- [x] User authentication (JWT-based)
-- [x] Email OTP verification (Resend) - Fixed duplicate OTP issue
+### Core Platform
+- [x] User authentication (JWT)
+- [x] Email OTP verification (Resend)
 - [x] Onboarding flow
-- [x] Email analyzer with AI (Claude via Emergent LLM Key)
-- [x] Performance tracking dashboard
-- [x] Sequence analyzer (Pro+)
-- [x] Analysis history with details view
-- [x] Template library with AI generation
-- [x] Stripe payments (test mode configured)
+- [x] Dashboard with analytics
+- [x] Email analyzer with AI (Claude)
+- [x] Analysis history with full details
+- [x] Template library with 30+ templates
+- [x] AI template generation
 
-### UI/UX & Routing
-- [x] "Midnight Architect" theme with dark mode
-- [x] Universal feature visibility (locked states with upgrade CTAs)
-- [x] Mobile responsive layout
-- [x] Landing page with agency mockups
-- [x] **NEW:** Logged-in users redirected from Landing/Pricing/Login/Signup to Dashboard
-- [x] **NEW:** History modal shows locked features with upgrade prompts (consistent with Analyzer)
+### Tier-Specific Features
+- [x] **Free:** Basic analysis, limited history (3)
+- [x] **Starter:** Spam detection, readability score, CTA analysis, subject line analysis
+- [x] **Pro:** AI rewrites, inbox placement, emotional tone, A/B test ideas, performance tracking, industry benchmarks, sequence analyzer
+- [x] Agency features scaffolded (not functional - on hold)
 
-### Agency Features (Scaffolded)
-- [x] Clients page (UI + backend endpoints)
-- [x] Campaigns page (UI + backend endpoints)
-- [x] Reports page (UI + backend endpoints)
-- [x] API Access page (UI + backend endpoints)
+### Payments & Billing
+- [x] Stripe integration (test mode)
+- [x] Checkout flow with email verification requirement
+- [x] Subscription tier upgrades
 
-## Recent Bug Fixes (Dec 2025)
-- [x] **P0 Fixed:** Signup sending duplicate emails (old link + new OTP)
-- [x] **P0 Fixed:** Email OTP verification flow not working
-- [x] **P0 Fixed:** Duplicate OTP emails due to React StrictMode (useRef fix)
-- [x] **P0 Fixed:** Checkout allowed before email verification
-- [x] **P2 Fixed:** History modal hiding locked features instead of showing locked state
+### UI/UX
+- [x] "Midnight Architect" dark theme
+- [x] Light/dark mode toggle
+- [x] Mobile responsive
+- [x] Locked feature states with upgrade CTAs
+- [x] Consistent locked states in History modal
 
-## Pending Issues
-- [ ] **P1:** AI model inconsistent JSON responses for Pro analysis (consider switching to OpenAI)
+### Admin Dashboard
+- [x] Platform statistics (users, analyses, payments)
+- [x] User management (view, create, edit, delete)
+- [x] Subscription tier management
+- [x] Payment transaction history
+- [x] Database collection stats
+- [x] Hidden admin login on landing page
 
-## In Progress
-- [ ] **P1:** Complete Growth Agency features (functional UI for clients, campaigns, reports, API)
+### Routing
+- [x] Public-only routes (Landing, Pricing, Login, Signup redirect logged-in users)
+- [x] Protected routes for dashboard features
+- [x] Admin route
 
-## Future/Backlog
-- [ ] **P2:** Live Amazon SNS phone verification
-- [ ] **P2:** Progressive Web App (PWA)
-- [ ] **P2:** Admin dashboard for viewing users/data
+## 🔴 KNOWN ISSUES
+- [ ] AI model sometimes doesn't return all Pro-level JSON fields (emotional_tone, ab_test_suggestions)
 
-## Technical Stack
-- **Frontend:** React, Tailwind CSS, Recharts, Framer Motion
-- **Backend:** FastAPI, MongoDB (motor), Pydantic, JWT
-- **Integrations:** Stripe (payments), Resend (email), Anthropic Claude (AI)
+## 🟡 ON HOLD (Growth Agency Features)
+- Client workspaces
+- Campaign analytics
+- White-label PDF reports
+- API key management
+
+## 🔵 FUTURE ENHANCEMENTS
+- [ ] Live phone verification (Amazon SNS)
+- [ ] PWA conversion
+- [ ] Email notifications for analysis results
+- [ ] Team collaboration features
+- [ ] Webhook integrations
 
 ## Test Accounts
-- free@test.com / Test1234!
-- starter@test.com / Test1234!
-- pro@test.com / Test1234!
-- agency@test.com / Test1234!
+| Email | Password | Tier |
+|-------|----------|------|
+| free@test.com | Test1234! | Free |
+| starter@test.com | Test1234! | Starter |
+| pro@test.com | Test1234! | Pro |
+| agency@test.com | Test1234! | Agency |
 
-## Stripe Test Card
-- Card: 4242 4242 4242 4242
-- Expiry: Any future date
-- CVC: Any 3 digits
+## Admin Access
+- **Email:** jabriel@arisolutionsinc.com
+- **Password:** Finao028!
+- **Access:** Click shield icon in footer of landing page, or go to /admin when logged in
 
-## Stripe Webhook URL
-https://coldiq-dashboard.preview.emergentagent.com/api/webhook/stripe
+## Stripe (Test Mode)
+- **Webhook URL:** https://coldiq-dashboard.preview.emergentagent.com/api/webhook/stripe
+- **Test Card:** 4242 4242 4242 4242
+
+## Technical Stack
+- Frontend: React, Tailwind CSS, Recharts, Framer Motion
+- Backend: FastAPI, MongoDB, Pydantic
+- Integrations: Stripe, Resend, Anthropic Claude
