@@ -2395,7 +2395,7 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
     if data.plan_tier not in SUBSCRIPTION_PRICES:
         raise HTTPException(status_code=400, detail="Invalid plan tier")
     
-    api_key = os.environ.get('STRIPE_API_KEY')
+    api_key = os.environ.get('STRIPE_SECRET_KEY')
     if not api_key:
         raise HTTPException(status_code=500, detail="Stripe not configured")
     
