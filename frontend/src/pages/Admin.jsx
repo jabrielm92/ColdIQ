@@ -427,7 +427,7 @@ const Admin = () => {
                             <p className="text-xs text-zinc-500">{p.user_email}</p>
                           </td>
                           <td className="px-4 py-3">{getTierBadge(p.plan_tier)}</td>
-                          <td className="px-4 py-3 font-mono">${(p.amount / 100).toFixed(2)}</td>
+                          <td className="px-4 py-3 font-mono">${p.amount?.toFixed(2) || '0.00'}</td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-0.5 text-xs font-bold rounded ${
                               p.payment_status === "paid" ? "bg-emerald-500/20 text-emerald-400" :
