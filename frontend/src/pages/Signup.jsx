@@ -21,7 +21,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(null);
-  const { signup } = useAuth();
+  const { signup, updateUser } = useAuth();
   const navigate = useNavigate();
 
   const planLabels = { free: "Free", starter: "Starter", pro: "Pro" };
