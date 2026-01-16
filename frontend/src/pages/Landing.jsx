@@ -354,7 +354,7 @@ const Landing = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-            {/* Screenshot 1: Score & Key Insight */}
+            {/* Screenshot 1: Multi-Client Dashboard */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -362,34 +362,40 @@ const Landing = () => {
               transition={{ delay: 0 }}
               className="bg-theme border border-theme overflow-hidden group"
             >
-              <div className="p-4 border-b border-theme">
-                <p className="text-xs font-mono tracking-widest uppercase text-theme-dim">Analysis Score</p>
+              <div className="p-4 border-b border-theme flex items-center justify-between">
+                <p className="text-xs font-mono tracking-widest uppercase text-theme-dim">Client Dashboard</p>
+                <span className="px-2 py-0.5 text-[9px] bg-violet-500/20 text-violet-400 font-mono">AGENCY</span>
               </div>
               <div className="p-6">
-                {/* Mock Score UI */}
-                <div className="bg-[#a3e635]/10 border border-[#a3e635]/20 p-5 mb-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-mono text-zinc-500">OVERALL SCORE</span>
-                  </div>
-                  <div className="flex items-end gap-4">
-                    <span className="text-5xl font-bold text-[#a3e635]" style={{ fontFamily: 'JetBrains Mono' }}>78</span>
-                    <div className="pb-1">
-                      <p className="text-xs text-zinc-500">Est. Response</p>
-                      <p className="font-semibold text-cyan-400" style={{ fontFamily: 'JetBrains Mono' }}>4.2%</p>
+                {/* Mock Client Cards */}
+                <div className="space-y-3">
+                  {[
+                    { name: "TechScale", score: 78, analyses: 42 },
+                    { name: "Acme Corp", score: 65, analyses: 28 },
+                    { name: "StartupXYZ", score: 82, analyses: 15 }
+                  ].map((client, i) => (
+                    <div key={i} className="bg-zinc-800/50 p-3 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-[#d4af37]/20 flex items-center justify-center text-[#d4af37] text-xs font-bold">
+                          {client.name.charAt(0)}
+                        </div>
+                        <span className="text-sm font-medium">{client.name}</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-mono text-sm text-[#d4af37]">{client.score}</p>
+                        <p className="text-[9px] text-zinc-500">{client.analyses} emails</p>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-                <div className="bg-indigo-500/10 border border-indigo-500/20 p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Zap className="w-3 h-3 text-indigo-400" />
-                    <span className="text-xs font-medium text-indigo-400">Key Insight</span>
-                  </div>
-                  <p className="text-xs text-zinc-300">Strong personalization hooks but CTA could be more specific...</p>
+                <div className="mt-4 pt-4 border-t border-zinc-800 flex items-center justify-between">
+                  <span className="text-xs text-zinc-500">3 Clients</span>
+                  <span className="text-xs text-[#d4af37]">+ Add Client</span>
                 </div>
               </div>
             </motion.div>
             
-            {/* Screenshot 2: Metrics Grid */}
+            {/* Screenshot 2: Campaign Analytics */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -397,44 +403,56 @@ const Landing = () => {
               transition={{ delay: 0.1 }}
               className="bg-theme border border-theme overflow-hidden group"
             >
-              <div className="p-4 border-b border-theme">
-                <p className="text-xs font-mono tracking-widest uppercase text-theme-dim">Deep Metrics</p>
+              <div className="p-4 border-b border-theme flex items-center justify-between">
+                <p className="text-xs font-mono tracking-widest uppercase text-theme-dim">Campaign Analytics</p>
+                <span className="px-2 py-0.5 text-[9px] bg-violet-500/20 text-violet-400 font-mono">AGENCY</span>
               </div>
-              <div className="p-6 space-y-3">
-                {/* Mock Metrics */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-zinc-800/50 p-3">
-                    <p className="text-[10px] text-zinc-500 mb-1">Readability</p>
-                    <p className="font-bold text-[#a3e635]" style={{ fontFamily: 'JetBrains Mono' }}>72</p>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 font-medium">Easy</span>
-                  </div>
-                  <div className="bg-zinc-800/50 p-3">
-                    <p className="text-[10px] text-zinc-500 mb-1">Spam Risk</p>
-                    <p className="font-bold text-amber-400" style={{ fontFamily: 'JetBrains Mono' }}>23%</p>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-amber-500/20 text-amber-400 font-medium">Low</span>
-                  </div>
-                </div>
-                <div className="bg-zinc-800/50 p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-[10px] text-zinc-500">Subject Line</p>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-[#d4af37]/20 text-[#d4af37]">7/10</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="text-[10px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400">✓ Personalized</span>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400">✓ Curiosity</span>
+              <div className="p-6 space-y-4">
+                {/* Top Performing */}
+                <div>
+                  <p className="text-xs text-zinc-500 mb-2">Top Subject Lines</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-zinc-300 truncate max-w-[140px]">"Quick question about {{company}}"</span>
+                      <span className="font-mono text-[#d4af37]">82</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-zinc-300 truncate max-w-[140px]">"Saw your recent {{trigger}}"</span>
+                      <span className="font-mono text-[#d4af37]">78</span>
+                    </div>
                   </div>
                 </div>
-                <div className="bg-zinc-800/50 p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-[10px] text-zinc-500">CTA Analysis</p>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-[#d4af37]/20 text-[#d4af37]">8/10</span>
+                <div className="border-t border-zinc-800 pt-4">
+                  <p className="text-xs text-zinc-500 mb-2">Top CTAs</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-zinc-300 truncate max-w-[140px]">"Tuesday at 2pm work?"</span>
+                      <span className="font-mono text-cyan-400">4.2%</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-zinc-300 truncate max-w-[140px]">"Worth a 15-min chat?"</span>
+                      <span className="font-mono text-cyan-400">3.8%</span>
+                    </div>
                   </div>
-                  <p className="text-[10px] text-zinc-400">Clear call-to-action with low friction</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-center pt-2">
+                  <div className="bg-zinc-800/50 p-2">
+                    <p className="text-lg font-mono font-bold text-emerald-400">+34%</p>
+                    <p className="text-[9px] text-zinc-500">Reply Rate</p>
+                  </div>
+                  <div className="bg-zinc-800/50 p-2">
+                    <p className="text-lg font-mono font-bold text-[#d4af37]">72</p>
+                    <p className="text-[9px] text-zinc-500">Avg Score</p>
+                  </div>
+                  <div className="bg-zinc-800/50 p-2">
+                    <p className="text-lg font-mono font-bold">127</p>
+                    <p className="text-[9px] text-zinc-500">Emails</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
             
-            {/* Screenshot 3: Optimized Version */}
+            {/* Screenshot 3: White-Label Report */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -443,31 +461,47 @@ const Landing = () => {
               className="bg-theme border border-theme overflow-hidden group"
             >
               <div className="p-4 border-b border-theme flex items-center justify-between">
-                <p className="text-xs font-mono tracking-widest uppercase text-theme-dim">AI Rewrite</p>
-                <span className="text-[10px] px-2 py-0.5 bg-violet-500/20 text-violet-400 font-medium">Optimized</span>
+                <p className="text-xs font-mono tracking-widest uppercase text-theme-dim">Client Report</p>
+                <span className="px-2 py-0.5 text-[9px] bg-violet-500/20 text-violet-400 font-mono">AGENCY</span>
               </div>
               <div className="p-6 space-y-4">
-                {/* Mock Optimized Email */}
-                <div>
-                  <p className="text-[10px] text-zinc-500 mb-1">Subject</p>
-                  <p className="text-xs bg-zinc-800/50 p-2 text-emerald-400" style={{ fontFamily: 'JetBrains Mono' }}>
-                    Quick question about scaling your SDR team
-                  </p>
+                {/* Report Header */}
+                <div className="bg-gradient-to-r from-[#d4af37]/10 to-violet-500/10 border border-[#d4af37]/20 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 bg-[#d4af37] flex items-center justify-center">
+                      <Mail className="w-3 h-3 text-black" />
+                    </div>
+                    <span className="text-xs font-bold">TechScale Monthly Report</span>
+                  </div>
+                  <p className="text-[10px] text-zinc-500">January 2026 • Generated by ColdIQ</p>
                 </div>
-                <div>
-                  <p className="text-[10px] text-zinc-500 mb-1">Body</p>
-                  <div className="text-xs bg-zinc-800/50 p-2 text-emerald-400/90 space-y-2" style={{ fontFamily: 'JetBrains Mono' }}>
-                    <p>Hi Sarah,</p>
-                    <p>Noticed TechScale just closed Series B - congrats! As you scale from 5 to 15 SDRs, cold email quality usually drops...</p>
-                    <p className="text-zinc-500">...</p>
+                
+                {/* Report Metrics */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-zinc-400">Email Performance</span>
+                    <span className="text-xs font-mono text-emerald-400">+47%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-zinc-400">Response Rate</span>
+                    <span className="text-xs font-mono">2.1% → 4.8%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-zinc-400">Emails Analyzed</span>
+                    <span className="text-xs font-mono">42</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-zinc-400">Avg Score</span>
+                    <span className="text-xs font-mono text-[#d4af37]">78</span>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button className="flex-1 text-[10px] px-2 py-1.5 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center gap-1">
-                    <Copy className="w-3 h-3" /> Copy
+                
+                <div className="flex gap-2 pt-2">
+                  <button className="flex-1 text-[10px] px-2 py-1.5 bg-[#d4af37] text-black font-bold flex items-center justify-center gap-1">
+                    Download PDF
                   </button>
-                  <button className="flex-1 text-[10px] px-2 py-1.5 bg-zinc-800 text-zinc-400 border border-zinc-700 flex items-center justify-center gap-1">
-                    View Original
+                  <button className="text-[10px] px-3 py-1.5 bg-zinc-800 text-zinc-400 border border-zinc-700">
+                    Share
                   </button>
                 </div>
               </div>
