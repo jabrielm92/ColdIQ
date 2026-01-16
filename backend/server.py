@@ -2476,7 +2476,7 @@ async def get_prices():
 
 @api_router.get("/billing/checkout-status/{session_id}")
 async def get_checkout_status(session_id: str, user: dict = Depends(get_current_user)):
-    api_key = os.environ.get('STRIPE_API_KEY')
+    api_key = os.environ.get('STRIPE_SECRET_KEY')
     if not api_key:
         raise HTTPException(status_code=500, detail="Stripe not configured")
     
@@ -2498,7 +2498,7 @@ async def get_checkout_status(session_id: str, user: dict = Depends(get_current_
         }
         
         # For agency, create team if not exists
-        if plan_tier == "agency" and not user.get("team_id"):
+        if plan_tier in ["agency", "growth_agency"] and not user.get("team_id"):
             team_id = str(uuid.uuid4())
             await db.teams.insert_one({
                 "id": team_id,
@@ -2510,6 +2510,7 @@ async def get_checkout_status(session_id: str, user: dict = Depends(get_current_
             update_data["team_role"] = "owner"
         
         await db.users.update_one({"id": user["id"]}, {"$set": update_data})
+        logger.info(f"✅ Payment confirmed via status check: {user['id']} -> {plan_tier}")
     
     return {
         "status": status.status,
