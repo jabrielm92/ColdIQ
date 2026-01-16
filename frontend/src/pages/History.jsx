@@ -178,7 +178,7 @@ const History = () => {
                 <Button
                   variant="outline"
                   className="border-zinc-700 text-zinc-500"
-                  onClick={() => toast.info("Upgrade to Pro for CSV export")}
+                  onClick={() => navigate("/pricing")}
                   data-testid="export-csv-locked-btn"
                 >
                   <Lock className="w-4 h-4 mr-2" />
