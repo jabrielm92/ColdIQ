@@ -2061,14 +2061,20 @@ Make it:
 Return ONLY valid JSON, no other text."""
 
     try:
-        from emergentintegrations.llm.anthropic import chat
+        # Use OpenAI GPT-4o-mini
+        from openai import AsyncOpenAI
+        client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         
-        response = await chat(
-            api_key=os.environ.get('EMERGENT_LLM_KEY'),
-            prompt=prompt,
-            model="claude-sonnet-4-20250514",
+        completion = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are ColdIQ, an expert cold email template creator. Always respond with valid JSON only."},
+                {"role": "user", "content": prompt}
+            ],
             temperature=0.7
         )
+        
+        response = completion.choices[0].message.content
         
         # Parse the AI response
         import json
