@@ -249,14 +249,15 @@ const Signup = () => {
                   <div className="flex-1 h-px bg-[#a3e635]" />
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-[#d4af37] flex items-center justify-center text-black text-sm font-bold">2</div>
-                    <span className="text-sm font-medium">Phone</span>
+                    <span className="text-sm font-medium">Verify Email</span>
                   </div>
                 </div>
               </div>
               
-              <PhoneVerification 
-                onVerified={handlePhoneVerified}
+              <EmailOTPVerification 
+                onVerified={handleEmailVerified}
                 token={token}
+                userEmail={email}
               />
             </motion.div>
           )}
