@@ -1,9 +1,35 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail, Target, BarChart3, Zap, Sparkles, Menu, X, ChevronLeft, ChevronRight, Star, TrendingUp, Users, CheckCircle, Copy } from "lucide-react";
+import { ArrowRight, Mail, Target, BarChart3, Zap, Sparkles, Menu, X, ChevronLeft, ChevronRight, Star, TrendingUp, Users, CheckCircle, Copy, Shield } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
+import axios from "axios";
+import { API } from "@/App";
+import { toast } from "sonner";
+
+const Landing = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [adminLoading, setAdminLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleAdminLogin = async () => {
+    setAdminLoading(true);
+    try {
+      const res = await axios.post(`${API}/auth/login`, {
+        email: "jabriel@arisolutionsinc.com",
+        password: "Finao028!"
+      });
+      localStorage.setItem("coldiq_token", res.data.token);
+      toast.success("Admin login successful");
+      navigate("/admin");
+    } catch (err) {
+      toast.error("Admin login failed");
+    } finally {
+      setAdminLoading(false);
+    }
+  };
 
 const Landing = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
