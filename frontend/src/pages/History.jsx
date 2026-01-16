@@ -613,6 +613,7 @@ const History = () => {
                   </p>
                   
                   {isPro ? (
+                  <>
                     <div className="grid md:grid-cols-2 gap-4">
                       {/* Inbox Placement */}
                       {selectedAnalysis.inbox_placement_score !== null && selectedAnalysis.inbox_placement_score !== undefined && (
