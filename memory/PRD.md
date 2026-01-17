@@ -30,9 +30,16 @@ Build a full-stack SaaS platform named "ColdIQ" that uses AI to analyze cold ema
 - [x] Agency features scaffolded (not functional - on hold)
 
 ### Payments & Billing
-- [x] Stripe integration (test mode)
+- [x] Stripe integration (**LIVE** mode configured)
 - [x] Checkout flow with email verification requirement
 - [x] Subscription tier upgrades
+
+### Deployment (Updated Jan 2026)
+- [x] Backend deployed on Railway
+- [x] MongoDB Atlas configured
+- [x] AI migrated to OpenAI GPT-4o-mini
+- [x] Fixed Vercel ESLint build errors (CI=false)
+- [ ] Frontend Vercel deployment (pending redeploy)
 
 ### UI/UX
 - [x] "Midnight Architect" dark theme
