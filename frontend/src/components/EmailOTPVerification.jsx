@@ -51,27 +51,6 @@ const EmailOTPVerification = ({ onVerified, onSkip, token, userEmail }) => {
     }
   }, [userEmail, token]);
 
-  const handleAutoSendOtp = async () => {
-    setLoading(true);
-    try {
-      await axios.post(`${API}/auth/email-otp/send`, {
-        email: userEmail.trim()
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      setResendTimer(60);
-      toast.success("Verification code sent to your email!");
-    } catch (err) {
-      const message = err.response?.data?.detail || "Failed to send verification code";
-      toast.error(message);
-      // Fall back to email input if auto-send fails
-      setStep("email");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSendOtp = async () => {
     if (!email || !email.includes("@")) {
       toast.error("Please enter a valid email address");
