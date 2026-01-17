@@ -7,7 +7,7 @@ import axios from "axios";
 import { 
   Users, Database, CreditCard, BarChart3, Search, Trash2, 
   Edit, Plus, X, Check, RefreshCw, ChevronLeft, ChevronRight,
-  Mail, Shield, Crown, Zap, ArrowLeft
+  Mail, Shield, Crown, Zap, ArrowLeft, MessageSquare, Building2, ExternalLink
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -24,10 +24,12 @@ const Admin = () => {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [contactRequests, setContactRequests] = useState([]);
   const [dbInfo, setDbInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [tierFilter, setTierFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   
@@ -63,6 +65,13 @@ const Admin = () => {
           setPayments(res.data.payments);
           setTotalPages(res.data.pages);
         }
+        if (activeTab === "contacts") {
+          const params = new URLSearchParams({ page, limit: 15 });
+          if (statusFilter) params.append("status", statusFilter);
+          const res = await axios.get(`${API}/admin/contact-requests?${params}`);
+          setContactRequests(res.data.requests);
+          setTotalPages(res.data.pages);
+        }
         if (activeTab === "database") {
           const res = await axios.get(`${API}/admin/db-info`);
           setDbInfo(res.data.collections);
@@ -79,7 +88,7 @@ const Admin = () => {
       }
     };
     loadData();
-  }, [activeTab, page, searchTerm, tierFilter, navigate]);
+  }, [activeTab, page, searchTerm, tierFilter, statusFilter, navigate]);
 
   const fetchUsers = async () => {
     setLoading(true);
