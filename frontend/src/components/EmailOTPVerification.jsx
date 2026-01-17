@@ -25,9 +25,29 @@ const EmailOTPVerification = ({ onVerified, onSkip, token, userEmail }) => {
 
   // Auto-send OTP on mount when email is provided from signup
   useEffect(() => {
+    const autoSendOtp = async () => {
+      setLoading(true);
+      try {
+        await axios.post(`${API}/auth/email-otp/send`, {
+          email: userEmail.trim()
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        setResendTimer(60);
+        toast.success("Verification code sent to your email!");
+      } catch (err) {
+        const message = err.response?.data?.detail || "Failed to send verification code";
+        toast.error(message);
+        setStep("email");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (userEmail && token && !initialSendDone.current) {
       initialSendDone.current = true;
-      handleAutoSendOtp();
+      autoSendOtp();
     }
   }, [userEmail, token]);
 

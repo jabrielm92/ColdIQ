@@ -39,7 +39,21 @@ const History = () => {
   const isStarter = isPro || user?.subscription_tier === "starter";
 
   useEffect(() => {
-    fetchAnalyses();
+    const loadAnalyses = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`${API}/analysis/history?page=${page}&limit=10`);
+        setAnalyses(res.data.analyses);
+        setTotalPages(res.data.total_pages);
+        setTotal(res.data.total);
+        setTierLimit(res.data.tier_limit);
+      } catch (err) {
+        toast.error("Failed to load history");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadAnalyses();
   }, [page]);
 
   useEffect(() => {

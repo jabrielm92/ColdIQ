@@ -43,11 +43,43 @@ const Admin = () => {
   const [editData, setEditData] = useState({});
 
   useEffect(() => {
-    if (activeTab === "stats") fetchStats();
-    if (activeTab === "users") fetchUsers();
-    if (activeTab === "payments") fetchPayments();
-    if (activeTab === "database") fetchDbInfo();
-  }, [activeTab, page, searchTerm, tierFilter]);
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        if (activeTab === "stats") {
+          const res = await axios.get(`${API}/admin/stats`);
+          setStats(res.data);
+        }
+        if (activeTab === "users") {
+          const params = new URLSearchParams({ page, limit: 15 });
+          if (searchTerm) params.append("search", searchTerm);
+          if (tierFilter) params.append("tier", tierFilter);
+          const res = await axios.get(`${API}/admin/users?${params}`);
+          setUsers(res.data.users);
+          setTotalPages(res.data.pages);
+        }
+        if (activeTab === "payments") {
+          const res = await axios.get(`${API}/admin/payments?page=${page}&limit=15`);
+          setPayments(res.data.payments);
+          setTotalPages(res.data.pages);
+        }
+        if (activeTab === "database") {
+          const res = await axios.get(`${API}/admin/db-info`);
+          setDbInfo(res.data.collections);
+        }
+      } catch (err) {
+        if (err.response?.status === 403) {
+          toast.error("Admin access required");
+          navigate("/dashboard");
+        } else {
+          toast.error("Failed to load data");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [activeTab, page, searchTerm, tierFilter, navigate]);
 
   const fetchStats = async () => {
     setLoading(true);

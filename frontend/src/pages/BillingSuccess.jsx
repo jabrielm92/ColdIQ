@@ -15,15 +15,51 @@ const BillingSuccess = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const pollPaymentStatus = async (sessionId, attempts = 0) => {
+      const maxAttempts = 10;
+      const pollInterval = 2000;
+
+      if (attempts >= maxAttempts) {
+        setStatus("error");
+        toast.error("Payment verification timed out. Please check your email for confirmation.");
+        return;
+      }
+
+      try {
+        const res = await axios.get(`${API}/billing/checkout-status/${sessionId}`);
+        
+        if (res.data.payment_status === "paid") {
+          setStatus("success");
+          setPaymentInfo(res.data);
+          
+          // Refresh user data
+          const userRes = await axios.get(`${API}/auth/me`);
+          updateUser(userRes.data);
+          
+          toast.success("Payment successful! Your plan has been upgraded.");
+        } else if (res.data.status === "expired") {
+          setStatus("error");
+          toast.error("Payment session expired. Please try again.");
+        } else {
+          // Continue polling
+          setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
+        }
+      } catch (err) {
+        console.error("Error checking payment status", err);
+        setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
+      }
+    };
+
     const sessionId = searchParams.get("session_id");
     if (sessionId) {
       pollPaymentStatus(sessionId);
     } else {
       setStatus("error");
     }
-  }, [searchParams]);
+  }, [searchParams, updateUser]);
 
-  const pollPaymentStatus = async (sessionId, attempts = 0) => {
+  // Removed duplicate pollPaymentStatus - now inside useEffect
+  const _pollPaymentStatusDummy = async (sessionId, attempts = 0) => {
     const maxAttempts = 10;
     const pollInterval = 2000;
 

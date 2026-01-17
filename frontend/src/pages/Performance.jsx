@@ -26,11 +26,73 @@ const Performance = () => {
   const hasProFeatures = ["pro", "agency", "growth_agency"].includes(userTier);
 
   useEffect(() => {
-    fetchHistory();
+    const loadHistory = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`${API}/analysis/history?limit=100`);
+        const analyses = res.data?.analyses || [];
+        
+        // Filter by time range
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - parseInt(timeRange));
+        
+        const filtered = analyses.filter(a => new Date(a.created_at) >= cutoffDate);
+        setHistory(filtered);
+        
+        // Calculate stats
+        if (filtered.length > 0) {
+          const scores = filtered.map(a => a.analysis_score);
+          const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+          
+          const midpoint = Math.floor(filtered.length / 2);
+          const firstHalf = scores.slice(0, midpoint);
+          const secondHalf = scores.slice(midpoint);
+          
+          const firstAvg = firstHalf.length ? firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length : 0;
+          const secondAvg = secondHalf.length ? secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length : 0;
+          const trend = secondAvg - firstAvg;
+          
+          const best = Math.max(...scores);
+          const worst = Math.min(...scores);
+          
+          const responseRates = filtered.map(a => a.estimated_response_rate);
+          const avgResponse = responseRates.reduce((a, b) => a + b, 0) / responseRates.length;
+          
+          setStats({
+            avgScore: Math.round(avgScore),
+            trend: Math.round(trend),
+            best,
+            worst,
+            totalAnalyses: filtered.length,
+            avgResponse: avgResponse.toFixed(1)
+          });
+        } else {
+          setStats(null);
+        }
+      } catch (err) {
+        console.error("Failed to fetch history", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const loadPatterns = async () => {
+      setPatternsLoading(true);
+      try {
+        const res = await axios.get(`${API}/analysis/patterns`);
+        setPatterns(res.data);
+      } catch (err) {
+        console.error("Failed to fetch patterns", err);
+      } finally {
+        setPatternsLoading(false);
+      }
+    };
+
+    loadHistory();
     if (hasProFeatures) {
-      fetchPatterns();
+      loadPatterns();
     }
-  }, [timeRange]);
+  }, [timeRange, hasProFeatures]);
 
   const fetchPatterns = async () => {
     setPatternsLoading(true);
