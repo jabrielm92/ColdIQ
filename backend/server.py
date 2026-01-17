@@ -19,13 +19,7 @@ import csv
 import io
 import secrets
 import resend
-from emergentintegrations.llm.chat import LlmChat, UserMessage
-from emergentintegrations.payments.stripe.checkout import (
-    StripeCheckout, 
-    CheckoutSessionResponse, 
-    CheckoutStatusResponse, 
-    CheckoutSessionRequest
-)
+import stripe
 from analysis_utils import run_server_side_analysis
 
 ROOT_DIR = Path(__file__).parent
@@ -33,6 +27,9 @@ load_dotenv(ROOT_DIR / '.env')
 
 # Initialize Resend
 resend.api_key = os.environ.get('RESEND_API_KEY')
+
+# Initialize Stripe
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
 
