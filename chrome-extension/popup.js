@@ -1,5 +1,5 @@
 // ColdIQ Chrome Extension - Popup Script
-const API_URL = 'https://coldiq-dashboard.preview.emergentagent.com/api';
+const API_URL = 'https://coldiq-launch.preview.emergentagent.com/api';
 
 // DOM Elements
 const loginSection = document.getElementById('login-section');

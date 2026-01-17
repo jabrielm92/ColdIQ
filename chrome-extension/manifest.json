@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://mail.google.com/*",
-    "https://coldiq-dashboard.preview.emergentagent.com/*"
+    "https://coldiq-launch.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

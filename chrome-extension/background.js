@@ -46,7 +46,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'analyze-selection' && info.selectionText) {
     // Open popup or send to analyzer
     chrome.tabs.create({
-      url: `https://coldiq-dashboard.preview.emergentagent.com/analyze?prefill=${encodeURIComponent(info.selectionText)}`
+      url: `https://coldiq-launch.preview.emergentagent.com/analyze?prefill=${encodeURIComponent(info.selectionText)}`
     });
   }
 });

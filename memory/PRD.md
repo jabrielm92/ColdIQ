@@ -84,7 +84,7 @@ Build a full-stack SaaS platform named "ColdIQ" that uses AI to analyze cold ema
 - **Access:** Click shield icon in footer of landing page, or go to /admin when logged in
 
 ## Stripe (Test Mode)
-- **Webhook URL:** https://coldiq-dashboard.preview.emergentagent.com/api/webhook/stripe
+- **Webhook URL:** https://coldiq-launch.preview.emergentagent.com/api/webhook/stripe
 - **Test Card:** 4242 4242 4242 4242
 
 ## Technical Stack
