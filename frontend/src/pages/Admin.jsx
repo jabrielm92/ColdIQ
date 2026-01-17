@@ -169,6 +169,7 @@ const Admin = () => {
   const tabs = [
     { id: "stats", label: "Overview", icon: BarChart3 },
     { id: "users", label: "Users", icon: Users },
+    { id: "contacts", label: "Inquiries", icon: MessageSquare },
     { id: "payments", label: "Payments", icon: CreditCard },
     { id: "database", label: "Database", icon: Database }
   ];
