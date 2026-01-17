@@ -478,6 +478,109 @@ const Admin = () => {
               </div>
             )}
 
+            {/* Contacts Tab */}
+            {activeTab === "contacts" && (
+              <div className="space-y-4">
+                <div className="flex gap-3 items-center">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+                    className="bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-sm"
+                  >
+                    <option value="">All Status</option>
+                    <option value="new">New</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="converted">Converted</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </div>
+
+                <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-zinc-800/50">
+                      <tr>
+                        <th className="text-left text-xs font-medium text-zinc-400 uppercase px-4 py-3">Contact</th>
+                        <th className="text-left text-xs font-medium text-zinc-400 uppercase px-4 py-3">Company</th>
+                        <th className="text-left text-xs font-medium text-zinc-400 uppercase px-4 py-3">Team Size</th>
+                        <th className="text-left text-xs font-medium text-zinc-400 uppercase px-4 py-3">Status</th>
+                        <th className="text-left text-xs font-medium text-zinc-400 uppercase px-4 py-3">Date</th>
+                        <th className="text-right text-xs font-medium text-zinc-400 uppercase px-4 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-800">
+                      {contactRequests.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-8 text-center text-zinc-500">No contact requests yet</td>
+                        </tr>
+                      ) : contactRequests.map(req => (
+                        <tr key={req.id} className="hover:bg-zinc-800/30">
+                          <td className="px-4 py-3">
+                            <p className="font-medium">{req.name}</p>
+                            <a href={`mailto:${req.email}`} className="text-xs text-cyan-400 hover:underline">{req.email}</a>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <Building2 className="w-4 h-4 text-zinc-500" />
+                              <span>{req.company}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-zinc-400">{req.team_size || '-'}</td>
+                          <td className="px-4 py-3">{getStatusBadge(req.status)}</td>
+                          <td className="px-4 py-3 text-zinc-400 text-sm">
+                            {new Date(req.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex justify-end gap-2">
+                              <a
+                                href={`mailto:${req.email}?subject=Re: ColdIQ Growth Agency Inquiry`}
+                                className="p-1.5 hover:bg-zinc-700 rounded"
+                                title="Reply via Email"
+                              >
+                                <Mail className="w-4 h-4 text-cyan-400" />
+                              </a>
+                              <select
+                                value={req.status}
+                                onChange={(e) => updateContactStatus(req.id, e.target.value)}
+                                className="bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-xs"
+                              >
+                                <option value="new">New</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="converted">Converted</option>
+                                <option value="closed">Closed</option>
+                              </select>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <span className="text-sm text-zinc-400">Page {page} of {totalPages}</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Database Tab */}
             {activeTab === "database" && dbInfo && (
               <div className="space-y-4">
