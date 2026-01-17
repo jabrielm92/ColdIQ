@@ -81,21 +81,6 @@ const Admin = () => {
     loadData();
   }, [activeTab, page, searchTerm, tierFilter, navigate]);
 
-  const fetchStats = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API}/admin/stats`);
-      setStats(res.data);
-    } catch (err) {
-      if (err.response?.status === 403) {
-        toast.error("Admin access required");
-        navigate("/dashboard");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -108,31 +93,6 @@ const Admin = () => {
       setTotalPages(res.data.pages);
     } catch (err) {
       toast.error("Failed to fetch users");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchPayments = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API}/admin/payments?page=${page}&limit=15`);
-      setPayments(res.data.payments);
-      setTotalPages(res.data.pages);
-    } catch (err) {
-      toast.error("Failed to fetch payments");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchDbInfo = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API}/admin/db-info`);
-      setDbInfo(res.data.collections);
-    } catch (err) {
-      toast.error("Failed to fetch database info");
     } finally {
       setLoading(false);
     }
