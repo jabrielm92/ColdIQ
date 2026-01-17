@@ -66,21 +66,6 @@ const History = () => {
     }
   }, [searchParams, analyses]);
 
-  const fetchAnalyses = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API}/analysis/history?page=${page}&limit=10`);
-      setAnalyses(res.data.analyses);
-      setTotalPages(res.data.total_pages);
-      setTotal(res.data.total);
-      setTierLimit(res.data.tier_limit);
-    } catch (err) {
-      toast.error("Failed to load history");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const deleteAnalysis = async (id) => {
     try {
       await axios.delete(`${API}/analysis/${id}`);
