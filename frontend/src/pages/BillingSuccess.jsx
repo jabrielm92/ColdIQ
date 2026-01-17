@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth, API } from "@/App";
@@ -13,9 +13,21 @@ const BillingSuccess = () => {
   const [paymentInfo, setPaymentInfo] = useState(null);
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
+  const hasProcessed = useRef(false);
 
   useEffect(() => {
-    const pollPaymentStatus = async (sessionId, attempts = 0) => {
+    // Prevent multiple executions
+    if (hasProcessed.current) return;
+    
+    const sessionId = searchParams.get("session_id");
+    if (!sessionId) {
+      setStatus("error");
+      return;
+    }
+
+    hasProcessed.current = true;
+
+    const pollPaymentStatus = async (attempts = 0) => {
       const maxAttempts = 10;
       const pollInterval = 2000;
 
@@ -37,26 +49,23 @@ const BillingSuccess = () => {
           updateUser(userRes.data);
           
           toast.success("Payment successful! Your plan has been upgraded.");
+          return; // Stop polling
         } else if (res.data.status === "expired") {
           setStatus("error");
           toast.error("Payment session expired. Please try again.");
+          return; // Stop polling
         } else {
           // Continue polling
-          setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
+          setTimeout(() => pollPaymentStatus(attempts + 1), pollInterval);
         }
       } catch (err) {
         console.error("Error checking payment status", err);
-        setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
+        setTimeout(() => pollPaymentStatus(attempts + 1), pollInterval);
       }
     };
 
-    const sessionId = searchParams.get("session_id");
-    if (sessionId) {
-      pollPaymentStatus(sessionId);
-    } else {
-      setStatus("error");
-    }
-  }, [searchParams, updateUser]);
+    pollPaymentStatus();
+  }, [searchParams]); // Remove updateUser from deps, use ref to prevent re-runs
 
   const handleContinue = () => {
     // If user hasn't completed onboarding, go there first
