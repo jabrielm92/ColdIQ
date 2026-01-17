@@ -2495,16 +2495,17 @@ async def get_prices():
 
 @api_router.get("/billing/checkout-status/{session_id}")
 async def get_checkout_status(session_id: str, user: dict = Depends(get_current_user)):
-    api_key = os.environ.get('STRIPE_SECRET_KEY')
-    if not api_key:
+    if not stripe.api_key:
         raise HTTPException(status_code=500, detail="Stripe not configured")
     
-    stripe_checkout = StripeCheckout(api_key=api_key, webhook_url="")
-    status = await stripe_checkout.get_checkout_status(session_id)
+    # Retrieve session from Stripe
+    session = stripe.checkout.Session.retrieve(session_id)
     
     transaction = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
     
-    if transaction and status.payment_status == "paid" and transaction.get("payment_status") != "paid":
+    payment_status = "paid" if session.payment_status == "paid" else session.payment_status
+    
+    if transaction and payment_status == "paid" and transaction.get("payment_status") != "paid":
         await db.payment_transactions.update_one(
             {"session_id": session_id},
             {"$set": {"payment_status": "paid", "updated_at": datetime.now(timezone.utc).isoformat()}}
@@ -2532,10 +2533,10 @@ async def get_checkout_status(session_id: str, user: dict = Depends(get_current_
         logger.info(f"✅ Payment confirmed via status check: {user['id']} -> {plan_tier}")
     
     return {
-        "status": status.status,
-        "payment_status": status.payment_status,
-        "amount_total": status.amount_total,
-        "currency": status.currency
+        "status": session.status,
+        "payment_status": payment_status,
+        "amount_total": session.amount_total,
+        "currency": session.currency
     }
 
 @api_router.post("/webhook/stripe")
