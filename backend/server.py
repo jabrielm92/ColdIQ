@@ -2374,9 +2374,12 @@ class ContactFormRequest(BaseModel):
     team_size: Optional[str] = None
     message: Optional[str] = None
 
+# Admin email to receive notifications
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'jabriel@arisolutionsinc.com')
+
 @api_router.post("/contact/growth-agency")
 async def submit_growth_agency_contact(data: ContactFormRequest):
-    """Submit Growth Agency contact form - stores in DB for manual follow-up"""
+    """Submit Growth Agency contact form - stores in DB and sends email notification"""
     contact_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     
@@ -2395,7 +2398,99 @@ async def submit_growth_agency_contact(data: ContactFormRequest):
     await db.contact_requests.insert_one(contact_doc)
     logger.info(f"New Growth Agency inquiry from {data.email} at {data.company}")
     
+    # Send email notification to admin
+    try:
+        resend.Emails.send({
+            "from": f"ColdIQ <{SENDER_EMAIL}>",
+            "to": [ADMIN_EMAIL],
+            "subject": f"🚀 New Growth Agency Inquiry - {data.company}",
+            "html": f"""
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #09090b; color: #fff; padding: 30px; border-radius: 10px;">
+                <h1 style="color: #d4af37; margin-bottom: 20px;">New Growth Agency Inquiry</h1>
+                
+                <div style="background: #18181b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #d4af37; margin-top: 0;">Contact Details</h3>
+                    <p><strong>Name:</strong> {data.name}</p>
+                    <p><strong>Email:</strong> <a href="mailto:{data.email}" style="color: #22d3ee;">{data.email}</a></p>
+                    <p><strong>Company:</strong> {data.company}</p>
+                    <p><strong>Team Size:</strong> {data.team_size or 'Not specified'}</p>
+                </div>
+                
+                {f'<div style="background: #18181b; padding: 20px; border-radius: 8px; margin-bottom: 20px;"><h3 style="color: #d4af37; margin-top: 0;">Message</h3><p>{data.message}</p></div>' if data.message else ''}
+                
+                <p style="color: #71717a; font-size: 12px; margin-top: 20px;">
+                    Submitted at {now}<br>
+                    Request ID: {contact_id}
+                </p>
+                
+                <a href="mailto:{data.email}?subject=Re: ColdIQ Growth Agency Inquiry" 
+                   style="display: inline-block; background: #d4af37; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; margin-top: 10px;">
+                    Reply to {data.name}
+                </a>
+            </div>
+            """
+        })
+        logger.info(f"Email notification sent to {ADMIN_EMAIL}")
+    except Exception as e:
+        logger.error(f"Failed to send email notification: {e}")
+        # Don't fail the request if email fails
+    
     return {"message": "Request submitted successfully", "id": contact_id}
+
+# Admin endpoint to view contact requests
+@api_router.get("/admin/contact-requests")
+async def get_contact_requests(
+    page: int = 1, 
+    limit: int = 20, 
+    status: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    """Get all contact requests (admin only)"""
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    if status:
+        query["status"] = status
+    
+    skip = (page - 1) * limit
+    total = await db.contact_requests.count_documents(query)
+    
+    requests = await db.contact_requests.find(query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Remove MongoDB _id
+    for req in requests:
+        req.pop("_id", None)
+    
+    return {
+        "requests": requests,
+        "total": total,
+        "page": page,
+        "pages": (total + limit - 1) // limit
+    }
+
+@api_router.patch("/admin/contact-requests/{request_id}")
+async def update_contact_request(
+    request_id: str,
+    status: str,
+    user: dict = Depends(get_current_user)
+):
+    """Update contact request status (admin only)"""
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    if status not in ["new", "contacted", "closed", "converted"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    result = await db.contact_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": status, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    return {"message": "Status updated"}
 
 # ================= BILLING ROUTES =================
 
