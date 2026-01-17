@@ -151,6 +151,34 @@ const Admin = () => {
     }
   };
 
+  const updateContactStatus = async (requestId, newStatus) => {
+    try {
+      await axios.patch(`${API}/admin/contact-requests/${requestId}?status=${newStatus}`);
+      toast.success("Status updated");
+      // Refresh the list
+      const params = new URLSearchParams({ page, limit: 15 });
+      if (statusFilter) params.append("status", statusFilter);
+      const res = await axios.get(`${API}/admin/contact-requests?${params}`);
+      setContactRequests(res.data.requests);
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    const styles = {
+      new: "bg-emerald-500/20 text-emerald-400",
+      contacted: "bg-amber-500/20 text-amber-400",
+      converted: "bg-cyan-500/20 text-cyan-400",
+      closed: "bg-zinc-700 text-zinc-400"
+    };
+    return (
+      <span className={`px-2 py-0.5 text-xs font-bold rounded ${styles[status] || styles.new}`}>
+        {status?.toUpperCase() || "NEW"}
+      </span>
+    );
+  };
+
   const getTierBadge = (tier) => {
     const styles = {
       free: "bg-zinc-700 text-zinc-300",
