@@ -2408,15 +2408,10 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
     if data.plan_tier not in SUBSCRIPTION_PRICES:
         raise HTTPException(status_code=400, detail="Invalid plan tier")
     
-    api_key = os.environ.get('STRIPE_SECRET_KEY')
-    if not api_key:
+    if not stripe.api_key:
         raise HTTPException(status_code=500, detail="Stripe not configured")
     
     host_url = data.origin_url
-    webhook_url = f"{str(request.base_url).rstrip('/')}/api/webhook/stripe"
-    
-    stripe_checkout = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
-    
     amount = SUBSCRIPTION_PRICES[data.plan_tier]
     
     # Determine actual tier from price key
@@ -2426,11 +2421,24 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
     success_url = f"{host_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{host_url}/pricing"
     
-    checkout_request = CheckoutSessionRequest(
-        amount=amount,
-        currency="usd",
+    # Create Stripe checkout session
+    session = stripe.checkout.Session.create(
+        payment_method_types=["card"],
+        line_items=[{
+            "price_data": {
+                "currency": "usd",
+                "unit_amount": int(amount * 100),  # Stripe uses cents
+                "product_data": {
+                    "name": f"ColdIQ {actual_tier.title()} Plan ({('Annual' if is_annual else 'Monthly')})",
+                    "description": f"ColdIQ {actual_tier.title()} subscription"
+                }
+            },
+            "quantity": 1
+        }],
+        mode="payment",
         success_url=success_url,
         cancel_url=cancel_url,
+        customer_email=user["email"],
         metadata={
             "user_id": user["id"],
             "plan_tier": actual_tier,
@@ -2439,11 +2447,9 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
         }
     )
     
-    session = await stripe_checkout.create_checkout_session(checkout_request)
-    
     await db.payment_transactions.insert_one({
         "id": str(uuid.uuid4()),
-        "session_id": session.session_id,
+        "session_id": session.id,
         "user_id": user["id"],
         "amount": amount,
         "currency": "usd",
@@ -2453,7 +2459,7 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
         "created_at": datetime.now(timezone.utc).isoformat()
     })
     
-    return {"url": session.url, "session_id": session.session_id}
+    return {"url": session.url, "session_id": session.id}
 
 @api_router.get("/billing/prices")
 async def get_prices():
