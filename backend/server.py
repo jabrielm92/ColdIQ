@@ -2543,49 +2543,57 @@ async def get_checkout_status(session_id: str, user: dict = Depends(get_current_
 async def stripe_webhook(request: Request):
     body = await request.body()
     signature = request.headers.get("Stripe-Signature")
+    webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET')
     
-    api_key = os.environ.get('STRIPE_SECRET_KEY')
-    if not api_key:
+    if not stripe.api_key:
         return {"status": "error", "message": "Stripe not configured"}
     
     try:
-        stripe_checkout = StripeCheckout(api_key=api_key, webhook_url="")
-        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        # Verify webhook signature if secret is configured
+        if webhook_secret:
+            event = stripe.Webhook.construct_event(body, signature, webhook_secret)
+        else:
+            # Parse without verification (not recommended for production)
+            import json
+            event = json.loads(body)
         
-        if webhook_response.payment_status == "paid":
-            session_id = webhook_response.session_id
-            metadata = webhook_response.metadata
+        if event.get("type") == "checkout.session.completed":
+            session = event["data"]["object"]
             
-            await db.payment_transactions.update_one(
-                {"session_id": session_id},
-                {"$set": {"payment_status": "paid", "updated_at": datetime.now(timezone.utc).isoformat()}}
-            )
-            
-            user_id = metadata.get("user_id")
-            plan_tier = metadata.get("plan_tier", "starter")
-            
-            if user_id:
-                update_data = {
-                    "subscription_tier": plan_tier,
-                    "subscription_status": "active",
-                    "stripe_customer_id": webhook_response.customer_id if hasattr(webhook_response, 'customer_id') else None
-                }
+            if session.get("payment_status") == "paid":
+                session_id = session["id"]
+                metadata = session.get("metadata", {})
                 
-                if plan_tier in ["agency", "growth_agency"]:
-                    user = await db.users.find_one({"id": user_id})
-                    if user and not user.get("team_id"):
-                        team_id = str(uuid.uuid4())
-                        await db.teams.insert_one({
-                            "id": team_id,
-                            "owner_id": user_id,
-                            "name": f"{user.get('full_name', 'User')}'s Team",
-                            "created_at": datetime.now(timezone.utc).isoformat()
-                        })
-                        update_data["team_id"] = team_id
-                        update_data["team_role"] = "owner"
+                await db.payment_transactions.update_one(
+                    {"session_id": session_id},
+                    {"$set": {"payment_status": "paid", "updated_at": datetime.now(timezone.utc).isoformat()}}
+                )
                 
-                await db.users.update_one({"id": user_id}, {"$set": update_data})
-                logger.info(f"✅ Subscription activated: {user_id} -> {plan_tier}")
+                user_id = metadata.get("user_id")
+                plan_tier = metadata.get("plan_tier", "starter")
+                
+                if user_id:
+                    update_data = {
+                        "subscription_tier": plan_tier,
+                        "subscription_status": "active",
+                        "stripe_customer_id": session.get("customer")
+                    }
+                    
+                    if plan_tier in ["agency", "growth_agency"]:
+                        user = await db.users.find_one({"id": user_id})
+                        if user and not user.get("team_id"):
+                            team_id = str(uuid.uuid4())
+                            await db.teams.insert_one({
+                                "id": team_id,
+                                "owner_id": user_id,
+                                "name": f"{user.get('full_name', 'User')}'s Team",
+                                "created_at": datetime.now(timezone.utc).isoformat()
+                            })
+                            update_data["team_id"] = team_id
+                            update_data["team_role"] = "owner"
+                    
+                    await db.users.update_one({"id": user_id}, {"$set": update_data})
+                    logger.info(f"✅ Subscription activated: {user_id} -> {plan_tier}")
         
         return {"status": "success"}
     except Exception as e:
