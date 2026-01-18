@@ -23,22 +23,22 @@ const Landing = () => {
     {
       icon: <Zap className="w-5 h-5" />,
       title: "AI-Powered Analysis",
-      description: "Claude AI dissects every word, scoring your cold emails with surgical precision."
+      description: "Advanced AI dissects every word, scoring your cold emails with surgical precision. Know exactly what's working and what's costing you deals."
     },
     {
       icon: <Target className="w-5 h-5" />,
-      title: "Actionable Insights",
-      description: "No fluff. Get specific changes that move the needle on response rates."
+      title: "Revenue-Focused Insights",
+      description: "No fluff. Get specific changes that translate directly into booked meetings and closed deals. Every suggestion is tied to conversion."
     },
     {
       icon: <BarChart3 className="w-5 h-5" />,
-      title: "Performance Tracking",
-      description: "Track your evolution. See patterns emerge across hundreds of emails."
+      title: "Performance Intelligence",
+      description: "Track your evolution over time. Identify patterns in your highest-converting emails and replicate success systematically."
     },
     {
       icon: <Sparkles className="w-5 h-5" />,
-      title: "Instant Rewrites",
-      description: "One click. Optimized email. Ready to send to your next prospect."
+      title: "One-Click Optimization",
+      description: "Instant rewrites that transform mediocre emails into compelling outreach. Stop sending emails that get ignored."
     }
   ];
 
