@@ -1990,14 +1990,20 @@ async def get_insights_dashboard(user: dict = Depends(get_current_user)):
 
 @api_router.get("/templates")
 async def get_templates(user: dict = Depends(get_current_user)):
-    """Get all templates - shows all to everyone, tier controls access"""
+    """Get all templates - only available to Pro and Agency tiers"""
+    user_tier = user.get("subscription_tier", "free")
+    
+    # Only Pro and Agency have access to templates
+    if user_tier not in ["pro", "agency", "growth_agency"]:
+        raise HTTPException(status_code=403, detail="Templates are available on Pro and Agency plans")
+    
     # Get user's templates and shared team templates
     query = {"$or": [{"user_id": user["id"]}]}
     
     if user.get("team_id"):
         query["$or"].append({"team_id": user["team_id"], "is_shared": True})
     
-    # Also get system templates (include ALL tiers - let frontend handle locking)
+    # Also get system templates
     query["$or"].append({"is_system": True})
     
     templates = await db.templates.find(query, {"_id": 0}).to_list(200)
