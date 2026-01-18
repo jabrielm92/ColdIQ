@@ -174,7 +174,7 @@ const FAQ = () => {
           <h3 className="text-xl font-semibold mb-2">Still have questions?</h3>
           <p className="text-zinc-400 mb-6">Our support team is here to help you get the most out of ColdIQ.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/contact">
+            <Link to="/support">
               <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-3 h-auto">
                 Contact Support
               </Button>
