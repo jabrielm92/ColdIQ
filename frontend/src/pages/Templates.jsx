@@ -55,15 +55,15 @@ const Templates = () => {
   const isPro = ["pro", "agency", "growth_agency"].includes(userTier);
   const isAgency = userTier === "agency" || userTier === "growth_agency";
   const isStarter = ["starter", "pro", "agency", "growth_agency"].includes(userTier);
-  const isFree = userTier === "free";
+  const hasTemplateAccess = ["pro", "agency", "growth_agency"].includes(userTier);
 
   useEffect(() => {
-    if (!isFree) {
+    if (hasTemplateAccess) {
       fetchTemplates();
     } else {
       setLoading(false);
     }
-  }, [isFree]);
+  }, [hasTemplateAccess]);
 
   const fetchTemplates = async () => {
     try {
@@ -78,8 +78,8 @@ const Templates = () => {
     }
   };
 
-  // Free tier doesn't have access to templates
-  if (isFree) {
+  // Only Pro and Agency have access to templates
+  if (!hasTemplateAccess) {
     return (
       <DashboardLayout>
         <div className="p-6 lg:p-8 flex items-center justify-center min-h-[60vh]">
@@ -89,14 +89,14 @@ const Templates = () => {
             </div>
             <h1 className="font-serif text-3xl mb-4">Email Templates</h1>
             <p className="text-zinc-500 max-w-md mx-auto mb-8">
-              Access our library of proven cold email templates and create your own. Start writing emails that convert.
+              Access our library of proven, high-converting cold email templates. Create custom templates and generate AI-powered emails tailored to your industry.
             </p>
-            <Link to="/pricing">
+            <Link to="/pricing?highlight=pro">
               <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-4 h-auto">
-                Upgrade to Access Templates
+                Upgrade to Pro to Access Templates
               </Button>
             </Link>
-            <p className="text-xs text-zinc-600 mt-4">Available on Starter plan and above</p>
+            <p className="text-xs text-zinc-600 mt-4">Available on Pro and Agency plans</p>
           </div>
         </div>
       </DashboardLayout>
