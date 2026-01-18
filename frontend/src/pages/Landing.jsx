@@ -43,9 +43,9 @@ const Landing = () => {
   ];
 
   const stats = [
-    { value: "47%", label: "Avg Response Increase", icon: <TrendingUp className="w-4 h-4" /> },
-    { value: "125K+", label: "Emails Analyzed", icon: <Mail className="w-4 h-4" /> },
-    { value: "2,400+", label: "Active Users", icon: <Users className="w-4 h-4" /> }
+    { value: "47%", label: "Higher Response Rate", icon: <TrendingUp className="w-4 h-4" /> },
+    { value: "3.2x", label: "More Meetings Booked", icon: <Target className="w-4 h-4" /> },
+    { value: "<30s", label: "Analysis Time", icon: <Zap className="w-4 h-4" /> }
   ];
 
   const dataPoints = [
