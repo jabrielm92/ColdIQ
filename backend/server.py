@@ -2498,6 +2498,122 @@ async def update_contact_request(
     
     return {"message": "Status updated"}
 
+# ================= SUPPORT CONTACT =================
+
+class SupportContactRequest(BaseModel):
+    name: str
+    email: EmailStr
+    subject: str
+    message: str
+
+SUPPORT_EMAIL = "coldiq@arisolutionsinc.com"
+
+@api_router.post("/contact/support")
+async def submit_support_contact(data: SupportContactRequest):
+    """Submit general support contact form"""
+    contact_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    contact_doc = {
+        "id": contact_id,
+        "type": "support",
+        "name": data.name,
+        "email": data.email,
+        "subject": data.subject,
+        "message": data.message,
+        "status": "new",
+        "created_at": now
+    }
+    
+    await db.support_messages.insert_one(contact_doc)
+    logger.info(f"New support message from {data.email}: {data.subject}")
+    
+    # Send email notification
+    try:
+        resend.Emails.send({
+            "from": f"ColdIQ <{SENDER_EMAIL}>",
+            "to": [SUPPORT_EMAIL],
+            "subject": f"[Support] {data.subject}",
+            "html": f"""
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #09090b; color: #fff; padding: 30px; border-radius: 10px;">
+                <h2 style="color: #d4af37; margin-bottom: 20px;">New Support Message</h2>
+                
+                <div style="background: #18181b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <p><strong>From:</strong> {data.name}</p>
+                    <p><strong>Email:</strong> <a href="mailto:{data.email}" style="color: #22d3ee;">{data.email}</a></p>
+                    <p><strong>Subject:</strong> {data.subject}</p>
+                </div>
+                
+                <div style="background: #18181b; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #d4af37; margin-top: 0;">Message</h3>
+                    <p style="white-space: pre-wrap;">{data.message}</p>
+                </div>
+                
+                <a href="mailto:{data.email}?subject=Re: {data.subject}" 
+                   style="display: inline-block; background: #d4af37; color: #000; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; margin-top: 20px;">
+                    Reply to {data.name}
+                </a>
+            </div>
+            """
+        })
+    except Exception as e:
+        logger.error(f"Failed to send support email notification: {e}")
+    
+    return {"message": "Message sent successfully", "id": contact_id}
+
+@api_router.get("/admin/support-messages")
+async def get_support_messages(
+    page: int = 1, 
+    limit: int = 20, 
+    status: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    """Get all support messages (admin only)"""
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    if status:
+        query["status"] = status
+    
+    skip = (page - 1) * limit
+    total = await db.support_messages.count_documents(query)
+    
+    messages = await db.support_messages.find(query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    for msg in messages:
+        msg.pop("_id", None)
+    
+    return {
+        "messages": messages,
+        "total": total,
+        "page": page,
+        "pages": (total + limit - 1) // limit
+    }
+
+@api_router.patch("/admin/support-messages/{message_id}")
+async def update_support_message(
+    message_id: str,
+    status: str,
+    user: dict = Depends(get_current_user)
+):
+    """Update support message status (admin only)"""
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    if status not in ["new", "in_progress", "resolved", "closed"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    result = await db.support_messages.update_one(
+        {"id": message_id},
+        {"$set": {"status": status, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+    
+    return {"message": "Status updated"}
+
 # ================= BILLING ROUTES =================
 
 @api_router.post("/billing/create-checkout-session")
