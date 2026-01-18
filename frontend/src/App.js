@@ -247,6 +247,7 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/support" element={<Support />} />
               <Route path="/sms-opt-in" element={<SmsOptIn />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/performance" element={
