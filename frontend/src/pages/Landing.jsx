@@ -198,19 +198,21 @@ const Landing = () => {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="lg:col-span-7"
             >
-              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 border border-theme bg-theme-secondary mb-6 sm:mb-8">
-                <span className="w-2 h-2 bg-[#a3e635] animate-pulse" />
-                <span className="text-[10px] sm:text-xs font-mono tracking-widest uppercase text-theme-muted">Trusted by 2,400+ Sales Teams</span>
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 border border-[#d4af37]/30 bg-[#d4af37]/5 mb-6 sm:mb-8">
+                <span className="w-2 h-2 bg-[#d4af37] animate-pulse" />
+                <span className="text-[10px] sm:text-xs font-mono tracking-widest uppercase text-[#d4af37]">The Unfair Advantage in Cold Outreach</span>
               </div>
               
               <h1 className="font-serif text-4xl sm:text-5xl lg:text-7xl tracking-tight leading-[1.1] sm:leading-[1.05] mb-6 sm:mb-8">
-                Stop Sending
+                You Don't Need More
                 <br />
-                <span className="text-gradient-gold">Bad Cold Emails.</span>
+                <span className="text-gradient-gold">Cold Emails.</span>
+                <br />
+                <span className="text-theme-muted text-3xl sm:text-4xl lg:text-5xl">You Need Better Ones.</span>
               </h1>
               
               <p className="text-base sm:text-lg text-theme-muted leading-relaxed max-w-xl mb-8 sm:mb-10 font-sans">
-                ColdIQ uses Claude AI to analyze your cold emails in seconds. Get a score, actionable fixes, and an optimized rewrite that actually gets responses. <strong className="text-theme">Average users see 47% better response rates.</strong>
+                The difference between a booked meeting and being ignored isn't volume—it's quality. <strong className="text-theme">Every weak email costs you money.</strong> ColdIQ uses AI to transform your outreach from forgettable to irresistible in seconds.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8">
