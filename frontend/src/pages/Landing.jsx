@@ -706,7 +706,7 @@ const Landing = () => {
               <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">Company</h4>
               <ul className="space-y-2 text-sm text-theme-muted">
                 <li><a href="https://arisolutionsinc.com" target="_blank" rel="noopener noreferrer" className="hover:text-theme transition-colors">ARI Solutions Inc.</a></li>
-                <li><Link to="/contact" className="hover:text-theme transition-colors">Contact</Link></li>
+                <li><Link to="/support" className="hover:text-theme transition-colors">Contact</Link></li>
               </ul>
             </div>
 
