@@ -49,10 +49,10 @@ const Landing = () => {
   ];
 
   const dataPoints = [
-    { before: "2.1%", after: "3.5%", metric: "Response Rate", improvement: "+67%" },
-    { before: "18%", after: "32%", metric: "Open Rate", improvement: "+78%" },
-    { before: "45", after: "71", metric: "Avg Score", improvement: "+58%" },
-    { before: "5.2", after: "2.8", metric: "Days to Reply", improvement: "-46%" }
+    { before: "Ignored", after: "Replied", metric: "Prospect Response", improvement: "→ DEAL" },
+    { before: "2.1%", after: "4.8%", metric: "Reply Rate", improvement: "+129%" },
+    { before: "Generic", after: "Personalized", metric: "Email Quality", improvement: "→ TRUST" },
+    { before: "$0", after: "$$$", metric: "Pipeline Value", improvement: "↑ ROI" }
   ];
 
   const testimonials = [
