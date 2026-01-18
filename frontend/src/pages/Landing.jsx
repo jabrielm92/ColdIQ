@@ -276,12 +276,12 @@ const Landing = () => {
       <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-12 bg-theme-secondary border-y border-theme">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
-            <p className="text-xs font-mono tracking-widest uppercase text-[#d4af37] mb-3 sm:mb-4">Real Results</p>
+            <p className="text-xs font-mono tracking-widest uppercase text-[#d4af37] mb-3 sm:mb-4">The Cost of Bad Emails</p>
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight mb-4 sm:mb-6">
-              The Numbers Don't Lie
+              Every Weak Email Costs You Revenue
             </h2>
             <p className="text-theme-muted max-w-2xl mx-auto">
-              Based on 125,000+ emails analyzed. ColdIQ users consistently outperform industry benchmarks.
+              A poorly written cold email doesn't just get ignored—it burns a prospect forever. See what happens when you stop guessing and start optimizing.
             </p>
           </div>
           
