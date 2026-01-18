@@ -613,17 +613,17 @@ const Landing = () => {
             viewport={{ once: true }}
             className="mb-10 sm:mb-16 lg:mb-20"
           >
-            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3 sm:mb-4">Process</p>
+            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3 sm:mb-4">Simple Process</p>
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight max-w-2xl">
-              Three steps to better outreach
+              From forgettable to unforgettable in three steps
             </h2>
           </motion.div>
           
           <div className="grid sm:grid-cols-3 gap-8 sm:gap-6 lg:gap-12">
             {[
-              { step: "01", title: "Paste Your Email", desc: "Enter your subject line and email body. No setup. No complexity. Takes 10 seconds." },
-              { step: "02", title: "Get AI Analysis", desc: "Claude AI scores your email 0-100, identifies weaknesses, and suggests specific improvements." },
-              { step: "03", title: "Send Optimized", desc: "Copy the AI-rewritten version and watch your response rates climb. It's that simple." }
+              { step: "01", title: "Paste Your Email", desc: "Drop in your subject line and body. No setup, no integrations, no complexity. Takes 10 seconds." },
+              { step: "02", title: "Get AI Intelligence", desc: "Receive a score, pinpoint weaknesses, and get specific fixes. Know exactly why your email won't convert—and how to fix it." },
+              { step: "03", title: "Send & Close", desc: "Copy the optimized version and watch your calendar fill up. Better emails = more meetings = more revenue." }
             ].map((item, i) => (
               <motion.div
                 key={i}
