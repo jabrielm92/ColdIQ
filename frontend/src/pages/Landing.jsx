@@ -285,7 +285,7 @@ const Landing = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {dataPoints.map((data, i) => (
               <motion.div
                 key={i}
@@ -293,21 +293,21 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-theme border border-theme p-4 sm:p-6 text-center"
+                className="bg-theme border border-theme p-5 sm:p-6 text-center"
               >
-                <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-4">{data.metric}</p>
-                <div className="flex items-center justify-center gap-3 sm:gap-4 mb-3">
-                  <div>
-                    <p className="text-theme-dim text-xs mb-1">Before</p>
-                    <p className="font-mono text-xl sm:text-2xl text-theme-muted">{data.before}</p>
+                <p className="text-[10px] sm:text-xs font-mono tracking-widest uppercase text-theme-dim mb-4">{data.metric}</p>
+                <div className="flex items-center justify-center gap-4 sm:gap-4 mb-3">
+                  <div className="min-w-0">
+                    <p className="text-theme-dim text-[10px] sm:text-xs mb-1">Before</p>
+                    <p className="font-mono text-lg sm:text-2xl text-theme-muted truncate">{data.before}</p>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-[#d4af37]" />
-                  <div>
-                    <p className="text-[#a3e635] text-xs mb-1">After</p>
-                    <p className="font-mono text-xl sm:text-2xl font-bold text-[#a3e635]">{data.after}</p>
+                  <ArrowRight className="w-4 h-4 text-[#d4af37] flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[#a3e635] text-[10px] sm:text-xs mb-1">After</p>
+                    <p className="font-mono text-lg sm:text-2xl font-bold text-[#a3e635] truncate">{data.after}</p>
                   </div>
                 </div>
-                <div className="inline-block px-3 py-1 bg-[#a3e635]/10 text-[#a3e635] text-sm font-mono font-bold">
+                <div className="inline-block px-3 py-1 bg-[#a3e635]/10 text-[#a3e635] text-xs sm:text-sm font-mono font-bold">
                   {data.improvement}
                 </div>
               </motion.div>
