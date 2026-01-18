@@ -674,25 +674,74 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 sm:py-12 px-4 sm:px-6 lg:px-12 border-t border-theme">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-[#d4af37] flex items-center justify-center">
-              <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-black" />
+      <footer className="py-12 sm:py-16 px-4 sm:px-6 lg:px-12 border-t border-theme">
+        <div className="max-w-7xl mx-auto">
+          {/* Main Footer Content */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-[#d4af37] flex items-center justify-center">
+                  <Mail className="w-4 h-4 text-black" />
+                </div>
+                <span className="font-semibold tracking-tight font-sans text-lg">ColdIQ</span>
+              </div>
+              <p className="text-theme-dim text-sm mb-4">
+                AI-powered cold email analysis for sales teams who want results, not guesswork.
+              </p>
             </div>
-            <span className="font-semibold tracking-tight font-sans text-sm sm:text-base">ColdIQ</span>
+
+            {/* Product */}
+            <div>
+              <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">Product</h4>
+              <ul className="space-y-2 text-sm text-theme-muted">
+                <li><Link to="/pricing" className="hover:text-theme transition-colors">Pricing</Link></li>
+                <li><Link to="/faq" className="hover:text-theme transition-colors">FAQ</Link></li>
+                <li><Link to="/signup" className="hover:text-theme transition-colors">Get Started</Link></li>
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-theme-muted">
+                <li><a href="https://arisolutionsinc.com" target="_blank" rel="noopener noreferrer" className="hover:text-theme transition-colors">ARI Solutions Inc.</a></li>
+                <li><Link to="/contact" className="hover:text-theme transition-colors">Contact</Link></li>
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-theme-muted">
+                <li><Link to="/terms" className="hover:text-theme transition-colors">Terms of Service</Link></li>
+                <li><Link to="/privacy" className="hover:text-theme transition-colors">Privacy Policy</Link></li>
+              </ul>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <p className="text-theme-dim text-xs sm:text-sm font-mono">© 2025 ColdIQ. All rights reserved.</p>
-            {/* Hidden admin login */}
-            <button
-              onClick={handleAdminLogin}
-              disabled={adminLoading}
-              className="opacity-30 hover:opacity-100 transition-opacity p-1"
-              title="Admin"
-            >
-              <Shield className="w-4 h-4 text-zinc-500" />
-            </button>
+
+          {/* Bottom Bar */}
+          <div className="pt-8 border-t border-theme-subtle flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-theme-dim text-xs font-mono">
+              © 2025 ColdIQ. All rights reserved. A product of{" "}
+              <a href="https://arisolutionsinc.com" target="_blank" rel="noopener noreferrer" className="text-[#d4af37] hover:underline">
+                ARI Solutions Inc.
+              </a>
+            </p>
+            <div className="flex items-center gap-4">
+              <a href="mailto:coldiq@arisolutionsinc.com" className="text-theme-dim hover:text-theme text-xs">
+                coldiq@arisolutionsinc.com
+              </a>
+              {/* Hidden admin login */}
+              <button
+                onClick={handleAdminLogin}
+                disabled={adminLoading}
+                className="opacity-20 hover:opacity-100 transition-opacity p-1"
+                title="Admin"
+              >
+                <Shield className="w-4 h-4 text-zinc-500" />
+              </button>
+            </div>
           </div>
         </div>
       </footer>
