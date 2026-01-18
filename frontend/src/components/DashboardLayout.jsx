@@ -34,7 +34,7 @@ const DashboardLayout = ({ children }) => {
     { path: "/history", label: "History", icon: <History className="w-5 h-5" />, tier: "free" },
     
     // Starter features
-    { path: "/templates", label: "Templates", icon: <FileText className="w-5 h-5" />, tier: "starter", badge: "STARTER" },
+    { path: "/templates", label: "Templates", icon: <FileText className="w-5 h-5" />, tier: "pro", badge: "PRO" },
     { path: "/insights", label: "Insights", icon: <BarChart3 className="w-5 h-5" />, tier: "starter", badge: "STARTER" },
     
     // Pro features
