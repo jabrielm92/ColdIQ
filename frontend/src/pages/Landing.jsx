@@ -526,9 +526,9 @@ const Landing = () => {
       <section className="py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-12 bg-theme-secondary">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10 sm:mb-16">
-            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3 sm:mb-4">Testimonials</p>
+            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-3 sm:mb-4">Success Stories</p>
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight">
-              Loved by Sales Teams
+              From Cold Outreach to Closed Deals
             </h2>
           </div>
           
