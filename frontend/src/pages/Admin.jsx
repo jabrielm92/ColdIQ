@@ -25,6 +25,7 @@ const Admin = () => {
   const [users, setUsers] = useState([]);
   const [payments, setPayments] = useState([]);
   const [contactRequests, setContactRequests] = useState([]);
+  const [supportMessages, setSupportMessages] = useState([]);
   const [dbInfo, setDbInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
