@@ -130,7 +130,7 @@ const FAQ = () => {
           <h1 className="text-4xl font-serif mb-4">Frequently Asked Questions</h1>
           <p className="text-zinc-400 max-w-2xl mx-auto">
             Find answers to common questions about ColdIQ. Can't find what you're looking for? 
-            <Link to="/contact" className="text-[#d4af37] hover:underline ml-1">Contact our support team</Link>.
+            <Link to="/support" className="text-[#d4af37] hover:underline ml-1">Contact our support team</Link>.
           </p>
         </div>
 
