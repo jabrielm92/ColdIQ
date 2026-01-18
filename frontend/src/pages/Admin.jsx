@@ -73,6 +73,13 @@ const Admin = () => {
           setContactRequests(res.data.requests);
           setTotalPages(res.data.pages);
         }
+        if (activeTab === "support") {
+          const params = new URLSearchParams({ page, limit: 15 });
+          if (statusFilter) params.append("status", statusFilter);
+          const res = await axios.get(`${API}/admin/support-messages?${params}`);
+          setSupportMessages(res.data.messages);
+          setTotalPages(res.data.pages);
+        }
         if (activeTab === "database") {
           const res = await axios.get(`${API}/admin/db-info`);
           setDbInfo(res.data.collections);
