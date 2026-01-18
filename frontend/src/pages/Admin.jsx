@@ -617,6 +617,94 @@ const Admin = () => {
               </div>
             )}
 
+            {/* Support Tab */}
+            {activeTab === "support" && (
+              <div className="space-y-4">
+                <div className="flex gap-3 items-center">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+                    className="bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-sm"
+                  >
+                    <option value="">All Status</option>
+                    <option value="new">New</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </div>
+
+                <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-zinc-800/50">
+                      <tr>
+                        <th className="text-left text-xs font-medium text-zinc-400 uppercase px-4 py-3">From</th>
+                        <th className="text-left text-xs font-medium text-zinc-400 uppercase px-4 py-3">Subject</th>
+                        <th className="text-left text-xs font-medium text-zinc-400 uppercase px-4 py-3">Status</th>
+                        <th className="text-left text-xs font-medium text-zinc-400 uppercase px-4 py-3">Date</th>
+                        <th className="text-right text-xs font-medium text-zinc-400 uppercase px-4 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-800">
+                      {supportMessages.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-8 text-center text-zinc-500">No support messages yet</td>
+                        </tr>
+                      ) : supportMessages.map(msg => (
+                        <tr key={msg.id} className="hover:bg-zinc-800/30">
+                          <td className="px-4 py-3">
+                            <p className="font-medium">{msg.name}</p>
+                            <a href={`mailto:${msg.email}`} className="text-xs text-cyan-400 hover:underline">{msg.email}</a>
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className="font-medium text-sm">{msg.subject}</p>
+                            <p className="text-xs text-zinc-500 truncate max-w-[200px]">{msg.message}</p>
+                          </td>
+                          <td className="px-4 py-3">{getSupportStatusBadge(msg.status)}</td>
+                          <td className="px-4 py-3 text-zinc-400 text-sm">
+                            {new Date(msg.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex justify-end gap-2">
+                              <a
+                                href={`mailto:${msg.email}?subject=Re: ${msg.subject}`}
+                                className="p-1.5 hover:bg-zinc-700 rounded"
+                                title="Reply via Email"
+                              >
+                                <Mail className="w-4 h-4 text-cyan-400" />
+                              </a>
+                              <select
+                                value={msg.status}
+                                onChange={(e) => updateSupportStatus(msg.id, e.target.value)}
+                                className="bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-xs"
+                              >
+                                <option value="new">New</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="resolved">Resolved</option>
+                                <option value="closed">Closed</option>
+                              </select>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <span className="text-sm text-zinc-400">Page {page} of {totalPages}</span>
+                    <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Database Tab */}
             {activeTab === "database" && dbInfo && (
               <div className="space-y-4">
