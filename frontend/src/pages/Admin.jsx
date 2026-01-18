@@ -7,7 +7,7 @@ import axios from "axios";
 import { 
   Users, Database, CreditCard, BarChart3, Search, Trash2, 
   Edit, Plus, X, Check, RefreshCw, ChevronLeft, ChevronRight,
-  Mail, Shield, Crown, Zap, ArrowLeft, MessageSquare, Building2, ExternalLink
+  Mail, Shield, Crown, Zap, ArrowLeft, MessageSquare, Building2, ExternalLink, Headphones
 } from "lucide-react";
 import { toast } from "sonner";
 import {
