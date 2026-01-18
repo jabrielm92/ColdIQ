@@ -206,6 +206,7 @@ const Admin = () => {
     { id: "stats", label: "Overview", icon: BarChart3 },
     { id: "users", label: "Users", icon: Users },
     { id: "contacts", label: "Inquiries", icon: MessageSquare },
+    { id: "support", label: "Support", icon: Headphones },
     { id: "payments", label: "Payments", icon: CreditCard },
     { id: "database", label: "Database", icon: Database }
   ];
