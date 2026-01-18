@@ -674,11 +674,6 @@ const Pricing = () => {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
-            <Link to="/analyze">
-              <Button variant="outline" className="rounded-none font-bold uppercase tracking-wider text-xs px-8 py-4 h-auto border-theme text-theme-muted hover:text-theme hover:bg-transparent">
-                Try Demo
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
@@ -693,10 +688,12 @@ const Pricing = () => {
             <span className="font-semibold tracking-tight font-sans text-sm sm:text-base">ColdIQ</span>
           </div>
           <div className="flex items-center gap-6 text-xs text-theme-dim">
+            <Link to="/faq" className="hover:text-theme-muted">FAQ</Link>
+            <Link to="/contact" className="hover:text-theme-muted">Contact</Link>
             <Link to="/terms" className="hover:text-theme-muted">Terms</Link>
             <Link to="/privacy" className="hover:text-theme-muted">Privacy</Link>
           </div>
-          <p className="text-theme-dim text-xs sm:text-sm font-mono">© 2025 ColdIQ. All rights reserved.</p>
+          <p className="text-theme-dim text-xs sm:text-sm font-mono">© 2025 <a href="https://arisolutionsinc.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#d4af37]">ARI Solutions Inc.</a></p>
         </div>
       </footer>
     </div>
