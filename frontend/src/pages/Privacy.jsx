@@ -180,7 +180,7 @@ const Privacy = () => {
               <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
             </ul>
             <p className="text-theme-muted leading-relaxed mt-4">
-              To exercise these rights, contact us at privacy@coldiq.io.
+              To exercise these rights, contact us at coldiq@arisolutionsinc.com.
             </p>
           </section>
 

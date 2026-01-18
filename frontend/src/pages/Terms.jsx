@@ -169,7 +169,7 @@ const Terms = () => {
             <p className="text-theme-muted leading-relaxed">
               If you have any questions about these Terms of Service, please contact us at:
             </p>
-            <p className="text-[#d4af37] mt-4">support@coldiq.io</p>
+            <p className="text-[#d4af37] mt-4">coldiq@arisolutionsinc.com</p>
           </section>
         </div>
       </main>
