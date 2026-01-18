@@ -689,7 +689,7 @@ const Pricing = () => {
           </div>
           <div className="flex items-center gap-6 text-xs text-theme-dim">
             <Link to="/faq" className="hover:text-theme-muted">FAQ</Link>
-            <Link to="/contact" className="hover:text-theme-muted">Contact</Link>
+            <Link to="/support" className="hover:text-theme-muted">Contact</Link>
             <Link to="/terms" className="hover:text-theme-muted">Terms</Link>
             <Link to="/privacy" className="hover:text-theme-muted">Privacy</Link>
           </div>
