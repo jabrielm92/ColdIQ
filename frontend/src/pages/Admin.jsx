@@ -173,6 +173,33 @@ const Admin = () => {
     }
   };
 
+  const updateSupportStatus = async (messageId, newStatus) => {
+    try {
+      await axios.patch(`${API}/admin/support-messages/${messageId}?status=${newStatus}`);
+      toast.success("Status updated");
+      const params = new URLSearchParams({ page, limit: 15 });
+      if (statusFilter) params.append("status", statusFilter);
+      const res = await axios.get(`${API}/admin/support-messages?${params}`);
+      setSupportMessages(res.data.messages);
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
+  };
+
+  const getSupportStatusBadge = (status) => {
+    const styles = {
+      new: "bg-emerald-500/20 text-emerald-400",
+      in_progress: "bg-amber-500/20 text-amber-400",
+      resolved: "bg-cyan-500/20 text-cyan-400",
+      closed: "bg-zinc-700 text-zinc-400"
+    };
+    return (
+      <span className={`px-2 py-0.5 text-xs font-bold rounded ${styles[status] || styles.new}`}>
+        {status?.replace("_", " ").toUpperCase() || "NEW"}
+      </span>
+    );
+  };
+
   const getStatusBadge = (status) => {
     const styles = {
       new: "bg-emerald-500/20 text-emerald-400",
