@@ -654,20 +654,20 @@ const Landing = () => {
             <div className="absolute top-0 right-0 w-32 sm:w-48 lg:w-64 h-32 sm:h-48 lg:h-64 bg-[#d4af37]/5 blur-3xl" />
             
             <div className="relative z-10 text-center">
-              <p className="text-xs font-mono tracking-widest uppercase text-[#d4af37] mb-4 sm:mb-6">Start Now</p>
+              <p className="text-xs font-mono tracking-widest uppercase text-[#d4af37] mb-4 sm:mb-6">Stop Leaving Money on the Table</p>
               <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl tracking-tight mb-4 sm:mb-6">
-                Your Next Cold Email Could Be Your Best
+                Your Competitors Are Already Optimizing
               </h2>
               <p className="text-sm sm:text-base text-theme-muted mb-8 sm:mb-10 max-w-xl mx-auto">
-                Join 2,400+ sales professionals who've stopped guessing and started converting. Your first 3 analyses are completely free.
+                Every day you send unoptimized cold emails, you're burning prospects that could have become customers. The best sales teams don't guess—they know. <strong className="text-theme">Start your first analysis free.</strong>
               </p>
               <Link to="/signup">
                 <Button className="w-full sm:w-auto bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 sm:px-10 py-4 sm:py-5 h-auto transition-all hover:shadow-[0_0_30px_rgba(212,175,55,0.3)]" data-testid="cta-signup-btn">
-                  Start Analyzing for Free
+                  Get Your Unfair Advantage
                   <ArrowRight className="w-4 h-4 ml-2 sm:ml-3" />
                 </Button>
               </Link>
-              <p className="mt-4 text-xs text-theme-dim font-mono">No credit card required • 3 free analyses • Setup in 30 seconds</p>
+              <p className="mt-4 text-xs text-theme-dim font-mono">No credit card required • 3 free analyses • Results in 30 seconds</p>
             </div>
           </motion.div>
         </div>
