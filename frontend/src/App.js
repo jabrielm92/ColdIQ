@@ -245,6 +245,7 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/faq" element={<FAQ />} />
               <Route path="/sms-opt-in" element={<SmsOptIn />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/performance" element={
