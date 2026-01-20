@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth, API } from "@/App";
 import axios from "axios";
 import { 
-  Mail, BarChart3, Plus, TrendingUp, Target, Zap, ChevronRight, Clock
+  Mail, BarChart3, Plus, TrendingUp, Target, Zap, ChevronRight, Clock, Flame, Trophy, Star, Crown
 } from "lucide-react";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -13,18 +13,21 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [usage, setUsage] = useState(null);
   const [recentAnalyses, setRecentAnalyses] = useState([]);
+  const [streak, setStreak] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [usageRes, historyRes] = await Promise.all([
+        const [usageRes, historyRes, streakRes] = await Promise.all([
           axios.get(`${API}/user/usage`),
-          axios.get(`${API}/analysis/history?page=1&limit=5`)
+          axios.get(`${API}/analysis/history?page=1&limit=5`),
+          axios.get(`${API}/user/streak`)
         ]);
         setUsage(usageRes.data);
         setRecentAnalyses(historyRes.data.analyses);
+        setStreak(streakRes.data);
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
       } finally {
@@ -33,6 +36,14 @@ const Dashboard = () => {
     };
     fetchData();
   }, []);
+
+  const badgeIcons = {
+    flame: <Flame className="w-4 h-4" />,
+    trophy: <Trophy className="w-4 h-4" />,
+    star: <Star className="w-4 h-4" />,
+    zap: <Zap className="w-4 h-4" />,
+    crown: <Crown className="w-4 h-4" />
+  };
 
   const getScoreColor = (score) => {
     if (score >= 71) return "text-[#a3e635]";
@@ -47,6 +58,13 @@ const Dashboard = () => {
   };
 
   const stats = [
+    { 
+      label: "Current Streak", 
+      value: streak?.current_streak || 0, 
+      suffix: " days",
+      icon: <Flame className="w-5 h-5" />,
+      color: streak?.current_streak >= 3 ? "text-orange-400" : "text-zinc-400"
+    },
     { 
       label: "Total Analyses", 
       value: user?.total_analyses || 0, 
