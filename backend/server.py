@@ -666,12 +666,16 @@ async def verify_api_key(x_api_key: str = Header(None)):
     return user
 
 def require_tier(min_tier: str):
-    tier_order = ["free", "starter", "pro", "agency"]
-    min_index = tier_order.index(min_tier)
+    tier_order = ["free", "starter", "pro", "agency", "growth_agency"]
+    min_index = tier_order.index(min_tier) if min_tier in tier_order else 0
     
     async def check_tier(user: dict = Depends(get_current_user)):
         user_tier = user.get("subscription_tier", "free")
-        user_index = tier_order.index(user_tier) if user_tier in tier_order else 0
+        # Map growth_agency to agency level for comparison
+        if user_tier == "growth_agency":
+            user_index = tier_order.index("growth_agency")
+        else:
+            user_index = tier_order.index(user_tier) if user_tier in tier_order else 0
         if user_index < min_index:
             raise HTTPException(
                 status_code=403, 
