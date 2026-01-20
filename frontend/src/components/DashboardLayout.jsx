@@ -32,6 +32,7 @@ const DashboardLayout = ({ children }) => {
     { path: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, tier: "free" },
     { path: "/analyze", label: "Analyze", icon: <Plus className="w-5 h-5" />, tier: "free" },
     { path: "/history", label: "History", icon: <History className="w-5 h-5" />, tier: "free" },
+    { path: "/tools", label: "Tools", icon: <Zap className="w-5 h-5" />, tier: "free" },
     
     // Starter features
     { path: "/templates", label: "Templates", icon: <FileText className="w-5 h-5" />, tier: "pro", badge: "PRO" },
