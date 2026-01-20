@@ -248,6 +248,17 @@ const Analyzer = () => {
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xs font-mono tracking-widest uppercase text-zinc-500">Overall Score</h3>
                         <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              const report = `ColdIQ Analysis Report\n\nScore: ${analysis.analysis_score}/100\nEst. Response Rate: ${analysis.estimated_response_rate}%\nEst. Open Rate: ${analysis.estimated_open_rate}%\n\nSubject: ${analysis.subject}\n\nKey Issues:\n${analysis.fix_suggestions?.slice(0, 3).map(s => `• ${s}`).join('\n') || 'None'}\n\nOptimized Subject: ${analysis.optimized_subject || 'N/A'}\n\nOptimized Body:\n${analysis.optimized_body || 'N/A'}`;
+                              navigator.clipboard.writeText(report);
+                              toast.success("Analysis report copied!");
+                            }}
+                            className="p-2 hover:bg-white/5 text-zinc-500 hover:text-[#d4af37] transition-colors"
+                            title="Copy full report"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
                           <button 
                             onClick={() => submitFeedback('helpful')}
                             className="p-2 hover:bg-white/5 text-zinc-500 hover:text-[#a3e635] transition-colors"
