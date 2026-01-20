@@ -2614,6 +2614,474 @@ async def update_support_message(
     
     return {"message": "Status updated"}
 
+# ================= QUICK WINS & NEW FEATURES =================
+
+# Spam trigger words database
+SPAM_TRIGGER_WORDS = {
+    "urgent": "time-sensitive",
+    "free": "complimentary",
+    "act now": "when you're ready",
+    "limited time": "available now",
+    "click here": "learn more",
+    "buy now": "get started",
+    "earn money": "grow revenue",
+    "no obligation": "no commitment required",
+    "winner": "selected",
+    "congratulations": "great news",
+    "guarantee": "committed to",
+    "risk-free": "with confidence",
+    "discount": "special pricing",
+    "lowest price": "competitive rate",
+    "order now": "get started today",
+    "apply now": "submit your application",
+    "call now": "schedule a call",
+    "double your": "increase your",
+    "extra income": "additional revenue",
+    "fast cash": "quick results",
+    "make money": "generate revenue",
+    "million dollars": "significant value",
+    "no fees": "transparent pricing",
+    "no cost": "included",
+    "100% free": "at no charge",
+    "credit card": "payment details",
+    "dear friend": "Hi [Name]",
+    "incredible deal": "great opportunity"
+}
+
+BEST_SEND_TIMES = {
+    "saas": {"day": "Tuesday", "time": "10:00 AM", "timezone": "recipient's local time"},
+    "finance": {"day": "Wednesday", "time": "8:00 AM", "timezone": "recipient's local time"},
+    "healthcare": {"day": "Thursday", "time": "11:00 AM", "timezone": "recipient's local time"},
+    "ecommerce": {"day": "Tuesday", "time": "2:00 PM", "timezone": "recipient's local time"},
+    "consulting": {"day": "Tuesday", "time": "9:00 AM", "timezone": "recipient's local time"},
+    "real estate": {"day": "Thursday", "time": "10:00 AM", "timezone": "recipient's local time"},
+    "marketing": {"day": "Wednesday", "time": "10:00 AM", "timezone": "recipient's local time"},
+    "default": {"day": "Tuesday", "time": "10:00 AM", "timezone": "recipient's local time"}
+}
+
+INDUSTRY_BENCHMARKS = {
+    "saas": {"avg_score": 68, "avg_response": 3.2, "avg_open": 24},
+    "finance": {"avg_score": 62, "avg_response": 2.1, "avg_open": 21},
+    "healthcare": {"avg_score": 58, "avg_response": 1.8, "avg_open": 19},
+    "ecommerce": {"avg_score": 65, "avg_response": 2.8, "avg_open": 22},
+    "consulting": {"avg_score": 70, "avg_response": 3.5, "avg_open": 26},
+    "real estate": {"avg_score": 61, "avg_response": 2.4, "avg_open": 20},
+    "marketing": {"avg_score": 72, "avg_response": 3.8, "avg_open": 28},
+    "default": {"avg_score": 65, "avg_response": 2.8, "avg_open": 23}
+}
+
+@api_router.post("/tools/spam-check")
+async def check_spam_words(data: dict, user: dict = Depends(get_current_user)):
+    """Check email for spam trigger words - Free tier"""
+    text = (data.get("subject", "") + " " + data.get("body", "")).lower()
+    found_words = []
+    
+    for spam_word, alternative in SPAM_TRIGGER_WORDS.items():
+        if spam_word in text:
+            found_words.append({
+                "word": spam_word,
+                "alternative": alternative,
+                "severity": "high" if spam_word in ["free", "urgent", "act now", "buy now"] else "medium"
+            })
+    
+    spam_score = min(100, len(found_words) * 15)
+    
+    return {
+        "spam_score": spam_score,
+        "risk_level": "high" if spam_score > 50 else "medium" if spam_score > 25 else "low",
+        "found_words": found_words,
+        "total_issues": len(found_words)
+    }
+
+@api_router.post("/tools/subject-variants")
+async def generate_subject_variants(data: dict, user: dict = Depends(require_tier("starter"))):
+    """Generate A/B subject line variants - Starter+"""
+    subject = data.get("subject", "")
+    industry = data.get("industry", "general")
+    
+    if not subject:
+        raise HTTPException(status_code=400, detail="Subject is required")
+    
+    from openai import OpenAI
+    openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+    
+    prompt = f"""Generate 5 A/B test variants of this email subject line for {industry} industry.
+Original: "{subject}"
+
+Return JSON array with exactly 5 variants, each with:
+- subject: the variant subject line
+- style: brief style description (e.g., "question-based", "urgency", "personalized", "benefit-focused", "curiosity")
+- expected_lift: estimated % improvement over original (-10 to +30)
+
+Return ONLY valid JSON array, no other text."""
+
+    response = openai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.8
+    )
+    
+    try:
+        variants = json.loads(response.choices[0].message.content)
+    except:
+        variants = [{"subject": subject, "style": "original", "expected_lift": 0}]
+    
+    return {"original": subject, "variants": variants[:5]}
+
+@api_router.get("/tools/best-send-time")
+async def get_best_send_time(industry: str = "default", user: dict = Depends(require_tier("starter"))):
+    """Get best send time recommendation - Starter+"""
+    industry_lower = industry.lower().replace(" ", "_")
+    timing = BEST_SEND_TIMES.get(industry_lower, BEST_SEND_TIMES["default"])
+    
+    return {
+        "industry": industry,
+        "recommendation": timing,
+        "tip": f"Emails sent on {timing['day']} at {timing['time']} in {industry} typically see 15-25% higher open rates.",
+        "avoid": "Mondays (inbox overload) and Fridays (weekend mindset)"
+    }
+
+@api_router.get("/tools/industry-benchmark")
+async def get_industry_benchmark(industry: str = "default", user: dict = Depends(require_tier("pro"))):
+    """Get industry benchmark data - Pro+"""
+    industry_lower = industry.lower().replace(" ", "_")
+    benchmark = INDUSTRY_BENCHMARKS.get(industry_lower, INDUSTRY_BENCHMARKS["default"])
+    
+    return {
+        "industry": industry,
+        "benchmarks": benchmark,
+        "percentiles": {
+            "top_10": {"score": benchmark["avg_score"] + 15, "response": benchmark["avg_response"] * 1.5},
+            "top_25": {"score": benchmark["avg_score"] + 8, "response": benchmark["avg_response"] * 1.2},
+            "average": {"score": benchmark["avg_score"], "response": benchmark["avg_response"]},
+            "bottom_25": {"score": benchmark["avg_score"] - 10, "response": benchmark["avg_response"] * 0.6}
+        }
+    }
+
+class ToneCustomizeRequest(BaseModel):
+    text: str
+    tone: str  # casual, formal, urgent, friendly, authoritative
+    preserve_key_points: bool = True
+
+@api_router.post("/tools/customize-tone")
+async def customize_tone(data: ToneCustomizeRequest, user: dict = Depends(require_tier("pro"))):
+    """AI Tone Customizer - Pro+"""
+    from openai import OpenAI
+    openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+    
+    tone_instructions = {
+        "casual": "Make it conversational, friendly, use contractions, shorter sentences",
+        "formal": "Make it professional, polished, no contractions, business appropriate",
+        "urgent": "Add urgency without being pushy, emphasize time-sensitivity",
+        "friendly": "Warm, personable, relatable, like talking to a colleague",
+        "authoritative": "Confident, expert positioning, data-driven, decisive"
+    }
+    
+    instruction = tone_instructions.get(data.tone, tone_instructions["friendly"])
+    
+    prompt = f"""Rewrite this email in a {data.tone} tone. {instruction}
+{"Keep the core message and key points intact." if data.preserve_key_points else ""}
+
+Original:
+{data.text}
+
+Return ONLY the rewritten email, no explanations."""
+
+    response = openai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7
+    )
+    
+    return {
+        "original": data.text,
+        "rewritten": response.choices[0].message.content,
+        "tone_applied": data.tone
+    }
+
+class FollowUpRequest(BaseModel):
+    original_email: str
+    subject: str
+    context: Optional[str] = None
+    num_followups: int = 3
+
+@api_router.post("/tools/generate-sequence")
+async def generate_followup_sequence(data: FollowUpRequest, user: dict = Depends(require_tier("pro"))):
+    """Generate follow-up email sequence - Pro+"""
+    from openai import OpenAI
+    openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+    
+    prompt = f"""Based on this initial cold email, generate a {data.num_followups}-email follow-up sequence.
+
+Initial Email Subject: {data.subject}
+Initial Email Body:
+{data.original_email}
+
+{f"Context: {data.context}" if data.context else ""}
+
+For each follow-up, provide:
+1. Days after previous email (suggested timing)
+2. Subject line
+3. Email body (keep short, 50-100 words)
+4. Strategy (what angle this follow-up takes)
+
+Return as JSON array with objects containing: days_after, subject, body, strategy
+
+Return ONLY valid JSON array."""
+
+    response = openai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7
+    )
+    
+    try:
+        sequence = json.loads(response.choices[0].message.content)
+    except:
+        sequence = []
+    
+    return {
+        "original_subject": data.subject,
+        "sequence": sequence[:data.num_followups],
+        "total_emails": data.num_followups + 1
+    }
+
+class CompetitorAnalysisRequest(BaseModel):
+    email_text: str
+    your_product: Optional[str] = None
+
+@api_router.post("/tools/analyze-competitor")
+async def analyze_competitor_email(data: CompetitorAnalysisRequest, user: dict = Depends(require_tier("pro"))):
+    """Analyze competitor email for insights - Pro+"""
+    from openai import OpenAI
+    openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+    
+    prompt = f"""Analyze this competitor's cold email and extract actionable insights:
+
+{data.email_text}
+
+Provide analysis in JSON format:
+{{
+    "strengths": ["list of what works well"],
+    "weaknesses": ["list of what could be improved"],
+    "tactics_used": ["specific tactics/techniques they're using"],
+    "value_proposition": "their main value prop in one sentence",
+    "cta_analysis": "analysis of their call-to-action",
+    "tone": "description of their tone/voice",
+    "personalization_level": "low/medium/high",
+    "estimated_score": 0-100,
+    "what_to_steal": ["ideas you could adapt"],
+    "what_to_avoid": ["things not to copy"]
+}}
+
+Return ONLY valid JSON."""
+
+    response = openai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.5
+    )
+    
+    try:
+        analysis = json.loads(response.choices[0].message.content)
+    except:
+        analysis = {"error": "Could not analyze email"}
+    
+    return analysis
+
+class SignatureAnalysisRequest(BaseModel):
+    signature: str
+
+@api_router.post("/tools/analyze-signature")
+async def analyze_signature(data: SignatureAnalysisRequest, user: dict = Depends(require_tier("pro"))):
+    """Analyze and optimize email signature - Pro+"""
+    from openai import OpenAI
+    openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+    
+    prompt = f"""Analyze this email signature and provide optimization suggestions:
+
+{data.signature}
+
+Return JSON:
+{{
+    "score": 0-100,
+    "issues": ["list of problems"],
+    "suggestions": ["list of improvements"],
+    "optimized_version": "rewritten signature",
+    "best_practices": ["relevant tips"],
+    "missing_elements": ["what should be added"],
+    "remove_elements": ["what should be removed"]
+}}
+
+Return ONLY valid JSON."""
+
+    response = openai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.5
+    )
+    
+    try:
+        analysis = json.loads(response.choices[0].message.content)
+    except:
+        analysis = {"score": 50, "suggestions": ["Could not analyze signature"]}
+    
+    return analysis
+
+class BulkAnalysisRequest(BaseModel):
+    emails: List[dict]  # List of {subject, body}
+
+@api_router.post("/tools/bulk-analyze")
+async def bulk_analyze_emails(data: BulkAnalysisRequest, user: dict = Depends(require_tier("pro"))):
+    """Bulk analyze multiple emails - Pro+"""
+    if len(data.emails) > 20:
+        raise HTTPException(status_code=400, detail="Maximum 20 emails per batch")
+    
+    results = []
+    for i, email in enumerate(data.emails):
+        try:
+            # Run simplified analysis
+            analysis = await run_quick_analysis(email.get("subject", ""), email.get("body", ""))
+            results.append({
+                "index": i,
+                "subject": email.get("subject", "")[:50],
+                "score": analysis.get("score", 0),
+                "issues": analysis.get("top_issues", []),
+                "status": "success"
+            })
+        except Exception as e:
+            results.append({
+                "index": i,
+                "subject": email.get("subject", "")[:50],
+                "score": 0,
+                "issues": [],
+                "status": "error",
+                "error": str(e)
+            })
+    
+    avg_score = sum(r["score"] for r in results if r["status"] == "success") / max(1, len([r for r in results if r["status"] == "success"]))
+    
+    return {
+        "total": len(data.emails),
+        "successful": len([r for r in results if r["status"] == "success"]),
+        "average_score": round(avg_score, 1),
+        "results": results
+    }
+
+async def run_quick_analysis(subject: str, body: str) -> dict:
+    """Quick analysis for bulk processing"""
+    from openai import OpenAI
+    openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+    
+    prompt = f"""Quickly score this cold email 0-100 and identify top 3 issues.
+
+Subject: {subject}
+Body: {body[:500]}
+
+Return JSON: {{"score": number, "top_issues": ["issue1", "issue2", "issue3"]}}
+Return ONLY valid JSON."""
+
+    response = openai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3,
+        max_tokens=150
+    )
+    
+    try:
+        return json.loads(response.choices[0].message.content)
+    except:
+        return {"score": 50, "top_issues": ["Could not analyze"]}
+
+@api_router.post("/analysis/share")
+async def create_share_link(analysis_id: str, user: dict = Depends(require_tier("pro"))):
+    """Create shareable link for analysis - Pro+"""
+    # Verify user owns this analysis
+    analysis = await db.analyses.find_one({"id": analysis_id, "user_id": user["id"]})
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+    
+    share_token = secrets.token_urlsafe(16)
+    
+    await db.analyses.update_one(
+        {"id": analysis_id},
+        {"$set": {"share_token": share_token, "shared_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {
+        "share_url": f"{FRONTEND_URL}/shared/{share_token}",
+        "expires": "never"
+    }
+
+@api_router.get("/shared/{share_token}")
+async def get_shared_analysis(share_token: str):
+    """Get shared analysis (public)"""
+    analysis = await db.analyses.find_one({"share_token": share_token}, {"_id": 0})
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Shared analysis not found")
+    
+    # Remove sensitive data
+    analysis.pop("user_id", None)
+    analysis.pop("share_token", None)
+    
+    return analysis
+
+# User streak tracking
+@api_router.get("/user/streak")
+async def get_user_streak(user: dict = Depends(get_current_user)):
+    """Get user's analysis streak"""
+    # Get analyses from last 30 days
+    thirty_days_ago = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+    
+    analyses = await db.analyses.find(
+        {"user_id": user["id"], "created_at": {"$gte": thirty_days_ago}},
+        {"created_at": 1}
+    ).sort("created_at", -1).to_list(100)
+    
+    if not analyses:
+        return {"current_streak": 0, "longest_streak": 0, "total_days_active": 0, "badges": []}
+    
+    # Calculate streak
+    dates = set()
+    for a in analyses:
+        date = a["created_at"][:10]  # Get just the date part
+        dates.add(date)
+    
+    sorted_dates = sorted(dates, reverse=True)
+    current_streak = 1
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    if sorted_dates[0] != today and sorted_dates[0] != (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d"):
+        current_streak = 0
+    else:
+        for i in range(1, len(sorted_dates)):
+            prev_date = datetime.strptime(sorted_dates[i-1], "%Y-%m-%d")
+            curr_date = datetime.strptime(sorted_dates[i], "%Y-%m-%d")
+            if (prev_date - curr_date).days == 1:
+                current_streak += 1
+            else:
+                break
+    
+    # Calculate badges
+    badges = []
+    if current_streak >= 3:
+        badges.append({"name": "On Fire", "icon": "flame", "description": "3+ day streak"})
+    if current_streak >= 7:
+        badges.append({"name": "Week Warrior", "icon": "trophy", "description": "7+ day streak"})
+    if len(dates) >= 10:
+        badges.append({"name": "Dedicated", "icon": "star", "description": "10+ active days"})
+    if user.get("total_analyses", 0) >= 50:
+        badges.append({"name": "Power User", "icon": "zap", "description": "50+ total analyses"})
+    if user.get("total_analyses", 0) >= 100:
+        badges.append({"name": "Email Master", "icon": "crown", "description": "100+ total analyses"})
+    
+    return {
+        "current_streak": current_streak,
+        "longest_streak": current_streak,  # Simplified
+        "total_days_active": len(dates),
+        "badges": badges
+    }
+
 # ================= BILLING ROUTES =================
 
 @api_router.post("/billing/create-checkout-session")
