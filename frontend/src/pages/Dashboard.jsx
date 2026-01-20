@@ -149,6 +149,24 @@ const Dashboard = () => {
             )}
           </div>
         )}
+
+        {/* Badges Section */}
+        {streak?.badges && streak.badges.length > 0 && (
+          <div className="bg-theme-secondary border border-theme p-6">
+            <p className="text-xs font-mono tracking-widest uppercase text-theme-dim mb-4">Your Badges</p>
+            <div className="flex flex-wrap gap-3">
+              {streak.badges.map((badge, i) => (
+                <div key={i} className="flex items-center gap-2 bg-[#d4af37]/10 border border-[#d4af37]/20 px-4 py-2 rounded">
+                  <span className="text-[#d4af37]">{badgeIcons[badge.icon] || <Star className="w-4 h-4" />}</span>
+                  <div>
+                    <p className="text-sm font-medium text-[#d4af37]">{badge.name}</p>
+                    <p className="text-[10px] text-zinc-500">{badge.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         
         {/* Recent Analyses */}
         <div className="bg-theme-secondary border border-theme overflow-hidden">
