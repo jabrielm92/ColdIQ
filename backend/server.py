@@ -1357,7 +1357,7 @@ async def analyze_email(data: EmailAnalysisRequest, user: dict = Depends(get_cur
             detail=f"Monthly analysis limit reached ({features['analyses_limit']}). Please upgrade your plan."
         )
     
-    api_key = os.environ.get('EMERGENT_LLM_KEY')
+    api_key = os.environ.get('OPENAI_API_KEY')
     if not api_key:
         raise HTTPException(status_code=500, detail="AI service not configured")
     
@@ -1558,7 +1558,7 @@ async def analyze_sequence(data: SequenceAnalysisRequest, user: dict = Depends(g
     if len(data.emails) > 5:
         raise HTTPException(status_code=400, detail="Maximum 5 emails per sequence")
     
-    api_key = os.environ.get('EMERGENT_LLM_KEY')
+    api_key = os.environ.get('OPENAI_API_KEY')
     if not api_key:
         raise HTTPException(status_code=500, detail="AI service not configured")
     
