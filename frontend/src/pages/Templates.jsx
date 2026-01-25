@@ -286,12 +286,12 @@ const Templates = () => {
               <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
                 <DialogTrigger asChild>
                   <Button 
-                    className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs"
+                    className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs sm:text-sm"
                     disabled={!isPro}
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create
-                    {!isPro && <Lock className="w-3 h-3 ml-2" />}
+                    <Plus className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Create</span>
+                    {!isPro && <Lock className="w-3 h-3 ml-1 sm:ml-2" />}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-zinc-900 border-zinc-800">
