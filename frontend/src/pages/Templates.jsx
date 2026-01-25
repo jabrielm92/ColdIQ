@@ -187,24 +187,24 @@ const Templates = () => {
       <div className="p-6 lg:p-10" data-testid="templates-page">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
-              <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-3">Email Library</p>
-              <h1 className="font-serif text-4xl tracking-tight">Templates</h1>
+              <p className="text-xs font-mono tracking-widest uppercase text-zinc-600 mb-2 sm:mb-3">Email Library</p>
+              <h1 className="font-serif text-2xl sm:text-4xl tracking-tight">Templates</h1>
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {/* AI Generate Button */}
               <Dialog open={showAIDialog} onOpenChange={setShowAIDialog}>
                 <DialogTrigger asChild>
                   <Button 
                     variant="outline" 
-                    className="border-violet-500/30 text-violet-400 hover:bg-violet-500/10 rounded-none"
+                    className="border-violet-500/30 text-violet-400 hover:bg-violet-500/10 rounded-none text-xs sm:text-sm"
                     disabled={!isPro}
                   >
-                    <Wand2 className="w-4 h-4 mr-2" />
-                    AI Generate
-                    {!isPro && <Lock className="w-3 h-3 ml-2" />}
+                    <Wand2 className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">AI Generate</span>
+                    {!isPro && <Lock className="w-3 h-3 ml-1 sm:ml-2" />}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-zinc-900 border-zinc-800">
