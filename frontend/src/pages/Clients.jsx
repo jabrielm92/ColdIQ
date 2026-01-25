@@ -27,7 +27,7 @@ const Clients = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newClient, setNewClient] = useState({ name: "", industry: "", contact_email: "" });
 
-  const isAgency = user?.subscription_tier === "agency" || user?.subscription_tier === "growth_agency";
+  const isAgency = user?.subscription_tier === "agency" || user?.subscription_tier === "growth_agency" || user?.subscription_tier === "growth_agency";
 
   useEffect(() => {
     if (isAgency) {

@@ -18,7 +18,7 @@ const TeamAnalytics = () => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const isAgency = user?.subscription_tier === "agency";
+  const isAgency = user?.subscription_tier === "agency" || user?.subscription_tier === "growth_agency";
 
   useEffect(() => {
     if (isAgency) {

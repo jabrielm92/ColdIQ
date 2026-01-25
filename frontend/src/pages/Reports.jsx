@@ -17,7 +17,7 @@ const Reports = () => {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
 
-  const isAgency = user?.subscription_tier === "agency" || user?.subscription_tier === "growth_agency";
+  const isAgency = user?.subscription_tier === "agency" || user?.subscription_tier === "growth_agency" || user?.subscription_tier === "growth_agency";
 
   useEffect(() => {
     if (isAgency) {

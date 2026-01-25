@@ -15,7 +15,7 @@ const Campaigns = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const isAgency = user?.subscription_tier === "agency" || user?.subscription_tier === "growth_agency";
+  const isAgency = user?.subscription_tier === "agency" || user?.subscription_tier === "growth_agency" || user?.subscription_tier === "growth_agency";
 
   useEffect(() => {
     if (isAgency) {
