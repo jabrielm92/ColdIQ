@@ -2831,9 +2831,13 @@ class FollowUpRequest(BaseModel):
 async def generate_followup_sequence(data: FollowUpRequest, user: dict = Depends(require_tier("pro"))):
     """Generate follow-up email sequence - Pro+"""
     from openai import OpenAI
-    openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+    api_key = os.environ.get('OPENAI_API_KEY')
+    if not api_key:
+        raise HTTPException(status_code=500, detail="AI service not configured")
     
-    prompt = f"""Based on this initial cold email, generate a {data.num_followups}-email follow-up sequence.
+    openai_client = OpenAI(api_key=api_key)
+    
+    prompt = f"""Based on this initial cold email, generate exactly {data.num_followups} follow-up emails.
 
 Initial Email Subject: {data.subject}
 Initial Email Body:
@@ -2841,25 +2845,37 @@ Initial Email Body:
 
 {f"Context: {data.context}" if data.context else ""}
 
-For each follow-up, provide:
-1. Days after previous email (suggested timing)
-2. Subject line
-3. Email body (keep short, 50-100 words)
-4. Strategy (what angle this follow-up takes)
+Return a JSON array with {data.num_followups} objects. Each object must have:
+- "days_after": integer (days after previous email, e.g., 3, 5, 7)
+- "subject": string (follow-up subject line)
+- "body": string (email body, 50-100 words)
+- "strategy": string (brief description of the approach)
 
-Return as JSON array with objects containing: days_after, subject, body, strategy
+Example format:
+[{{"days_after": 3, "subject": "Following up on my previous email", "body": "Hi, just wanted to...", "strategy": "gentle reminder"}}]
 
-Return ONLY valid JSON array."""
+Return ONLY the JSON array, no markdown, no explanation."""
 
-    response = openai_client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7
-    )
-    
     try:
-        sequence = json.loads(response.choices[0].message.content)
-    except:
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7
+        )
+        
+        content = response.choices[0].message.content.strip()
+        # Remove markdown code blocks if present
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        content = content.strip()
+        
+        sequence = json.loads(content)
+        if not isinstance(sequence, list):
+            sequence = [sequence]
+    except Exception as e:
+        logger.error(f"Sequence generation error: {e}")
         sequence = []
     
     return {
