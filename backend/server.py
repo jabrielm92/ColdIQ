@@ -3408,16 +3408,24 @@ async def stripe_webhook(request: Request):
             import json
             event = json.loads(body)
         
-        if event.get("type") == "checkout.session.completed":
+        event_type = event.get("type")
+        
+        # Handle checkout completion (new subscription)
+        if event_type == "checkout.session.completed":
             session = event["data"]["object"]
             
-            if session.get("payment_status") == "paid":
+            if session.get("payment_status") == "paid" or session.get("mode") == "subscription":
                 session_id = session["id"]
                 metadata = session.get("metadata", {})
+                subscription_id = session.get("subscription")
                 
                 await db.payment_transactions.update_one(
                     {"session_id": session_id},
-                    {"$set": {"payment_status": "paid", "updated_at": datetime.now(timezone.utc).isoformat()}}
+                    {"$set": {
+                        "payment_status": "paid", 
+                        "subscription_id": subscription_id,
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }}
                 )
                 
                 user_id = metadata.get("user_id")
@@ -3427,7 +3435,8 @@ async def stripe_webhook(request: Request):
                     update_data = {
                         "subscription_tier": plan_tier,
                         "subscription_status": "active",
-                        "stripe_customer_id": session.get("customer")
+                        "stripe_customer_id": session.get("customer"),
+                        "stripe_subscription_id": subscription_id
                     }
                     
                     if plan_tier in ["agency", "growth_agency"]:
@@ -3445,6 +3454,60 @@ async def stripe_webhook(request: Request):
                     
                     await db.users.update_one({"id": user_id}, {"$set": update_data})
                     logger.info(f"✅ Subscription activated: {user_id} -> {plan_tier}")
+        
+        # Handle successful recurring payment
+        elif event_type == "invoice.paid":
+            invoice = event["data"]["object"]
+            subscription_id = invoice.get("subscription")
+            customer_id = invoice.get("customer")
+            
+            if subscription_id:
+                # Keep subscription active
+                await db.users.update_one(
+                    {"stripe_subscription_id": subscription_id},
+                    {"$set": {"subscription_status": "active", "last_payment_at": datetime.now(timezone.utc).isoformat()}}
+                )
+                logger.info(f"✅ Recurring payment successful: {subscription_id}")
+        
+        # Handle failed payment
+        elif event_type == "invoice.payment_failed":
+            invoice = event["data"]["object"]
+            subscription_id = invoice.get("subscription")
+            
+            if subscription_id:
+                await db.users.update_one(
+                    {"stripe_subscription_id": subscription_id},
+                    {"$set": {"subscription_status": "past_due"}}
+                )
+                logger.warning(f"⚠️ Payment failed: {subscription_id}")
+        
+        # Handle subscription cancelled
+        elif event_type == "customer.subscription.deleted":
+            subscription = event["data"]["object"]
+            subscription_id = subscription.get("id")
+            
+            if subscription_id:
+                await db.users.update_one(
+                    {"stripe_subscription_id": subscription_id},
+                    {"$set": {
+                        "subscription_tier": "free",
+                        "subscription_status": "cancelled",
+                        "stripe_subscription_id": None
+                    }}
+                )
+                logger.info(f"🚫 Subscription cancelled: {subscription_id}")
+        
+        # Handle subscription updated (plan change)
+        elif event_type == "customer.subscription.updated":
+            subscription = event["data"]["object"]
+            subscription_id = subscription.get("id")
+            status = subscription.get("status")
+            
+            if subscription_id and status == "active":
+                await db.users.update_one(
+                    {"stripe_subscription_id": subscription_id},
+                    {"$set": {"subscription_status": "active"}}
+                )
         
         return {"status": "success"}
     except Exception as e:
