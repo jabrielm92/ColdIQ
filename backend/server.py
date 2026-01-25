@@ -2707,27 +2707,45 @@ async def generate_subject_variants(data: dict, user: dict = Depends(require_tie
         raise HTTPException(status_code=400, detail="Subject is required")
     
     from openai import OpenAI
-    openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+    api_key = os.environ.get('OPENAI_API_KEY')
+    if not api_key:
+        raise HTTPException(status_code=500, detail="AI service not configured")
+    
+    openai_client = OpenAI(api_key=api_key)
     
     prompt = f"""Generate 5 A/B test variants of this email subject line for {industry} industry.
 Original: "{subject}"
 
-Return JSON array with exactly 5 variants, each with:
-- subject: the variant subject line
-- style: brief style description (e.g., "question-based", "urgency", "personalized", "benefit-focused", "curiosity")
-- expected_lift: estimated % improvement over original (-10 to +30)
+Return a JSON array with exactly 5 objects. Each object must have:
+- "subject": the variant subject line (string)
+- "style": brief style description (string, e.g., "question-based", "urgency", "personalized", "benefit-focused", "curiosity")
+- "expected_lift": estimated percentage improvement over original (integer, -10 to +30)
 
-Return ONLY valid JSON array, no other text."""
+Example format:
+[{{"subject": "Example subject", "style": "curiosity", "expected_lift": 15}}]
 
-    response = openai_client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.8
-    )
-    
+Return ONLY the JSON array, no markdown, no explanation."""
+
     try:
-        variants = json.loads(response.choices[0].message.content)
-    except:
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.8
+        )
+        
+        content = response.choices[0].message.content.strip()
+        # Remove markdown code blocks if present
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        content = content.strip()
+        
+        variants = json.loads(content)
+        if not isinstance(variants, list):
+            variants = [variants]
+    except Exception as e:
+        logger.error(f"Subject variants error: {e}")
         variants = [{"subject": subject, "style": "original", "expected_lift": 0}]
     
     return {"original": subject, "variants": variants[:5]}
