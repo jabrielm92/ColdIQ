@@ -40,35 +40,35 @@ const Campaigns = () => {
   if (!isAgency) {
     return (
       <DashboardLayout>
-        <div className="p-6 lg:p-8">
+        <div className="p-4 sm:p-6 lg:p-8">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center py-20">
-              <div className="w-20 h-20 bg-zinc-800 flex items-center justify-center mx-auto mb-6">
-                <Lock className="w-10 h-10 text-zinc-600" />
+            <div className="text-center py-12 sm:py-20">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-zinc-800 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-zinc-600" />
               </div>
-              <h1 className="font-serif text-3xl mb-4">Campaign Analytics</h1>
-              <p className="text-zinc-500 max-w-md mx-auto mb-8">
+              <h1 className="font-serif text-2xl sm:text-3xl mb-3 sm:mb-4">Campaign Analytics</h1>
+              <p className="text-zinc-500 text-sm sm:text-base max-w-md mx-auto mb-6 sm:mb-8 px-4">
                 Track performance across entire campaigns, not just individual emails. See which angles, subject lines, and CTAs perform best.
               </p>
               
               {/* Preview stats */}
-              <div className="grid grid-cols-3 gap-4 max-w-md mx-auto mb-8">
-                <div className="bg-zinc-900/50 border border-zinc-800 p-4">
-                  <p className="text-2xl font-mono font-bold text-emerald-400">+34%</p>
-                  <p className="text-[10px] text-zinc-500">Reply Rate</p>
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 max-w-md mx-auto mb-6 sm:mb-8 px-4">
+                <div className="bg-zinc-900/50 border border-zinc-800 p-3 sm:p-4">
+                  <p className="text-lg sm:text-2xl font-mono font-bold text-emerald-400">+34%</p>
+                  <p className="text-[9px] sm:text-[10px] text-zinc-500">Reply Rate</p>
                 </div>
-                <div className="bg-zinc-900/50 border border-zinc-800 p-4">
-                  <p className="text-2xl font-mono font-bold text-[#d4af37]">72</p>
-                  <p className="text-[10px] text-zinc-500">Avg Score</p>
+                <div className="bg-zinc-900/50 border border-zinc-800 p-3 sm:p-4">
+                  <p className="text-lg sm:text-2xl font-mono font-bold text-[#d4af37]">72</p>
+                  <p className="text-[9px] sm:text-[10px] text-zinc-500">Avg Score</p>
                 </div>
-                <div className="bg-zinc-900/50 border border-zinc-800 p-4">
-                  <p className="text-2xl font-mono font-bold">24</p>
-                  <p className="text-[10px] text-zinc-500">Emails</p>
+                <div className="bg-zinc-900/50 border border-zinc-800 p-3 sm:p-4">
+                  <p className="text-lg sm:text-2xl font-mono font-bold">24</p>
+                  <p className="text-[9px] sm:text-[10px] text-zinc-500">Emails</p>
                 </div>
               </div>
               
               <Link to="/pricing">
-                <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-8 py-4 h-auto">
+                <Button className="bg-[#d4af37] text-black hover:bg-[#b5952f] rounded-none font-bold uppercase tracking-wider text-xs px-6 sm:px-8 py-3 sm:py-4 h-auto">
                   Upgrade to Growth Agency
                 </Button>
               </Link>
