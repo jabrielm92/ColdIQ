@@ -412,7 +412,7 @@ const Templates = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.03 }}
-                    className={`bg-zinc-900/50 border border-zinc-800 p-6 hover:border-zinc-700 transition-colors group ${
+                    className={`bg-zinc-900/50 border border-zinc-800 p-4 sm:p-6 hover:border-zinc-700 transition-colors group ${
                       !accessible ? 'opacity-60' : ''
                     }`}
                   >
