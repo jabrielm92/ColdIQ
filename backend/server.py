@@ -2736,30 +2736,6 @@ async def generate_api_key(user: dict = Depends(require_tier("agency"))):
     
     return {"api_key": api_key}
 
-@api_router.get("/team/analytics")
-async def get_team_analytics(user: dict = Depends(require_tier("agency"))):
-    """Get team analytics"""
-    team_id = user.get("team_id")
-    if not team_id:
-        return {"members": [], "total_analyses": 0, "avg_score": 0}
-    
-    members = await db.users.find({"team_id": team_id}, {"_id": 0, "password_hash": 0}).to_list(50)
-    
-    total_analyses = 0
-    total_score = 0
-    for member in members:
-        analyses = await db.analyses.find({"user_id": member["id"]}).to_list(100)
-        member["analyses_count"] = len(analyses)
-        member["avg_score"] = round(sum(a.get("analysis_score", 0) for a in analyses) / max(len(analyses), 1), 1)
-        total_analyses += len(analyses)
-        total_score += sum(a.get("analysis_score", 0) for a in analyses)
-    
-    return {
-        "members": members,
-        "total_analyses": total_analyses,
-        "avg_score": round(total_score / max(total_analyses, 1), 1)
-    }
-
 # ================= QUICK WINS & NEW FEATURES =================
 
 # Spam trigger words database
