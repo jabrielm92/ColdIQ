@@ -3262,7 +3262,7 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
     success_url = f"{host_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{host_url}/pricing"
     
-    # Create Stripe checkout session
+    # Create Stripe checkout session with SUBSCRIPTION mode for recurring billing
     session = stripe.checkout.Session.create(
         payment_method_types=["card"],
         line_items=[{
@@ -3270,13 +3270,17 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
                 "currency": "usd",
                 "unit_amount": int(amount * 100),  # Stripe uses cents
                 "product_data": {
-                    "name": f"ColdIQ {actual_tier.title()} Plan ({('Annual' if is_annual else 'Monthly')})",
-                    "description": f"ColdIQ {actual_tier.title()} subscription"
+                    "name": f"ColdIQ {actual_tier.title()} Plan",
+                    "description": f"ColdIQ {actual_tier.title()} subscription - {'Annual' if is_annual else 'Monthly'} billing"
+                },
+                "recurring": {
+                    "interval": "year" if is_annual else "month",
+                    "interval_count": 1
                 }
             },
             "quantity": 1
         }],
-        mode="payment",
+        mode="subscription",
         success_url=success_url,
         cancel_url=cancel_url,
         customer_email=user["email"],
@@ -3285,6 +3289,12 @@ async def create_checkout_session(data: CheckoutRequest, request: Request, user:
             "plan_tier": actual_tier,
             "billing_period": "annual" if is_annual else "monthly",
             "user_email": user["email"]
+        },
+        subscription_data={
+            "metadata": {
+                "user_id": user["id"],
+                "plan_tier": actual_tier
+            }
         }
     )
     
