@@ -385,9 +385,9 @@ const Templates = () => {
 
           {/* Templates Grid */}
           {loading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1,2,3,4,5,6].map(i => (
-                <div key={i} className="bg-zinc-900/50 border border-zinc-800 p-6 animate-pulse">
+                <div key={i} className="bg-zinc-900/50 border border-zinc-800 p-4 sm:p-6 animate-pulse">
                   <div className="h-4 w-32 bg-zinc-800 rounded mb-4" />
                   <div className="h-3 w-full bg-zinc-800 rounded mb-2" />
                   <div className="h-3 w-2/3 bg-zinc-800 rounded" />
@@ -395,13 +395,13 @@ const Templates = () => {
               ))}
             </div>
           ) : filteredTemplates.length === 0 ? (
-            <div className="text-center py-16 bg-zinc-900/30 border border-zinc-800">
-              <FileText className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
+            <div className="text-center py-12 sm:py-16 bg-zinc-900/30 border border-zinc-800">
+              <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-zinc-600 mx-auto mb-4" />
               <p className="text-zinc-400 mb-2">No templates found</p>
               <p className="text-sm text-zinc-600">Try adjusting your filters or create a new template</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {filteredTemplates.map((template, i) => {
                 const accessible = isTemplateAccessible(template);
                 const tierLabel = template.tier === "pro" ? "PRO" : template.tier === "agency" ? "AGENCY" : null;
