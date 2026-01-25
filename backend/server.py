@@ -2618,6 +2618,148 @@ async def update_support_message(
     
     return {"message": "Status updated"}
 
+# ================= AGENCY FEATURES =================
+
+@api_router.get("/reports")
+async def get_reports(user: dict = Depends(require_tier("agency"))):
+    """Get all reports for agency user"""
+    reports = await db.reports.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return {"reports": reports}
+
+@api_router.post("/reports/generate")
+async def generate_report(data: dict, user: dict = Depends(require_tier("agency"))):
+    """Generate a new report"""
+    report_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Get user's recent analyses for the report
+    analyses = await db.analyses.find({"user_id": user["id"]}).sort("created_at", -1).limit(50).to_list(50)
+    
+    avg_score = sum(a.get("analysis_score", 0) for a in analyses) / max(len(analyses), 1)
+    
+    report = {
+        "id": report_id,
+        "user_id": user["id"],
+        "client_id": data.get("client_id"),
+        "title": f"Performance Report - {datetime.now().strftime('%B %Y')}",
+        "period": "Last 30 days",
+        "metrics": {
+            "total_analyses": len(analyses),
+            "avg_score": round(avg_score, 1),
+            "improvement": round((avg_score - 50) / 50 * 100, 1) if analyses else 0
+        },
+        "created_at": now
+    }
+    
+    await db.reports.insert_one(report)
+    return {"report": report}
+
+@api_router.get("/reports/{report_id}/download")
+async def download_report(report_id: str, user: dict = Depends(require_tier("agency"))):
+    """Get report data for download"""
+    report = await db.reports.find_one({"id": report_id, "user_id": user["id"]}, {"_id": 0})
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    return report
+
+@api_router.get("/campaigns")
+async def get_campaigns(user: dict = Depends(require_tier("agency"))):
+    """Get all campaigns"""
+    campaigns = await db.campaigns.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return {"campaigns": campaigns}
+
+@api_router.post("/campaigns")
+async def create_campaign(data: dict, user: dict = Depends(require_tier("agency"))):
+    """Create a new campaign"""
+    campaign_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    campaign = {
+        "id": campaign_id,
+        "user_id": user["id"],
+        "name": data.get("name", "Untitled Campaign"),
+        "client_id": data.get("client_id"),
+        "status": "active",
+        "emails_count": 0,
+        "avg_score": 0,
+        "created_at": now
+    }
+    
+    await db.campaigns.insert_one(campaign)
+    return {"campaign": campaign}
+
+@api_router.get("/clients")
+async def get_clients(user: dict = Depends(require_tier("agency"))):
+    """Get all clients"""
+    clients = await db.clients.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return {"clients": clients}
+
+@api_router.post("/clients")
+async def create_client(data: dict, user: dict = Depends(require_tier("agency"))):
+    """Create a new client"""
+    client_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    client = {
+        "id": client_id,
+        "user_id": user["id"],
+        "name": data.get("name", ""),
+        "company": data.get("company", ""),
+        "email": data.get("email", ""),
+        "industry": data.get("industry", ""),
+        "status": "active",
+        "created_at": now
+    }
+    
+    await db.clients.insert_one(client)
+    return {"client": client}
+
+@api_router.get("/api-key")
+async def get_api_key(user: dict = Depends(require_tier("agency"))):
+    """Get user's API key"""
+    key_doc = await db.api_keys.find_one({"user_id": user["id"]}, {"_id": 0})
+    if not key_doc:
+        raise HTTPException(status_code=404, detail="No API key found")
+    return {"api_key": key_doc.get("key")}
+
+@api_router.post("/api-key/generate")
+async def generate_api_key(user: dict = Depends(require_tier("agency"))):
+    """Generate or regenerate API key"""
+    api_key = f"ciq_{secrets.token_urlsafe(32)}"
+    now = datetime.now(timezone.utc).isoformat()
+    
+    await db.api_keys.update_one(
+        {"user_id": user["id"]},
+        {"$set": {"key": api_key, "updated_at": now, "user_id": user["id"]}},
+        upsert=True
+    )
+    
+    return {"api_key": api_key}
+
+@api_router.get("/team/analytics")
+async def get_team_analytics(user: dict = Depends(require_tier("agency"))):
+    """Get team analytics"""
+    team_id = user.get("team_id")
+    if not team_id:
+        return {"members": [], "total_analyses": 0, "avg_score": 0}
+    
+    members = await db.users.find({"team_id": team_id}, {"_id": 0, "password_hash": 0}).to_list(50)
+    
+    total_analyses = 0
+    total_score = 0
+    for member in members:
+        analyses = await db.analyses.find({"user_id": member["id"]}).to_list(100)
+        member["analyses_count"] = len(analyses)
+        member["avg_score"] = round(sum(a.get("analysis_score", 0) for a in analyses) / max(len(analyses), 1), 1)
+        total_analyses += len(analyses)
+        total_score += sum(a.get("analysis_score", 0) for a in analyses)
+    
+    return {
+        "members": members,
+        "total_analyses": total_analyses,
+        "avg_score": round(total_score / max(total_analyses, 1), 1)
+    }
+
 # ================= QUICK WINS & NEW FEATURES =================
 
 # Spam trigger words database
